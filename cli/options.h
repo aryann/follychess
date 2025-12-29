@@ -16,10 +16,11 @@ class Option {
 
   [[nodiscard]] virtual std::string_view GetType() const = 0;
 
-  virtual void Set(std::string_view value, CommandState& game_state) = 0;
+  virtual std::expected<void, std::string> Set(std::string_view value,
+                                               CommandState& state) = 0;
 };
 
-std::vector<const Option*> GetOptions();
+std::vector<Option*> GetOptions();
 
 }  // namespace follychess
 

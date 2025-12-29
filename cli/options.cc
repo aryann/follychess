@@ -13,12 +13,15 @@ class LogDirectory : public Option {
     return "type string default <empty>";
   }
 
-  void Set(std::string_view value, CommandState& game_state) override {}
+  std::expected<void, std::string> Set(std::string_view value,
+                                       CommandState& state) override {
+    return {};
+  }
 };
 
 }  // namespace
 
-std::vector<const Option*> GetOptions() {
+std::vector<Option*> GetOptions() {
   static LogDirectory kLogDirectory;
 
   return {

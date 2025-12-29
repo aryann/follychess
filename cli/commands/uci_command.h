@@ -27,6 +27,38 @@ class Uci : public Command {
   }
 };
 
+class SetOption : public Command {
+ public:
+  explicit SetOption(CommandState& state) : state_(state) {}
+
+  std::expected<void, std::string> Run(
+      std::vector<std::string_view> args) override {
+    if (args.size() != 4) {
+      return std::unexpected(
+          std::format("Invalid setoption command: {}", args));
+    }
+
+    if (args[0] != "name" || args[2] != "value") {
+      return std::unexpected(
+          std::format("Invalid setoption command: {}", args));
+    }
+
+    std::string_view name = args[1];
+    std::string_view value = args[3];
+
+    for (Option* option : GetOptions()) {
+      if (option->GetName() == name) {
+        return option->Set(value, state_);
+      }
+    }
+
+    return std::unexpected(std::format("Invalid option: {}", name));
+  }
+
+ private:
+  CommandState& state_;
+};
+
 class Quit : public Command {
   std::expected<void, std::string> Run(
       std::vector<std::string_view> args) override {
