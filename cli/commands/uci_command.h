@@ -5,6 +5,7 @@
 #include <print>
 
 #include "cli/command.h"
+#include "cli/options.h"
 #include "search/search.h"
 
 namespace follychess {
@@ -15,6 +16,12 @@ class Uci : public Command {
       std::vector<std::string_view> args) override {
     std::println(std::cout, "id name chessengine");
     std::println(std::cout, "id author Aryan Naraghi");
+    std::println(std::cout);
+
+    for (const Option* option : GetOptions()) {
+      std::println(std::cout, "option name {} {}", option->GetName(),
+                   option->GetType());
+    }
     std::println(std::cout, "uciok");
     return {};
   }

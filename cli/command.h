@@ -8,7 +8,13 @@
 #include <variant>
 #include <vector>
 
+#include "engine/game.h"
+
 namespace follychess {
+
+struct CommandState {
+  Game game;
+};
 
 class Command {
  public:

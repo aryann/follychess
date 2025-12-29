@@ -65,6 +65,7 @@ cc_library(
     ],
     deps = [
         "//cli:command",
+        "//cli:options",
         "//engine:game",
         "//search",
     ],

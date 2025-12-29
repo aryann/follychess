@@ -50,3 +50,16 @@ cc_binary(
         "@abseil-cpp//absl/strings",
     ],
 )
+
+cc_library(
+    name = "options",
+    srcs = ["options.cc"],
+    hdrs = ["options.h"],
+    visibility = [
+        "//cli/commands:__subpackages__",
+    ],
+    deps = [
+        ":command",
+        "@abseil-cpp//absl/strings",
+    ],
+)
