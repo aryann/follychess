@@ -7,8 +7,6 @@
 #include "commands/perft_command.h"
 #include "commands/position_command.h"
 #include "commands/uci_command.h"
-#include "engine/move_generator.h"
-#include "engine/position.h"
 
 namespace follychess {
 
@@ -29,7 +27,6 @@ CommandDispatcher MakeCommandDispatcher(CommandState& state) {
   dispatcher.Add("uci", std::make_unique<Uci>(state));
   dispatcher.Add("setoption", std::make_unique<SetOption>(state));
   dispatcher.Add("go", std::make_unique<Go>(state));
-  dispatcher.Add("quit", std::make_unique<Quit>());
 
   return dispatcher;
 }

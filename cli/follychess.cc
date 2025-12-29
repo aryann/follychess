@@ -5,7 +5,7 @@
 #include "absl/strings/str_split.h"
 #include "cli.h"
 
-[[noreturn]] int main(int argc, char **argv) {
+int main(int argc, char **argv) {
   std::println(R"(
         ,,
       ,/  \
@@ -32,6 +32,10 @@
   while (true) {
     std::getline(std::cin, command);
     state.printer.PrintStdIn(command);
+
+    if (command == "quit") {
+      return EXIT_SUCCESS;
+    }
 
     std::vector<std::string_view> parts = absl::StrSplit(
         command, absl::ByAsciiWhitespace(), absl::SkipWhitespace());

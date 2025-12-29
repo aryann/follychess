@@ -64,13 +64,6 @@ class SetOption : public Command {
   CommandState& state_;
 };
 
-class Quit : public Command {
-  std::expected<void, std::string> Run(
-      std::vector<std::string_view> args) override {
-    std::exit(0);
-  }
-};
-
 class Go : public Command {
  public:
   explicit Go(CommandState& state) : state_(state) {}
