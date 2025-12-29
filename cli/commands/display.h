@@ -14,18 +14,16 @@ class Position;
 
 class Display : public Command {
  public:
-  explicit Display(const Game &game) : game_(game) {}
-
-  ~Display() override = default;
+  explicit Display(CommandState& state) : state_(state) {}
 
   std::expected<void, std::string> Run(
       std::vector<std::string_view> args) override {
-    std::println(std::cout, "{}", game_.GetPosition());
+    state_.printer.Println(std::cout, "{}", state_.game.GetPosition());
     return {};
   }
 
  private:
-  const Game &game_;
+  CommandState& state_;
 };
 
 }  // namespace follychess

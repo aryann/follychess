@@ -12,19 +12,24 @@ namespace follychess {
 
 class Uci : public Command {
  public:
+  explicit Uci(CommandState& state) : state_(state) {}
+
   std::expected<void, std::string> Run(
       std::vector<std::string_view> args) override {
-    std::println(std::cout, "id name chessengine");
-    std::println(std::cout, "id author Aryan Naraghi");
-    std::println(std::cout);
+    state_.printer.Println(std::cout, "id name chessengine");
+    state_.printer.Println(std::cout, "id author Aryan Naraghi");
+    state_.printer.Println(std::cout);
 
     for (const Option* option : GetOptions()) {
-      std::println(std::cout, "option name {} {}", option->GetName(),
-                   option->GetType());
+      state_.printer.Println(std::cout, "option name {} {}", option->GetName(),
+                             option->GetType());
     }
-    std::println(std::cout, "uciok");
+    state_.printer.Println(std::cout, "uciok");
     return {};
   }
+
+ private:
+  CommandState& state_;
 };
 
 class SetOption : public Command {
@@ -68,7 +73,7 @@ class Quit : public Command {
 
 class Go : public Command {
  public:
-  explicit Go(Game& game) : game_(game) {}
+  explicit Go(CommandState& state) : state_(state) {}
 
   std::expected<void, std::string> Run(
       std::vector<std::string_view> args) override {
@@ -85,14 +90,14 @@ class Go : public Command {
       }
     }
 
-    Move move =
-        Search(game_, SearchOptions().SetDepth(depth).SetLogEveryN(1 << 10));
-    std::println(std::cout, "bestmove {}", move);
+    Move move = Search(state_.game,
+                       SearchOptions().SetDepth(depth).SetLogEveryN(1 << 10));
+    state_.printer.Println(std::cout, "bestmove {}", move);
     return {};
   }
 
  private:
-  Game& game_;
+  CommandState& state_;
 };
 
 }  // namespace follychess

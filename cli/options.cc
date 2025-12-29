@@ -15,7 +15,7 @@ class LogDirectory : public Option {
 
   std::expected<void, std::string> Set(std::string_view value,
                                        CommandState& state) override {
-    return {};
+    return state.printer.SetLogFile(std::string(value));
   }
 };
 

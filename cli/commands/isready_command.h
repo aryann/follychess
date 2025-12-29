@@ -10,15 +10,16 @@ namespace follychess {
 
 class IsReady : public Command {
  public:
-  IsReady() = default;
-
-  ~IsReady() override = default;
+  explicit IsReady(CommandState& state) : state_(state) {}
 
   std::expected<void, std::string> Run(
       std::vector<std::string_view> args) override {
-    std::println(std::cout, "readyok");
+    state_.printer.Println(std::cout, "readyok");
     return {};
   }
+
+ private:
+  CommandState& state_;
 };
 
 }  // namespace follychess

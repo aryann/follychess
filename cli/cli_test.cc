@@ -71,7 +71,6 @@ class CliTest : public ::testing::Test {
     return command_dispatcher_.Run(command);
   }
 
- protected:
   CommandState state_;
   CommandDispatcher command_dispatcher_;
 

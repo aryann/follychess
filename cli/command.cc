@@ -15,6 +15,21 @@ struct overloaded : Ts... {
 
 }  // namespace
 
+void Printer::PrintStdIn(std::string_view in) const {
+  if (log_file_) {
+    *log_file_ << in << std::endl;
+  }
+}
+
+std::expected<void, std::string> Printer::SetLogFile(std::string filename) {
+  auto log_file = std::make_unique<std::ofstream>(filename);
+  if (!log_file->is_open()) {
+    return std::unexpected(std::format("Could not open file: {}", filename));
+  }
+  log_file_ = std::move(log_file);
+  return {};
+}
+
 CommandDispatcher &CommandDispatcher::Add(std::string arg,
                                           std::unique_ptr<Command> command) {
   command_map_[std::move(arg)] = std::move(command);

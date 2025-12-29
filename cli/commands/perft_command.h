@@ -14,7 +14,7 @@ namespace follychess {
 
 class PerftCommand : public Command {
  public:
-  explicit PerftCommand(Game &game) : game_(game) {}
+  explicit PerftCommand(CommandState& state) : state_(state) {}
 
   ~PerftCommand() override = default;
 
@@ -27,19 +27,20 @@ class PerftCommand : public Command {
 
     std::vector<std::size_t> depth_counts;
     std::map<Move, std::size_t> final_move_counts;
-    RunPerft(depth, game_.GetPosition(), depth_counts, final_move_counts);
+    RunPerft(depth, state_.game.GetPosition(), depth_counts, final_move_counts);
 
     for (auto [move, count] : final_move_counts) {
-      std::println(std::cout, "{}: {}", move, count);
+      state_.printer.Println(std::cout, "{}: {}", move, count);
     }
 
-    std::println(std::cout);
-    std::println(std::cout, "Nodes searched: {}", depth_counts.back());
+    state_.printer.Println(std::cout);
+    state_.printer.Println(std::cout, "Nodes searched: {}",
+                           depth_counts.back());
     return {};
   }
 
  private:
-  Game &game_;
+  CommandState& state_;
 };
 
 }  // namespace follychess
