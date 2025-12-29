@@ -1,7 +1,11 @@
 #include "options.h"
 
+#include <chrono>
+
 namespace follychess {
 namespace {
+
+namespace fs = std::filesystem;
 
 class LogDirectory : public Option {
  public:
@@ -13,9 +17,13 @@ class LogDirectory : public Option {
     return "type string default <empty>";
   }
 
-  std::expected<void, std::string> Set(std::string_view value,
+  std::expected<void, std::string> Set(std::string_view log_directory,
                                        CommandState& state) override {
-    return state.printer.SetLogFile(std::string(value));
+    auto now = std::chrono::system_clock::now();
+    const std::string iso_time_utc = std::format("{:%Y-%m-%dT%H:%M:%SZ}", now);
+    const fs::path path = fs::path(log_directory) / fs::path(iso_time_utc);
+
+    return state.printer.SetLogFile(path);
   }
 };
 

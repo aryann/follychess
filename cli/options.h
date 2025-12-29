@@ -16,7 +16,7 @@ class Option {
 
   [[nodiscard]] virtual std::string_view GetType() const = 0;
 
-  virtual std::expected<void, std::string> Set(std::string_view value,
+  virtual std::expected<void, std::string> Set(std::string_view log_directory,
                                                CommandState& state) = 0;
 };
 
