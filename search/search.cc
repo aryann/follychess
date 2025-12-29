@@ -22,6 +22,7 @@ class AlphaBetaSearcher {
         position_{game_.GetPosition()},
         requested_search_depth_{options.depth},
         log_every_n_{options.log_every_n},
+        logger_{options.logger},
         nodes_{0},
         transpositions_{position_} {}
 
@@ -169,9 +170,9 @@ class AlphaBetaSearcher {
 
     const int selective_depth = depth + additional_depth;
 
-    std::println(
-        std::cout, "info depth {} seldepth {} nodes {} nps {} tbhits {}", depth,
-        selective_depth, nodes_, nodes_per_second, transpositions_.GetHits());
+    logger_(std::format("info depth {} seldepth {} nodes {} nps {} tbhits {}",
+                        depth, selective_depth, nodes_, nodes_per_second,
+                        transpositions_.GetHits()));
   }
 
   Game game_;
@@ -179,6 +180,7 @@ class AlphaBetaSearcher {
 
   const int requested_search_depth_;
   const std::int64_t log_every_n_;
+  const std::function<void(std::string_view)> logger_;
 
   std::optional<Move> best_move_;
 

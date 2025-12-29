@@ -21,6 +21,13 @@ struct SearchOptions {
   }
 
   std::int64_t log_every_n = std::numeric_limits<std::int64_t>::max();
+
+  SearchOptions& SetLogger(std::function<void(std::string_view)> logger) {
+    this->logger = logger;
+    return *this;
+  }
+
+  std::function<void(std::string_view)> logger = [](std::string_view) {};
 };
 
 Move Search(const Game& game, const SearchOptions& options = SearchOptions());
