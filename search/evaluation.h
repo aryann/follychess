@@ -14,6 +14,9 @@ template <Side Side>
 template <Side Side>
 [[nodiscard]] int CountDoubledPawns(const Position& position);
 
+template <Side Side>
+[[nodiscard]] int CountBlockedPawns(const Position& position);
+
 [[nodiscard]] int Evaluate(const Position& position);
 
 }  // namespace follychess

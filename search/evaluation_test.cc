@@ -328,6 +328,127 @@ TEST(CountDoubledPawns, Gaps) {
               Eq(1));
 }
 
+TEST(CountBlockedPawns, White) {
+  EXPECT_THAT(CountBlockedPawns<kWhite>(MakePosition("8: . . . . . . . ."
+                                                     "7: . . . . . . . ."
+                                                     "6: . . . . . . . ."
+                                                     "5: . . . p . . . ."
+                                                     "4: . . . . . . . ."
+                                                     "3: . . . . . . . ."
+                                                     "2: . . . p . . . ."
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(0));
+
+  EXPECT_THAT(CountBlockedPawns<kWhite>(MakePosition("8: . . . . . . . ."
+                                                     "7: . . . . . . . ."
+                                                     "6: . . . . . . . ."
+                                                     "5: . . . p . . . ."
+                                                     "4: . . . P . . . ."
+                                                     "3: . . . . . . . ."
+                                                     "2: . . . . . . . ."
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(1));
+
+  EXPECT_THAT(CountBlockedPawns<kWhite>(MakePosition("8: . . . . . . . ."
+                                                     "7: . . . . . . . ."
+                                                     "6: . . . . . . . ."
+                                                     "5: . . . . . . . ."
+                                                     "4: . . . P . . . ."
+                                                     "3: . . . P . . . ."
+                                                     "2: . . . . . . . ."
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(1));
+
+  EXPECT_THAT(CountBlockedPawns<kWhite>(MakePosition("8: . . . . . . . ."
+                                                     "7: . . . . . . . ."
+                                                     "6: . . . . . . . ."
+                                                     "5: . . . n . . . ."
+                                                     "4: . . . P . . . ."
+                                                     "3: . . . . . . . ."
+                                                     "2: . . . . . . . ."
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(1));
+
+  EXPECT_THAT(CountBlockedPawns<kWhite>(MakePosition("8: . . . . . . . ."
+                                                     "7: . . . . . . . ."
+                                                     "6: . . . . . . . ."
+                                                     "5: p . . . . . . p"
+                                                     "4: P . . . . . . P"
+                                                     "3: . . . . . . . ."
+                                                     "2: . . . . . . . ."
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(2));
+}
+
+TEST(CountBlockedPawns, Black) {
+  EXPECT_THAT(CountBlockedPawns<kBlack>(MakePosition("8: . . . . . . . ."
+                                                     "7: . . . . . . . ."
+                                                     "6: . . . . . . . ."
+                                                     "5: . . . p . . . ."
+                                                     "4: . . . . . . . ."
+                                                     "3: . . . . . . . ."
+                                                     "2: . . . p . . . ."
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(0));
+
+  EXPECT_THAT(CountBlockedPawns<kBlack>(MakePosition("8: . . . . . . . ."
+                                                     "7: . . . . . . . ."
+                                                     "6: . . . . . . . ."
+                                                     "5: . . . . p . . ."
+                                                     "4: . . . . P . . ."
+                                                     "3: . . . . . . . ."
+                                                     "2: . . . . . . . ."
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(1));
+
+  EXPECT_THAT(CountBlockedPawns<kBlack>(MakePosition("8: . . . . . . . ."
+                                                     "7: . . . . . . . ."
+                                                     "6: . . . . . . . ."
+                                                     "5: . . . . p . . ."
+                                                     "4: . . . . . . . ."
+                                                     "3: . . . . P . . ."
+                                                     "2: . . . . . . . ."
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(0));
+
+  EXPECT_THAT(CountBlockedPawns<kBlack>(MakePosition("8: . . . . . . . ."
+                                                     "7: . . . . . . . p"
+                                                     "6: . . . . . . . R"
+                                                     "5: . . . . . . . ."
+                                                     "4: . . . . . . . ."
+                                                     "3: . . . . . . . ."
+                                                     "2: . . . . . . . ."
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(1));
+}
+
 TEST(Evaluate, Starting) { EXPECT_THAT(Evaluate(Position::Starting()), Eq(0)); }
 
 TEST(Evaluate, MaterialImbalance) {
@@ -357,7 +478,7 @@ TEST(Evaluate, DoubledPawnPenalty) {
                                     "   a b c d e f g h"
                                     //
                                     "   w - - 0 1")),
-              Eq(-60));
+              Eq(-110));
 }
 
 }  // namespace

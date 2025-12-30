@@ -139,13 +139,21 @@ template <Side Side>
   return count;
 }
 
+template <Side Side>
+[[nodiscard]] int CountBlockedPawns(const Position& position) {
+  const Bitboard pawns = position.GetPieces(Side, kPawn);
+  constexpr Direction forward = Side == kWhite ? kNorth : kSouth;
+  return (pawns.Shift<forward>() & position.GetPieces()).GetCount();
+}
+
 namespace {
 
 template <Side Side>
 [[nodiscard]] int Evaluate(const Position& position) {
-  return GetPlacementScore<Side>(position) +  //
-         GetMaterialScore<Side>(position) +   //
-         -50 * CountDoubledPawns<Side>(position);
+  return GetPlacementScore<Side>(position) +        //
+         GetMaterialScore<Side>(position) +         //
+         -50 * CountDoubledPawns<Side>(position) +  //
+         -50 * CountBlockedPawns<Side>(position);
 }
 
 }  // namespace
