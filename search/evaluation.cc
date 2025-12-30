@@ -101,6 +101,8 @@ template <Side Side, Piece Piece>
   return score;
 }
 
+}  // namespace
+
 template <Side Side>
 [[nodiscard]] int GetPlacementScore(const Position& position) {
   return GetPlacementScore<Side, kPawn>(position) +
@@ -111,30 +113,45 @@ template <Side Side>
          GetPlacementScore<Side, kKing>(position);
 }
 
-[[nodiscard]] constexpr int SideDifference(const Position& position,
-                                           const Piece piece) {
-  return position.GetPieces(kWhite, piece).GetCount() -
-         position.GetPieces(kBlack, piece).GetCount();
+template <Side Side>
+[[nodiscard]] int GetMaterialScore(const Position& position) {
+  return 20'000 * position.GetPieces(Side, kKing).GetCount() +
+         900 * position.GetPieces(Side, kQueen).GetCount() +
+         500 * position.GetPieces(Side, kRook).GetCount() +
+         300 * position.GetPieces(Side, kBishop).GetCount() +
+         300 * position.GetPieces(Side, kKnight).GetCount() +
+         100 * position.GetPieces(Side, kPawn).GetCount();
+}
+
+template <Side Side>
+[[nodiscard]] int CountDoubledPawns(const Position& position) {
+  const Bitboard pawns = position.GetPieces(Side, kPawn);
+  int count = 0;
+  for (Bitboard file : file::kFileMasks) {
+    const int current = (pawns & file).GetCount();
+
+    // If a file has N pawns, we count N - 1 doubled pawns.
+    if (current > 1) {
+      count += current - 1;
+    }
+  }
+
+  return count;
+}
+
+namespace {
+
+template <Side Side>
+[[nodiscard]] int Evaluate(const Position& position) {
+  return GetPlacementScore<Side>(position) +  //
+         GetMaterialScore<Side>(position) +   //
+         -50 * CountDoubledPawns<Side>(position);
 }
 
 }  // namespace
 
-[[nodiscard]] int GetMaterialScore(const Position& position) {
-  return 20'000 * SideDifference(position, kKing) +
-         900 * SideDifference(position, kQueen) +
-         500 * SideDifference(position, kRook) +
-         300 * SideDifference(position, kBishop) +
-         300 * SideDifference(position, kKnight) +
-         100 * SideDifference(position, kPawn);
-}
-
-[[nodiscard]] int GetPlacementScore(const Position& position) {
-  return GetPlacementScore<kWhite>(position) -
-         GetPlacementScore<kBlack>(position);
-}
-
 [[nodiscard]] int Evaluate(const Position& position) {
-  return GetMaterialScore(position) + GetPlacementScore(position);
+  return Evaluate<kWhite>(position) - Evaluate<kBlack>(position);
 }
 
 }  // namespace follychess
