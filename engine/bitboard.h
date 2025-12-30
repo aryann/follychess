@@ -175,6 +175,8 @@ constexpr Bitboard kF = kE << 1;
 constexpr Bitboard kG = kF << 1;
 constexpr Bitboard kH = kG << 1;
 
+constexpr std::array kFileMasks = {kA, kB, kC, kD, kE, kF, kG, kH};
+
 }  // namespace file
 
 constexpr Bitboard kEmptyBoard;

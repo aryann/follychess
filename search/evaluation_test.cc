@@ -147,5 +147,87 @@ TEST(Evaluation, GetPlacementScore) {
               Eq(50));
 }
 
+TEST(CountDoubledPawns, White) {
+  EXPECT_THAT(CountDoubledPawns<kWhite>(MakePosition("8: . . . . . . . ."
+                                                     "7: . . . p . . . ."
+                                                     "6: . . . p . . . ."
+                                                     "5: . . . . . . . ."
+                                                     "4: P . . . P . . ."
+                                                     "3: . . . P . . . ."
+                                                     "2: . . P . . . . ."
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(0));
+
+  EXPECT_THAT(CountDoubledPawns<kWhite>(MakePosition("8: . . . . . . . ."
+                                                     "7: . . . p . . . ."
+                                                     "6: . . . p . . . ."
+                                                     "5: . . . . . . . ."
+                                                     "4: . . . . . P . ."
+                                                     "3: . P . P . P . ."
+                                                     "2: . P P . . P . ."
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(3));
+
+  EXPECT_THAT(CountDoubledPawns<kWhite>(MakePosition("8: . . . . . . . ."
+                                                     "7: . . . p . P . ."
+                                                     "6: . . . p . . . ."
+                                                     "5: . P . . . . . ."
+                                                     "4: . . . . . . . ."
+                                                     "3: . . . P . . . ."
+                                                     "2: . P P . . P . ."
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(2));
+}
+
+TEST(CountDoubledPawns, Black) {
+  EXPECT_THAT(CountDoubledPawns<kBlack>(MakePosition("8: . . . . . . . ."
+                                                     "7: p p . p . p . ."
+                                                     "6: . . . . . . . ."
+                                                     "5: . . . . . . . ."
+                                                     "4: P . . P . . . ."
+                                                     "3: . . . P . . . ."
+                                                     "2: . . P P . . . ."
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(0));
+
+  EXPECT_THAT(CountDoubledPawns<kBlack>(MakePosition("8: . . . . . . . ."
+                                                     "7: . . . p . . . ."
+                                                     "6: . . . p . . . ."
+                                                     "5: . . . . . . . ."
+                                                     "4: . . . . . P . ."
+                                                     "3: . P . P . P . ."
+                                                     "2: . P P . . P . ."
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(1));
+
+  EXPECT_THAT(CountDoubledPawns<kBlack>(MakePosition("8: . . . . . . . ."
+                                                     "7: . . . p . . . p"
+                                                     "6: . . . p . . . ."
+                                                     "5: . . . . . . . ."
+                                                     "4: . . . . . P . ."
+                                                     "3: . P . P . P . ."
+                                                     "2: . P P . . P . p"
+                                                     "1: . . . . . . . ."
+                                                     "   a b c d e f g h"
+                                                     //
+                                                     "   w - - 0 1")),
+              Eq(2));
+}
+
 }  // namespace
 }  // namespace follychess
