@@ -74,12 +74,12 @@ class Go : public Command {
     int depth = kDefaultSearchDepth;
 
     if (!args.empty()) {
-      if (args.front() == "depth") {
-        if (args.size() != 2) {
+      if (args[0] == "depth") {
+        if (args.size() < 2) {
           return std::unexpected(std::format("Invalid go command: {}", args));
         }
 
-        depth = std::stoi(std::string(args.back()));
+        depth = std::stoi(std::string(args[1]));
       }
     }
 
