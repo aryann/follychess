@@ -110,6 +110,7 @@ TEST(FromUCI, Valid) {
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
     EXPECT_THAT(move->IsKingSideCastling(), IsFalse());
     EXPECT_THAT(move->IsQueenSideCastling(), IsFalse());
+    EXPECT_THAT(move->IsCastling(), IsFalse());
     EXPECT_THAT(move->IsPromotion(), IsFalse());
   }
   {
@@ -122,6 +123,7 @@ TEST(FromUCI, Valid) {
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
     EXPECT_THAT(move->IsKingSideCastling(), IsFalse());
     EXPECT_THAT(move->IsQueenSideCastling(), IsFalse());
+    EXPECT_THAT(move->IsCastling(), IsFalse());
     ASSERT_THAT(move->IsPromotion(), IsTrue());
     EXPECT_THAT(move->GetPromotedPiece(), Eq(kKnight));
   }
@@ -133,6 +135,7 @@ TEST(FromUCI, Valid) {
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
     EXPECT_THAT(move->IsKingSideCastling(), IsFalse());
     EXPECT_THAT(move->IsQueenSideCastling(), IsFalse());
+    EXPECT_THAT(move->IsCastling(), IsFalse());
     ASSERT_THAT(move->IsPromotion(), IsTrue());
     EXPECT_THAT(move->GetPromotedPiece(), Eq(kBishop));
   }
@@ -144,6 +147,7 @@ TEST(FromUCI, Valid) {
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
     EXPECT_THAT(move->IsKingSideCastling(), IsFalse());
     EXPECT_THAT(move->IsQueenSideCastling(), IsFalse());
+    EXPECT_THAT(move->IsCastling(), IsFalse());
     ASSERT_THAT(move->IsPromotion(), IsTrue());
     EXPECT_THAT(move->GetPromotedPiece(), Eq(kRook));
   }
@@ -155,6 +159,7 @@ TEST(FromUCI, Valid) {
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
     EXPECT_THAT(move->IsKingSideCastling(), IsFalse());
     EXPECT_THAT(move->IsQueenSideCastling(), IsFalse());
+    EXPECT_THAT(move->IsCastling(), IsFalse());
     ASSERT_THAT(move->IsPromotion(), IsTrue());
     EXPECT_THAT(move->GetPromotedPiece(), Eq(kQueen));
   }
@@ -166,6 +171,7 @@ TEST(FromUCI, Valid) {
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
     EXPECT_THAT(move->IsKingSideCastling(), IsFalse());
     EXPECT_THAT(move->IsQueenSideCastling(), IsFalse());
+    EXPECT_THAT(move->IsCastling(), IsFalse());
     ASSERT_THAT(move->IsPromotion(), IsTrue());
     EXPECT_THAT(move->GetPromotedPiece(), Eq(kQueen));
   }
@@ -179,6 +185,7 @@ TEST(FromUCI, Valid) {
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
     EXPECT_THAT(move->IsKingSideCastling(), IsFalse());
     EXPECT_THAT(move->IsQueenSideCastling(), IsFalse());
+    EXPECT_THAT(move->IsCastling(), IsFalse());
     EXPECT_THAT(move->IsPromotion(), IsFalse());
   }
   {
@@ -188,6 +195,7 @@ TEST(FromUCI, Valid) {
     EXPECT_THAT(move->GetEnPassantTarget(), Eq(D3));
     EXPECT_THAT(move->IsKingSideCastling(), IsFalse());
     EXPECT_THAT(move->IsQueenSideCastling(), IsFalse());
+    EXPECT_THAT(move->IsCastling(), IsFalse());
     EXPECT_THAT(move->IsPromotion(), IsFalse());
   }
   {
@@ -199,6 +207,7 @@ TEST(FromUCI, Valid) {
     EXPECT_THAT(move->GetEnPassantVictim(), Eq(A5));
     EXPECT_THAT(move->IsKingSideCastling(), IsFalse());
     EXPECT_THAT(move->IsQueenSideCastling(), IsFalse());
+    EXPECT_THAT(move->IsCastling(), IsFalse());
     EXPECT_THAT(move->IsPromotion(), IsFalse());
   }
   {
@@ -209,6 +218,7 @@ TEST(FromUCI, Valid) {
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
     EXPECT_THAT(move->IsKingSideCastling(), IsTrue());
     EXPECT_THAT(move->IsQueenSideCastling(), IsFalse());
+    EXPECT_THAT(move->IsCastling(), IsTrue());
     EXPECT_THAT(move->IsPromotion(), IsFalse());
   }
   {
@@ -219,6 +229,7 @@ TEST(FromUCI, Valid) {
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
     EXPECT_THAT(move->IsKingSideCastling(), IsFalse());
     EXPECT_THAT(move->IsQueenSideCastling(), IsTrue());
+    EXPECT_THAT(move->IsCastling(), IsTrue());
     EXPECT_THAT(move->IsPromotion(), IsFalse());
   }
 }

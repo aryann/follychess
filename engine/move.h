@@ -79,6 +79,10 @@ class Move {
     return GetFlags() == kQueenCastle;
   }
 
+  [[nodiscard]] constexpr bool IsCastling() const {
+    return IsKingSideCastling() || IsQueenSideCastling();
+  }
+
   [[nodiscard]] constexpr bool IsPromotion() const {
     return GetFlags() & 0b1000;
   }

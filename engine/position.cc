@@ -331,7 +331,7 @@ UndoInfo Position::Do(const Move &move) {
   //
   // TODO(aryann): The Do() and Undo() castling logic can be shared.
   Bitboard rook_mask = GetCastlingRookMask(move, side);
-  DCHECK(!rook_mask || move.IsKingSideCastling() || move.IsQueenSideCastling());
+  DCHECK(!rook_mask || move.IsCastling());
   pieces_[kRook] ^= rook_mask;
   sides_[side] ^= rook_mask;
   while (rook_mask) {
@@ -410,7 +410,7 @@ void Position::Undo(const UndoInfo &undo_info) {
 
   // Non-empty if and only if the move is a castling move.
   Bitboard rook_mask = GetCastlingRookMask(move, side);
-  DCHECK(!rook_mask || move.IsKingSideCastling() || move.IsQueenSideCastling());
+  DCHECK(!rook_mask || move.IsCastling());
   pieces_[kRook] ^= rook_mask;
   sides_[side] ^= rook_mask;
   while (rook_mask) {

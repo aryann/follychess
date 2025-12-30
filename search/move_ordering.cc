@@ -17,10 +17,27 @@ namespace {
     const int victim_score = kKing - victim;
     const int attacker_score = attacker;
 
-    return (victim_score * static_cast<int>(kNumPieces)) + attacker_score;
+    return victim_score * static_cast<int>(kNumPieces) + attacker_score;
   }
 
-  return 1'000;
+  if (move.IsPromotion()) {
+    switch (move.GetPromotedPiece()) {
+      case kQueen:
+        return 1'000;
+      case kRook:
+        return 1'001;
+      case kBishop:
+        return 1'002;
+      default:
+        return 1'003;
+    }
+  }
+
+  if (move.IsCastling()) {
+    return 10'000;
+  }
+
+  return 100'000;
 }
 
 }  // namespace
