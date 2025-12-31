@@ -271,9 +271,7 @@ std::vector<Move> GenerateMoves(const Position &position) {
 // This ensures the function is compiled and available to the linker, as the
 // template's definition is in this .cc file rather than a header.
 template std::vector<Move> GenerateMoves<kQuiet>(const Position &position);
-
 template std::vector<Move> GenerateMoves<kCapture>(const Position &position);
-
 template std::vector<Move> GenerateMoves<kEvasion>(const Position &position);
 
 std::vector<Move> GenerateMoves(const Position &position) {

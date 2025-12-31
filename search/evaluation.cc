@@ -123,6 +123,9 @@ template <Side Side>
          100 * position.GetPieces(Side, kPawn).GetCount();
 }
 
+template int GetMaterialScore<kWhite>(const Position& position);
+template int GetMaterialScore<kBlack>(const Position& position);
+
 template <Side Side>
 [[nodiscard]] int CountDoubledPawns(const Position& position) {
   const Bitboard pawns = position.GetPieces(Side, kPawn);
@@ -139,12 +142,18 @@ template <Side Side>
   return count;
 }
 
+template int CountDoubledPawns<kWhite>(const Position& position);
+template int CountDoubledPawns<kBlack>(const Position& position);
+
 template <Side Side>
 [[nodiscard]] int CountBlockedPawns(const Position& position) {
   const Bitboard pawns = position.GetPieces(Side, kPawn);
   constexpr Direction forward = Side == kWhite ? kNorth : kSouth;
   return (pawns.Shift<forward>() & position.GetPieces()).GetCount();
 }
+
+template int CountBlockedPawns<kWhite>(const Position& position);
+template int CountBlockedPawns<kBlack>(const Position& position);
 
 namespace {
 
