@@ -28,9 +28,17 @@ int main(int argc, char **argv) {
   CommandState state;
   CommandDispatcher dispatcher = MakeCommandDispatcher(state);
 
+  int positional_arg = 1;
+
   std::string command;
   while (true) {
-    std::getline(std::cin, command);
+    if (positional_arg < argc) {
+      command = argv[positional_arg];
+      state.printer.Println(std::cout, ">>> {}", command);
+      ++positional_arg;
+    } else {
+      std::getline(std::cin, command);
+    }
     state.printer.PrintStdIn(command);
 
     if (command == "quit") {
