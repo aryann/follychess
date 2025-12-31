@@ -192,6 +192,7 @@ TEST(FromUCI, Valid) {
     std::expected<Move, std::string> move = Move::FromUCI("d2d4#dpp");
     ASSERT_THAT(move.error_or(""), IsEmpty());
     ASSERT_THAT(move->IsDoublePawnPush(), IsTrue());
+    EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
     EXPECT_THAT(move->GetEnPassantTarget(), Eq(D3));
     EXPECT_THAT(move->IsKingSideCastling(), IsFalse());
     EXPECT_THAT(move->IsQueenSideCastling(), IsFalse());
