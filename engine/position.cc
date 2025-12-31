@@ -283,9 +283,9 @@ UndoInfo Position::Do(const Move &move) {
   Piece victim = GetPiece(move.GetTo());
   const UndoInfo undo_info = {
       .move = move,
+      .en_passant_target = en_passant_target_,
       .captured_piece = victim,
       .half_moves = half_moves_,
-      .en_passant_target = en_passant_target_,
       .castling_rights = castling_rights_,
   };
 
