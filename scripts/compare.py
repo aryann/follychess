@@ -30,7 +30,10 @@ def _create_pgn(engines, board):
 async def start_stockfish():
     transport, engine = await chess.engine.popen_uci("/opt/homebrew/bin/stockfish")
 
-    await engine.configure({"UCI_Elo": 1320})
+    await engine.configure({
+        "UCI_Elo": 1600,
+        "UCI_LimitStrength": True,
+    })
     return engine
 
 
