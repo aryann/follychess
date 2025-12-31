@@ -190,7 +190,7 @@ TEST(Position, DoAndUndo) {
       "1: R . B Q K B N R"
       "   a b c d e f g h"
       //
-      "   w KQkq d6 2 2";
+      "   w KQkq d6 0 2";
 
   std::string_view position_three =
       "8: r n b q k b n r"
@@ -1024,7 +1024,7 @@ TEST(QuietPromotion, White) {
                                          "1: . . . . . . . ."
                                          "   a b c d e f g h"
                                          //
-                                         "   b KQkq - 1 1"));
+                                         "   b KQkq - 0 1"));
   }
   EXPECT_THAT(position, EqualsPosition("8: . . . . . . . ."
                                        "7: . . . P . . . ."
@@ -1080,7 +1080,7 @@ TEST(QuietPromotion, Black) {
                                          "1: . . . . . . . q"
                                          "   a b c d e f g h"
                                          //
-                                         "   w Qkq - 1 2"));
+                                         "   w Qkq - 0 2"));
   }
   EXPECT_THAT(position, EqualsPosition("8: . . . . . . . ."
                                        "7: . . . . . . . ."
@@ -1303,6 +1303,103 @@ TEST(Position, Key) {
   }
 
   EXPECT_THAT(position.GetKey(), Eq(v0));
+}
+
+TEST(HalfMoveClock, ResetsOnPawnMovesAndCaptures) {
+  // Quiet move:
+  {
+    Position position = MakePosition(
+        "8: r n b q k b n r"
+        "7: p p p p p p p p"
+        "6: . . . . . . . ."
+        "5: . . . . . . . ."
+        "4: . . . . . . . ."
+        "3: . . . . . . . ."
+        "2: P P P P P P P P"
+        "1: R N B Q K B N R"
+        "   a b c d e f g h"
+        //
+        "   w KQkq - 50 1");
+
+    ScopedMove move(MakeMove("g1f3"), position);
+    EXPECT_THAT(position.GetHalfMoves(), Eq(51));
+  }
+
+  // Pawn push:
+  {
+    Position position = MakePosition(
+        "8: r n b q k b n r"
+        "7: p p p p p p p p"
+        "6: . . . . . . . ."
+        "5: . . . . . . . ."
+        "4: . . . . . . . ."
+        "3: . . . . . . . ."
+        "2: P P P P P P P P"
+        "1: R N B Q K B N R"
+        "   a b c d e f g h"
+        //
+        "   w KQkq - 50 1");
+
+    ScopedMove move(MakeMove("e2e3"), position);
+    EXPECT_THAT(position.GetHalfMoves(), Eq(0));
+  }
+
+  // Double pawn push:
+  {
+    Position position = MakePosition(
+        "8: r n b q k b n r"
+        "7: p p p p p p p p"
+        "6: . . . . . . . ."
+        "5: . . . . . . . ."
+        "4: . . . . . . . ."
+        "3: . . . . . . . ."
+        "2: P P P P P P P P"
+        "1: R N B Q K B N R"
+        "   a b c d e f g h"
+        //
+        "   w KQkq - 50 1");
+
+    ScopedMove move(MakeMove("e2e4#dpp"), position);
+    EXPECT_THAT(position.GetHalfMoves(), Eq(0));
+  }
+
+  // Capture:
+  {
+    Position position = MakePosition(
+        "8: r . . . k . . r"
+        "7: p p p . . p p p"
+        "6: . . . . . . . ."
+        "5: . . . p q . . ."
+        "4: . . . . P . . ."
+        "3: . . . . . . . ."
+        "2: P P P P . P P P"
+        "1: R N B Q K B N R"
+        "   a b c d e f g h"
+        //
+        "   w KQkq - 50 1");
+
+    ScopedMove move(MakeMove("e4d5#c"), position);
+    EXPECT_THAT(position.GetHalfMoves(), Eq(0));
+  }
+
+  // En-Passant capture:
+  {
+    Position position = MakePosition(
+        "8: r . . . k . . r"
+        "7: p p p . . . p p"
+        "6: . . . . . . . ."
+        "5: . . . p P p . ."
+        "4: . . . . . . . ."
+        "3: . . . . . . . ."
+        "2: P P P P . P P P"
+        "1: R N B Q K B N R"
+        "   a b c d e f g h"
+        //
+        "   w KQkq f6 50 1");
+
+    ScopedMove move(MakeMove("e5f6#ep"), position);
+    EXPECT_THAT(position.GetHalfMoves(), Eq(0));
+  }
 }
 
 }  // namespace

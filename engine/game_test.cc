@@ -25,25 +25,25 @@ TEST(GetRepetitionCount, Simple) {
   game.Do(MakeMove("e7e6"));
   EXPECT_THAT(game.GetRepetitionCount(), Eq(0));
 
-  game.Do(MakeMove("b2c3"));
+  game.Do(MakeMove("b1c3"));
   EXPECT_THAT(game.GetRepetitionCount(), Eq(0));
 
   game.Do(MakeMove("b8c6"));
   EXPECT_THAT(game.GetRepetitionCount(), Eq(0));
 
-  game.Do(MakeMove("c3b2"));
+  game.Do(MakeMove("c3b1"));
   EXPECT_THAT(game.GetRepetitionCount(), Eq(0));
 
   game.Do(MakeMove("c6b8"));
   EXPECT_THAT(game.GetRepetitionCount(), Eq(1));
 
-  game.Do(MakeMove("b2c3"));
+  game.Do(MakeMove("b1c3"));
   EXPECT_THAT(game.GetRepetitionCount(), Eq(1));
 
   game.Do(MakeMove("b8c6"));
   EXPECT_THAT(game.GetRepetitionCount(), Eq(1));
 
-  game.Do(MakeMove("c3b2"));
+  game.Do(MakeMove("c3b1"));
   EXPECT_THAT(game.GetRepetitionCount(), Eq(1));
 
   game.Do(MakeMove("c6b8"));
@@ -119,21 +119,27 @@ TEST(GetRepetitionCount, FourFoldRepetition) {
   game.Do(MakeMove("b8a8"));
   game.Do(MakeMove("a6c7"));
   game.Do(MakeMove("a8b8"));
-  EXPECT_THAT(game.GetRepetitionCount(), Eq(0));
+  EXPECT_THAT(game.GetRepetitionCount(), Eq(1));
 
   // Cycle 2:
   game.Do(MakeMove("c7a6"));
-  game.Do(MakeMove("b8a8"));
-  game.Do(MakeMove("a6c7"));
-  game.Do(MakeMove("a8b8"));
   EXPECT_THAT(game.GetRepetitionCount(), Eq(1));
+  game.Do(MakeMove("b8a8"));
+  EXPECT_THAT(game.GetRepetitionCount(), Eq(1));
+  game.Do(MakeMove("a6c7"));
+  EXPECT_THAT(game.GetRepetitionCount(), Eq(1));
+  game.Do(MakeMove("a8b8"));
+  EXPECT_THAT(game.GetRepetitionCount(), Eq(2));
 
   // Cycle 3:
   game.Do(MakeMove("c7a6"));
-  game.Do(MakeMove("b8a8"));
-  game.Do(MakeMove("a6c7"));
-  game.Do(MakeMove("a8b8"));
   EXPECT_THAT(game.GetRepetitionCount(), Eq(2));
+  game.Do(MakeMove("b8a8"));
+  EXPECT_THAT(game.GetRepetitionCount(), Eq(2));
+  game.Do(MakeMove("a6c7"));
+  EXPECT_THAT(game.GetRepetitionCount(), Eq(2));
+  game.Do(MakeMove("a8b8"));
+  EXPECT_THAT(game.GetRepetitionCount(), Eq(3));
 
   // Cycle 4:
   game.Do(MakeMove("c7a6"));
@@ -143,7 +149,7 @@ TEST(GetRepetitionCount, FourFoldRepetition) {
   game.Do(MakeMove("a6c7"));
   EXPECT_THAT(game.GetRepetitionCount(), Eq(3));
   game.Do(MakeMove("a8b8"));
-  EXPECT_THAT(game.GetRepetitionCount(), Eq(3));
+  EXPECT_THAT(game.GetRepetitionCount(), Eq(4));
 }
 
 }  // namespace

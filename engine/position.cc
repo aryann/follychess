@@ -302,6 +302,10 @@ UndoInfo Position::Do(const Move &move) {
 
   Piece piece = GetPiece(move.GetFrom());
   DCHECK(piece != kEmptyPiece);
+  if (piece == kPawn) {
+    half_moves_ = 0;
+  }
+
   zobrist_key_.Update(move.GetFrom(), piece, side_to_move_);
   zobrist_key_.Update(move.GetTo(), piece, side_to_move_);
 
