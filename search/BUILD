@@ -51,6 +51,15 @@ cc_test(
 )
 
 cc_library(
+    name = "phase",
+    srcs = ["phase.cc"],
+    hdrs = ["phase.h"],
+    deps = [
+        "//engine:position",
+    ],
+)
+
+cc_library(
     name = "search",
     srcs = ["search.cc"],
     hdrs = ["search.h"],

@@ -16,7 +16,7 @@ class Uci : public Command {
 
   std::expected<void, std::string> Run(
       std::vector<std::string_view> args) override {
-    state_.printer.Println(std::cout, "id name chessengine");
+    state_.printer.Println(std::cout, "id name FollyChess");
     state_.printer.Println(std::cout, "id author Aryan Naraghi");
     state_.printer.Println(std::cout);
 
