@@ -85,7 +85,8 @@ consteval auto MakePlacementScores() {
 constexpr auto kPlacementScores = MakePlacementScores();
 
 template <Side Side, Piece Piece>
-[[nodiscard]] constexpr int GetPlacementScore(const Position& position) {
+[[nodiscard]] constexpr int GetPlacementScore(const Position& position,
+                                              int phase) {
   Bitboard pieces = position.GetPieces(Side, Piece);
   const std::array<std::int8_t, kNumSquares>& scores = kPlacementScores[Piece];
 
@@ -104,13 +105,13 @@ template <Side Side, Piece Piece>
 }  // namespace
 
 template <Side Side>
-[[nodiscard]] int GetPlacementScore(const Position& position) {
-  return GetPlacementScore<Side, kPawn>(position) +
-         GetPlacementScore<Side, kKnight>(position) +
-         GetPlacementScore<Side, kBishop>(position) +
-         GetPlacementScore<Side, kRook>(position) +
-         GetPlacementScore<Side, kQueen>(position) +
-         GetPlacementScore<Side, kKing>(position);
+[[nodiscard]] int GetPlacementScore(const Position& position, int phase) {
+  return GetPlacementScore<Side, kPawn>(position, phase) +
+         GetPlacementScore<Side, kKnight>(position, phase) +
+         GetPlacementScore<Side, kBishop>(position, phase) +
+         GetPlacementScore<Side, kRook>(position, phase) +
+         GetPlacementScore<Side, kQueen>(position, phase) +
+         GetPlacementScore<Side, kKing>(position, phase);
 }
 
 template <Side Side>
@@ -158,17 +159,17 @@ template int CountBlockedPawns<kBlack>(const Position& position);
 namespace {
 
 template <Side Side>
-[[nodiscard]] int Evaluate(const Position& position) {
-  return GetPlacementScore<Side>(position) +        //
-         GetMaterialScore<Side>(position) +         //
-         -50 * CountDoubledPawns<Side>(position) +  //
+[[nodiscard]] int Evaluate(const Position& position, int phase) {
+  return GetPlacementScore<Side>(position, phase) +  //
+         GetMaterialScore<Side>(position) +          //
+         -50 * CountDoubledPawns<Side>(position) +   //
          -50 * CountBlockedPawns<Side>(position);
 }
 
 }  // namespace
 
-[[nodiscard]] int Evaluate(const Position& position) {
-  return Evaluate<kWhite>(position) - Evaluate<kBlack>(position);
+[[nodiscard]] int Evaluate(const Position& position, int phase) {
+  return Evaluate<kWhite>(position, phase) - Evaluate<kBlack>(position, phase);
 }
 
 }  // namespace follychess

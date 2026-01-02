@@ -9,6 +9,7 @@ cc_library(
     srcs = ["evaluation.cc"],
     hdrs = ["evaluation.h"],
     deps = [
+        ":phase",
         "//engine:move",
         "//engine:move_generator",
         "//engine:position",

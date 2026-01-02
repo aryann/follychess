@@ -13,7 +13,7 @@ using ::testing::ElementsAreArray;
 using ::testing::Eq;
 
 TEST(CalculatePhase, StartingPosition) {
-  EXPECT_THAT(CalculatePhase(Position::Starting()), Eq(0));
+  EXPECT_THAT(CalculatePhase(Position::Starting()), Eq(kStartPhase));
 }
 
 TEST(CalculatePhase, Mid) {
@@ -47,7 +47,7 @@ TEST(CalculatePhase, KingsOnly) {
       //
       "   w - - 0 1");
 
-  EXPECT_THAT(CalculatePhase(position), Eq(256));
+  EXPECT_THAT(CalculatePhase(position), Eq(kEndPhase));
 }
 
 }  // namespace

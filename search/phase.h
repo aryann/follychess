@@ -5,6 +5,9 @@
 
 namespace follychess {
 
+constexpr int kStartPhase = 0;
+constexpr int kEndPhase = 256;
+
 // Calculates the game phase based on material. Returns 0 for the starting
 // position and 256 for a position with only kings. All other positions
 // return an interpolated value.

@@ -143,7 +143,7 @@ class AlphaBetaSearcher {
   }
 
   [[nodiscard]] int GetScore() const {
-    const int score = Evaluate(position_);
+    const int score = Evaluate(position_, CalculatePhase(position_));
     return position_.SideToMove() == kWhite ? score : -score;
   }
 

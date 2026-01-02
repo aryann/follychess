@@ -147,7 +147,8 @@ TEST(GetPlacementScore, White) {
                                                      "1: . . . . . . . ."
                                                      "   a b c d e f g h"
                                                      //
-                                                     "   w - - 0 1")),
+                                                     "   w - - 0 1"),
+                                        kStartPhase),
               Eq(50));
 
   EXPECT_THAT(GetPlacementScore<kWhite>(MakePosition("8: . . . . . . . ."
@@ -160,7 +161,8 @@ TEST(GetPlacementScore, White) {
                                                      "1: . . . . . . . ."
                                                      "   a b c d e f g h"
                                                      //
-                                                     "   w - - 0 1")),
+                                                     "   w - - 0 1"),
+                                        kStartPhase),
               Eq(0));
 
   EXPECT_THAT(GetPlacementScore<kWhite>(MakePosition("8: . . . . . . . ."
@@ -173,7 +175,8 @@ TEST(GetPlacementScore, White) {
                                                      "1: . . . . . . . K"
                                                      "   a b c d e f g h"
                                                      //
-                                                     "   w - - 0 1")),
+                                                     "   w - - 0 1"),
+                                        kStartPhase),
               Eq(20));
 
   EXPECT_THAT(GetPlacementScore<kWhite>(MakePosition("8: Q . . . . . . ."
@@ -186,7 +189,8 @@ TEST(GetPlacementScore, White) {
                                                      "1: . . . . . . . K"
                                                      "   a b c d e f g h"
                                                      //
-                                                     "   w - - 0 1")),
+                                                     "   w - - 0 1"),
+                                        kStartPhase),
               Eq(0));
 }
 
@@ -201,7 +205,8 @@ TEST(GetPlacementScore, Black) {
                                                      "1: . . . . . . . K"
                                                      "   a b c d e f g h"
                                                      //
-                                                     "   b - - 0 1")),
+                                                     "   b - - 0 1"),
+                                        kStartPhase),
               Eq(-40));
 
   EXPECT_THAT(GetPlacementScore<kBlack>(MakePosition("8: . . . . . . . ."
@@ -214,7 +219,8 @@ TEST(GetPlacementScore, Black) {
                                                      "1: . . . . . . . K"
                                                      "   a b c d e f g h"
                                                      //
-                                                     "   b - - 0 1")),
+                                                     "   b - - 0 1"),
+                                        kStartPhase),
               Eq(20));
 }
 
@@ -449,7 +455,9 @@ TEST(CountBlockedPawns, Black) {
               Eq(1));
 }
 
-TEST(Evaluate, Starting) { EXPECT_THAT(Evaluate(Position::Starting()), Eq(0)); }
+TEST(Evaluate, Starting) {
+  EXPECT_THAT(Evaluate(Position::Starting(), kStartPhase), Eq(0));
+}
 
 TEST(Evaluate, MaterialImbalance) {
   EXPECT_THAT(Evaluate(MakePosition("8: r . . . . . . k"
@@ -462,7 +470,8 @@ TEST(Evaluate, MaterialImbalance) {
                                     "1: . . . Q . . . K"
                                     "   a b c d e f g h"
                                     //
-                                    "   w - - 0 1")),
+                                    "   w - - 0 1"),
+                       kStartPhase),
               Eq(395));
 }
 
@@ -477,7 +486,8 @@ TEST(Evaluate, DoubledPawnPenalty) {
                                     "1: . . . . . . . K"
                                     "   a b c d e f g h"
                                     //
-                                    "   w - - 0 1")),
+                                    "   w - - 0 1"),
+                       kStartPhase),
               Eq(-110));
 }
 
