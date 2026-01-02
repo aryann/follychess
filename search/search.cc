@@ -49,12 +49,6 @@ class AlphaBetaSearcher {
     ++nodes_;
     MaybeLog(depth);
 
-    if (game_.GetRepetitionCount() >= 3) {
-      // TODO(aryann): Figure out what when draws can be offered due to the
-      // three repetition rule.
-      return 0;
-    }
-
     if (std::optional<int> score = transpositions_.Probe(alpha, beta, depth)) {
       return *score;
     }
@@ -81,7 +75,6 @@ class AlphaBetaSearcher {
 
       if (score >= beta) {
         transpositions_.Record(score, depth, LowerBound);
-
         return beta;
       }
 
@@ -99,6 +92,11 @@ class AlphaBetaSearcher {
     if (has_legal_moves) {
       transpositions_.Record(alpha, depth, transposition_type);
       return alpha;
+    }
+
+    if (game_.GetRepetitionCount() >= 3) {
+      // A draw can be claimed due to the threefold repetition rule.
+      return 0;
     }
 
     if (CurrentSideInCheck()) {

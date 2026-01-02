@@ -13,6 +13,7 @@ namespace follychess {
 namespace {
 
 using ::testing::ElementsAreArray;
+using ::testing::Eq;
 
 constexpr int kMaxMovesAllowed = 10;
 
@@ -77,6 +78,33 @@ TEST(Search, SimpleEndGames) {
 
     std::vector<Move> moves = Play(game);
     EXPECT_THAT(moves, testing::SizeIs(testing::Lt(8)));
+  }
+}
+
+TEST(Search, Repetition) {
+  {
+    Game game(
+        MakePosition("8: . k r . . b r ."
+                     "7: p p N R . p p p"
+                     "6: . . . . . . . ."
+                     "5: . . p . n . . ."
+                     "4: P . . . P . . P"
+                     "3: . . . . . q P ."
+                     "2: . . . . . P . ."
+                     "1: . R . . . . K ."
+                     "a b c d e f g h"
+                     //
+                     "w - - 0 30"));
+
+    for (int i = 0; i < 4; ++i) {
+      game.Do(MakeMove("c7a6"));
+      game.Do(MakeMove("b8a8"));
+      game.Do(MakeMove("a6c7"));
+      game.Do(MakeMove("a8b8"));
+    }
+
+    Move move = Search(game, SearchOptions().SetDepth(6));
+    EXPECT_THAT(move, Eq(MakeMove("c7a6")));
   }
 }
 
