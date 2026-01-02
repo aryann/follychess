@@ -3,7 +3,7 @@
 namespace follychess {
 
 [[nodiscard]] int Game::GetRepetitionCount() const {
-  int repetitions = 0;
+  int repetitions = 1;
   const std::uint64_t current_key = position_.GetKey();
 
   const int start = std::ssize(history_) - 2;

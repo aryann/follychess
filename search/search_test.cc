@@ -96,14 +96,15 @@ TEST(Search, Repetition) {
                      //
                      "w - - 0 30"));
 
-    for (int i = 0; i < 4; ++i) {
+    // Force three repetitions.
+    for (int i = 0; i < 3; ++i) {
       game.Do(MakeMove("c7a6"));
       game.Do(MakeMove("b8a8"));
       game.Do(MakeMove("a6c7"));
       game.Do(MakeMove("a8b8"));
     }
 
-    Move move = Search(game, SearchOptions().SetDepth(6));
+    const Move move = Search(game, SearchOptions().SetDepth(6));
     EXPECT_THAT(move, Eq(MakeMove("c7a6")));
   }
 }
