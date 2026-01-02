@@ -59,6 +59,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "phase_test",
+    srcs = ["phase_test.cc"],
+    deps = [
+        ":phase",
+        "//engine:position",
+        "//engine:testing",
+        "@googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "search",
     srcs = ["search.cc"],

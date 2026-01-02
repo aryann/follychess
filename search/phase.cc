@@ -24,7 +24,7 @@ int CalculatePhase(const Position& position) {
   phase -= position.GetPieces(kRook).GetCount() * kRookPhase;
   phase -= position.GetPieces(kQueen).GetCount() * kQueenPhase;
 
-  phase = (phase * 256 * kStartPhase / 2) / kStartPhase;
+  phase = (phase * 256 + kStartPhase / 2) / kStartPhase;
   return phase;
 }
 
