@@ -13,6 +13,19 @@ using ::testing::IsTrue;
 using ::testing::Ne;
 using ::testing::Not;
 
+TEST(Move, Null) {
+  Move move = Move::NullMove();
+
+  EXPECT_THAT(move.IsNullMove(), IsTrue());
+  EXPECT_THAT(move.IsCapture(), IsFalse());
+  EXPECT_THAT(move.IsDoublePawnPush(), IsFalse());
+  EXPECT_THAT(move.IsEnPassantCapture(), IsFalse());
+  EXPECT_THAT(move.IsKingSideCastling(), IsFalse());
+  EXPECT_THAT(move.IsQueenSideCastling(), IsFalse());
+  EXPECT_THAT(move.IsCastling(), IsFalse());
+  EXPECT_THAT(move.IsPromotion(), IsFalse());
+}
+
 TEST(Move, NonPromotion) {
   Move move(A1, B2);
 
@@ -101,8 +114,21 @@ TEST(Move, Equality) {
 
 TEST(FromUCI, Valid) {
   {
+    std::expected<Move, std::string> move = Move::FromUCI("0000");
+    ASSERT_THAT(move.error_or(""), IsEmpty());
+    EXPECT_THAT(move->IsNullMove(), IsTrue());
+    EXPECT_THAT(move->IsCapture(), IsFalse());
+    EXPECT_THAT(move->IsDoublePawnPush(), IsFalse());
+    EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
+    EXPECT_THAT(move->IsKingSideCastling(), IsFalse());
+    EXPECT_THAT(move->IsQueenSideCastling(), IsFalse());
+    EXPECT_THAT(move->IsCastling(), IsFalse());
+    EXPECT_THAT(move->IsPromotion(), IsFalse());
+  }
+  {
     std::expected<Move, std::string> move = Move::FromUCI("e2e4");
     ASSERT_THAT(move.error_or(""), IsEmpty());
+    EXPECT_THAT(move->IsNullMove(), IsFalse());
     EXPECT_THAT(move->GetFrom(), Eq(E2));
     EXPECT_THAT(move->GetTo(), Eq(E4));
     EXPECT_THAT(move->IsCapture(), IsFalse());
@@ -116,6 +142,7 @@ TEST(FromUCI, Valid) {
   {
     std::expected<Move, std::string> move = Move::FromUCI("e7e8n");
     ASSERT_THAT(move.error_or(""), IsEmpty());
+    EXPECT_THAT(move->IsNullMove(), IsFalse());
     EXPECT_THAT(move->GetFrom(), Eq(E7));
     EXPECT_THAT(move->GetTo(), Eq(E8));
     EXPECT_THAT(move->IsCapture(), IsFalse());
@@ -130,6 +157,7 @@ TEST(FromUCI, Valid) {
   {
     std::expected<Move, std::string> move = Move::FromUCI("e7e8b");
     ASSERT_THAT(move.error_or(""), IsEmpty());
+    EXPECT_THAT(move->IsNullMove(), IsFalse());
     EXPECT_THAT(move->IsCapture(), IsFalse());
     EXPECT_THAT(move->IsDoublePawnPush(), IsFalse());
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
@@ -142,6 +170,7 @@ TEST(FromUCI, Valid) {
   {
     std::expected<Move, std::string> move = Move::FromUCI("e7e8r");
     ASSERT_THAT(move.error_or(""), IsEmpty());
+    EXPECT_THAT(move->IsNullMove(), IsFalse());
     EXPECT_THAT(move->IsCapture(), IsFalse());
     EXPECT_THAT(move->IsDoublePawnPush(), IsFalse());
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
@@ -154,6 +183,7 @@ TEST(FromUCI, Valid) {
   {
     std::expected<Move, std::string> move = Move::FromUCI("e7e8q");
     ASSERT_THAT(move.error_or(""), IsEmpty());
+    EXPECT_THAT(move->IsNullMove(), IsFalse());
     EXPECT_THAT(move->IsCapture(), IsFalse());
     EXPECT_THAT(move->IsDoublePawnPush(), IsFalse());
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
@@ -166,6 +196,7 @@ TEST(FromUCI, Valid) {
   {
     std::expected<Move, std::string> move = Move::FromUCI("e7f8q#c");
     ASSERT_THAT(move.error_or(""), IsEmpty());
+    EXPECT_THAT(move->IsNullMove(), IsFalse());
     EXPECT_THAT(move->IsCapture(), IsTrue());
     EXPECT_THAT(move->IsDoublePawnPush(), IsFalse());
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
@@ -178,6 +209,7 @@ TEST(FromUCI, Valid) {
   {
     std::expected<Move, std::string> move = Move::FromUCI("e2e3#c");
     ASSERT_THAT(move.error_or(""), IsEmpty());
+    EXPECT_THAT(move->IsNullMove(), IsFalse());
     EXPECT_THAT(move->GetFrom(), Eq(E2));
     EXPECT_THAT(move->GetTo(), Eq(E3));
     EXPECT_THAT(move->IsCapture(), IsTrue());
@@ -191,6 +223,7 @@ TEST(FromUCI, Valid) {
   {
     std::expected<Move, std::string> move = Move::FromUCI("d2d4#dpp");
     ASSERT_THAT(move.error_or(""), IsEmpty());
+    EXPECT_THAT(move->IsNullMove(), IsFalse());
     ASSERT_THAT(move->IsDoublePawnPush(), IsTrue());
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
     EXPECT_THAT(move->GetEnPassantTarget(), Eq(D3));
@@ -202,6 +235,7 @@ TEST(FromUCI, Valid) {
   {
     std::expected<Move, std::string> move = Move::FromUCI("b5a6#ep");
     ASSERT_THAT(move.error_or(""), IsEmpty());
+    EXPECT_THAT(move->IsNullMove(), IsFalse());
     EXPECT_THAT(move->IsCapture(), IsTrue());
     EXPECT_THAT(move->IsDoublePawnPush(), IsFalse());
     ASSERT_THAT(move->IsEnPassantCapture(), IsTrue());
@@ -214,6 +248,7 @@ TEST(FromUCI, Valid) {
   {
     std::expected<Move, std::string> move = Move::FromUCI("e1c1#oo");
     ASSERT_THAT(move.error_or(""), IsEmpty());
+    EXPECT_THAT(move->IsNullMove(), IsFalse());
     EXPECT_THAT(move->IsCapture(), IsFalse());
     EXPECT_THAT(move->IsDoublePawnPush(), IsFalse());
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
@@ -225,6 +260,7 @@ TEST(FromUCI, Valid) {
   {
     std::expected<Move, std::string> move = Move::FromUCI("e1c1#ooo");
     ASSERT_THAT(move.error_or(""), IsEmpty());
+    EXPECT_THAT(move->IsNullMove(), IsFalse());
     EXPECT_THAT(move->IsCapture(), IsFalse());
     EXPECT_THAT(move->IsDoublePawnPush(), IsFalse());
     EXPECT_THAT(move->IsEnPassantCapture(), IsFalse());
@@ -256,6 +292,7 @@ TEST(Move, String) {
     return buf.str();
   };
 
+  EXPECT_THAT(ToString(Move::NullMove()), Eq("0000"));
   EXPECT_THAT(ToString(Move(E7, E5)), Eq("e7e5"));
   EXPECT_THAT(ToString(Move(E2, F3, Move::Flags::kCapture)), Eq("e2f3#c"));
   EXPECT_THAT(ToString(Move(D2, D4, Move::Flags::kDoublePawnPush)),

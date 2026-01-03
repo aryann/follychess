@@ -12,9 +12,10 @@ class Game {
   Game() : position_(Position::Starting()) {}
 
   void Do(Move move) {
-    history_.emplace_back();
-    history_.back().undo_info = position_.Do(move);
-    history_.back().key = position_.GetKey();
+    history_.push_back({
+        .key = position_.GetKey(),
+        .undo_info = position_.Do(move),
+    });
   }
 
   void Undo() {

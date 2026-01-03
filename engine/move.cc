@@ -48,6 +48,11 @@ std::expected<Move, std::string> Move::FromUCI(std::string_view input) {
   if (input.empty()) {
     return error;
   }
+
+  if (input == "0000") {
+    return NullMove();
+  }
+
   auto parts = std::views::split(input, '#') |
                std::ranges::to<std::vector<std::string>>();
 

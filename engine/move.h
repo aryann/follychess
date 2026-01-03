@@ -32,20 +32,24 @@ class Move {
     kQueenPromotionCapture = /* */ 0b1111,
   };
 
-  constexpr Move() : data_(0) {}
-
   explicit constexpr Move(Square from, Square to, Flags flags = kNone)
       : data_(from + (to << 6) + (flags << 12)) {}
 
   static std::expected<Move, std::string> FromUCI(std::string_view input);
 
+  constexpr static Move NullMove() { return Move(); }
+
   [[nodiscard]] constexpr Square GetFrom() const {
+    DCHECK(!IsNullMove());
     return static_cast<Square>(data_ & 0b111111);
   }
 
   [[nodiscard]] constexpr Square GetTo() const {
+    DCHECK(!IsNullMove());
     return static_cast<Square>((data_ >> 6) & 0b111111);
   }
+
+  [[nodiscard]] constexpr bool IsNullMove() const { return data_ == 0; }
 
   [[nodiscard]] constexpr bool IsCapture() const {
     return GetFlags() & kCapture;
@@ -96,6 +100,11 @@ class Move {
 
   template <typename Out>
   Out FormatTo(Out out, bool full) const {
+    if (IsNullMove()) {
+      out = std::format_to(out, "0000");
+      return out;
+    }
+
     out = std::format_to(out, "{}{}", GetFrom(), GetTo());
 
     if (IsPromotion()) {
@@ -129,6 +138,8 @@ class Move {
   }
 
  private:
+  constexpr Move() : data_(0) {}
+
   [[nodiscard]] constexpr std::uint8_t GetFlags() const { return data_ >> 12; }
 
   // Stores the move state:
