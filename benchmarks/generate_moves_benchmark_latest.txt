@@ -1,0 +1,23 @@
+2026-01-03T13:34:00-08:00
+Running /private/var/tmp/_bazel_aryan/7319055b4501a6d3ca80b76ba19a8b9a/execroot/_main/bazel-out/darwin_arm64-opt/bin/benchmarks/generate_moves_benchmark
+Run on (10 X 24 MHz CPU s)
+CPU Caches:
+  L1 Data 64 KiB
+  L1 Instruction 128 KiB
+  L2 Unified 4096 KiB (x10)
+Load Average: 9.92, 7.88, 7.18
+-----------------------------------------------------------------------------------------
+Benchmark                                               Time             CPU   Iterations
+-----------------------------------------------------------------------------------------
+BM_GenerateLegalMovesWithCopy/kStarting               528 ns          503 ns      1000000
+BM_GenerateLegalMovesWithCopy/Position2               937 ns          936 ns       735101
+BM_GenerateLegalMovesWithCopy/Position3               402 ns          402 ns      1743271
+BM_GenerateLegalMovesWithCopy/kPosition5              867 ns          866 ns       805876
+BM_GenerateLegalMovesWithScopedMove/Starting          585 ns          584 ns      1192281
+BM_GenerateLegalMovesWithScopedMove/Position2        1217 ns         1216 ns       581193
+BM_GenerateLegalMovesWithScopedMove/Position3         501 ns          500 ns      1374301
+BM_GenerateLegalMovesWithScopedMove/kPosition5       1106 ns         1105 ns       633146
+BM_GeneratePseudoLegalMoves/kStarting                 185 ns          185 ns      3781004
+BM_GeneratePseudoLegalMoves/kPosition2                307 ns          307 ns      2286214
+BM_GeneratePseudoLegalMoves/kPosition3                158 ns          158 ns      4416571
+BM_GeneratePseudoLegalMoves/kPosition5                279 ns          279 ns      2490270

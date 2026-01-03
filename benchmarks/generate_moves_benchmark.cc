@@ -70,25 +70,23 @@ constexpr auto kStarting =
 constexpr auto kPosition2 =
     R"(r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1)";
 
-constexpr auto kPosition3 = R"(8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1)";
+constexpr auto kPosition3 =  //
+    R"(8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1)";
 
 constexpr auto kPosition5 =
     R"(rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8)";
 
-BENCHMARK_CAPTURE(  //
-    BM_GenerateLegalMovesWithCopy, kStarting, kStarting);
+BENCHMARK_CAPTURE(BM_GenerateLegalMovesWithCopy, kStarting, kStarting);
 BENCHMARK_CAPTURE(BM_GenerateLegalMovesWithCopy, Position2, kPosition2);
 BENCHMARK_CAPTURE(BM_GenerateLegalMovesWithCopy, Position3, kPosition3);
 BENCHMARK_CAPTURE(BM_GenerateLegalMovesWithCopy, kPosition5, kPosition5);
 
-BENCHMARK_CAPTURE(  //
-    BM_GenerateLegalMovesWithScopedMove, Starting, kStarting);
+BENCHMARK_CAPTURE(BM_GenerateLegalMovesWithScopedMove, Starting, kStarting);
 BENCHMARK_CAPTURE(BM_GenerateLegalMovesWithScopedMove, Position2, kPosition2);
 BENCHMARK_CAPTURE(BM_GenerateLegalMovesWithScopedMove, Position3, kPosition3);
 BENCHMARK_CAPTURE(BM_GenerateLegalMovesWithScopedMove, kPosition5, kPosition5);
 
-BENCHMARK_CAPTURE(  //
-    BM_GeneratePseudoLegalMoves, kStarting, kStarting);
+BENCHMARK_CAPTURE(BM_GeneratePseudoLegalMoves, kStarting, kStarting);
 BENCHMARK_CAPTURE(BM_GeneratePseudoLegalMoves, kPosition2, kPosition2);
 BENCHMARK_CAPTURE(BM_GeneratePseudoLegalMoves, kPosition3, kPosition3);
 BENCHMARK_CAPTURE(BM_GeneratePseudoLegalMoves, kPosition5, kPosition5);
