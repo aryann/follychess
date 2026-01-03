@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import os
 import random
+import shutil
 import sys
 
 import chess
@@ -28,7 +29,8 @@ def _create_pgn(engines, board):
 
 
 async def start_stockfish():
-    transport, engine = await chess.engine.popen_uci("/opt/homebrew/bin/stockfish")
+    stockfish = shutil.which("stockfish")
+    transport, engine = await chess.engine.popen_uci(stockfish)
 
     await engine.configure({
         "UCI_Elo": 1600,
@@ -48,26 +50,34 @@ async def run_game(engines) -> None:
     curr = 0
 
     board = chess.Board()
-    while not board.is_game_over():
+    while not board.is_game_over(claim_draw=True):
         engine = engines[curr % len(engines)]
         result = await engine.play(board, chess.engine.Limit(time=0.1))
         curr += 1
+        print(result.move, end=" ", flush=True)
         board.push(result.move)
 
     print(_create_pgn(engines, board))
+    return board.result()
 
 
 async def main() -> None:
-    engines = [await start_stockfish(), await start_follychess()]
+    engines = []
+    try:
+        engines = [await start_stockfish(), await start_follychess()]
 
-    for _ in range(100):
-        await run_game(engines)
-        print()
-        print("---")
-        print()
+        while True:
+            result = await run_game(engines)
+            print()
+            print(f'{engines[0].id.get("name")}, {engines[1].id.get("name")}, {result}')
 
-    for engine in engines:
-        await engine.quit()
+            print()
+            print("---")
+            print()
+
+    finally:
+        for engine in engines:
+            await engine.quit()
 
 
 asyncio.run(main())
