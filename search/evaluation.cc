@@ -5,14 +5,31 @@
 namespace follychess {
 namespace {
 
+consteval auto MakePlacementScores(std::array<std::int8_t, kNumSquares> all) {
+  std::array<Score, kNumSquares> result = {};
+  for (int i = 0; i < kNumSquares; ++i) {
+    result[i] = {.middle = all[i], .end = all[i]};
+  }
+  return result;
+}
+
+consteval auto MakePlacementScores(std::array<std::int8_t, kNumSquares> middle,
+                                   std::array<std::int8_t, kNumSquares> end) {
+  std::array<Score, kNumSquares> result = {};
+  for (int i = 0; i < kNumSquares; ++i) {
+    result[i] = {.middle = middle[i], .end = end[i]};
+  }
+  return result;
+}
+
 // Piece placement value source:
 // https://www.chessprogramming.org/Simplified_Evaluation_Function.
 //
 // All placement values are from white's perspective.
 consteval auto MakePlacementScores() {
-  std::array<std::array<std::int8_t, kNumSquares>, kNumPieces> result = {};
+  std::array<std::array<Score, kNumSquares>, kNumPieces> scores = {};
 
-  result[kPawn] = {
+  scores[kPawn] = MakePlacementScores({
       0,  0,  0,   0,   0,   0,   0,  0,   //
       50, 50, 50,  50,  50,  50,  50, 50,  //
       10, 10, 20,  30,  30,  20,  10, 10,  //
@@ -21,9 +38,9 @@ consteval auto MakePlacementScores() {
       5,  -5, -10, 0,   0,   -10, -5, 5,   //
       5,  10, 10,  -20, -20, 10,  10, 5,   //
       0,  0,  0,   0,   0,   0,   0,  0    //
-  };
+  });
 
-  result[kKnight] = {
+  scores[kKnight] = MakePlacementScores({
       -50, -40, -30, -30, -30, -30, -40, -50,  //
       -40, -20, 0,   0,   0,   0,   -20, -40,  //
       -30, 0,   10,  15,  15,  10,  0,   -30,  //
@@ -32,9 +49,9 @@ consteval auto MakePlacementScores() {
       -30, 5,   10,  15,  15,  10,  5,   -30,  //
       -40, -20, 0,   5,   5,   0,   -20, -40,  //
       -50, -40, -30, -30, -30, -30, -40, -50,  //
-  };
+  });
 
-  result[kBishop] = {
+  scores[kBishop] = MakePlacementScores({
       -20, -10, -10, -10, -10, -10, -10, -20,  //
       -10, 0,   0,   0,   0,   0,   0,   -10,  //
       -10, 0,   5,   10,  10,  5,   0,   -10,  //
@@ -43,9 +60,9 @@ consteval auto MakePlacementScores() {
       -10, 10,  10,  10,  10,  10,  10,  -10,  //
       -10, 5,   0,   0,   0,   0,   5,   -10,  //
       -20, -10, -10, -10, -10, -10, -10, -20,  //
-  };
+  });
 
-  result[kRook] = {
+  scores[kRook] = MakePlacementScores({
       0,  0,  0,  0,  0,  0,  0,  0,   //
       5,  10, 10, 10, 10, 10, 10, 5,   //
       -5, 0,  0,  0,  0,  0,  0,  -5,  //
@@ -54,9 +71,9 @@ consteval auto MakePlacementScores() {
       -5, 0,  0,  0,  0,  0,  0,  -5,  //
       -5, 0,  0,  0,  0,  0,  0,  -5,  //
       0,  0,  0,  5,  5,  0,  0,  0,   //
-  };
+  });
 
-  result[kQueen] = {
+  scores[kQueen] = MakePlacementScores({
       -20, -10, -10, -5, -5, -10, -10, -20,  //
       -10, 0,   0,   0,  0,  0,   0,   -10,  //
       -10, 0,   5,   5,  5,  5,   0,   -10,  //
@@ -65,39 +82,51 @@ consteval auto MakePlacementScores() {
       -10, 5,   5,   5,  5,  5,   0,   -10,  //
       -10, 0,   5,   0,  0,  0,   0,   -10,  //
       -20, -10, -10, -5, -5, -10, -10, -20,  //
-  };
+  });
 
-  result[kKing] = {
-      // TODO(aryann): Generate end-game placement scores.
-      -30, -40, -40, -50, -50, -40, -40, -30,  //
-      -30, -40, -40, -50, -50, -40, -40, -30,  //
-      -30, -40, -40, -50, -50, -40, -40, -30,  //
-      -30, -40, -40, -50, -50, -40, -40, -30,  //
-      -20, -30, -30, -40, -40, -30, -30, -20,  //
-      -10, -20, -20, -20, -20, -20, -20, -10,  //
-      20,  20,  0,   0,   0,   0,   20,  20,   //
-      20,  30,  10,  0,   0,   10,  30,  20,   //
-  };
+  scores[kKing] = MakePlacementScores(
+      // Middle game:
+      {
+          -30, -40, -40, -50, -50, -40, -40, -30,  //
+          -30, -40, -40, -50, -50, -40, -40, -30,  //
+          -30, -40, -40, -50, -50, -40, -40, -30,  //
+          -30, -40, -40, -50, -50, -40, -40, -30,  //
+          -20, -30, -30, -40, -40, -30, -30, -20,  //
+          -10, -20, -20, -20, -20, -20, -20, -10,  //
+          20,  20,  0,   0,   0,   0,   20,  20,   //
+          20,  30,  10,  0,   0,   10,  30,  20,   //
+      },
+      // End game:
+      {
+          -50, -40, -30, -20, -20, -30, -40, -50,  //
+          -30, -20, -10, 0,   0,   -10, -20, -30,  //
+          -30, -10, 20,  30,  30,  20,  -10, -30,  //
+          -30, -10, 30,  40,  40,  30,  -10, -30,  //
+          -30, -10, 30,  40,  40,  30,  -10, -30,  //
+          -30, -10, 20,  30,  30,  20,  -10, -30,  //
+          -30, -30, 0,   0,   0,   0,   -30, -30,  //
+          -50, -30, -30, -30, -30, -30, -30, -50,  //
+      });
+  ;
 
-  return result;
+  return scores;
 }
 
 constexpr auto kPlacementScores = MakePlacementScores();
 
 template <Side Side, Piece Piece>
-[[nodiscard]] constexpr int GetPlacementScore(const Position& position,
-                                              int phase) {
+[[nodiscard]] constexpr Score GetPlacementScore(const Position& position) {
   Bitboard pieces = position.GetPieces(Side, Piece);
-  const std::array<std::int8_t, kNumSquares>& scores = kPlacementScores[Piece];
 
-  int score = 0;
+  Score score;
   while (pieces) {
     Square square = pieces.PopLeastSignificantBit();
     if constexpr (Side == kBlack) {
       square = Reflect(square);
     }
 
-    score += scores[square];
+    score.middle += kPlacementScores[Piece][square].middle;
+    score.end += kPlacementScores[Piece][square].end;
   }
   return score;
 }
@@ -105,14 +134,17 @@ template <Side Side, Piece Piece>
 }  // namespace
 
 template <Side Side>
-[[nodiscard]] int GetPlacementScore(const Position& position, int phase) {
-  return GetPlacementScore<Side, kPawn>(position, phase) +
-         GetPlacementScore<Side, kKnight>(position, phase) +
-         GetPlacementScore<Side, kBishop>(position, phase) +
-         GetPlacementScore<Side, kRook>(position, phase) +
-         GetPlacementScore<Side, kQueen>(position, phase) +
-         GetPlacementScore<Side, kKing>(position, phase);
+[[nodiscard]] Score GetPlacementScore(const Position& position) {
+  return GetPlacementScore<Side, kPawn>(position) +
+         GetPlacementScore<Side, kKnight>(position) +
+         GetPlacementScore<Side, kBishop>(position) +
+         GetPlacementScore<Side, kRook>(position) +
+         GetPlacementScore<Side, kQueen>(position) +
+         GetPlacementScore<Side, kKing>(position);
 }
+
+template Score GetPlacementScore<kWhite>(const Position& position);
+template Score GetPlacementScore<kBlack>(const Position& position);
 
 template <Side Side>
 [[nodiscard]] int GetMaterialScore(const Position& position) {
@@ -158,11 +190,19 @@ template int CountBlockedPawns<kBlack>(const Position& position);
 
 namespace {
 
+[[nodiscard]] int Interpolate(Score score, int phase) {
+  const int middle = score.middle * (kEndPhaseValue - phase);
+  const int end = score.end * phase;
+  return (middle + end) / kEndPhaseValue;
+}
+
 template <Side Side>
 [[nodiscard]] int Evaluate(const Position& position, int phase) {
-  return GetPlacementScore<Side>(position, phase) +  //
-         GetMaterialScore<Side>(position) +          //
-         -50 * CountDoubledPawns<Side>(position) +   //
+  Score placement_score = GetPlacementScore<Side>(position);
+
+  return Interpolate(placement_score, phase) +      //
+         GetMaterialScore<Side>(position) +         //
+         -50 * CountDoubledPawns<Side>(position) +  //
          -50 * CountBlockedPawns<Side>(position);
 }
 

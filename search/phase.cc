@@ -24,7 +24,8 @@ int CalculatePhase(const Position& position) {
   phase -= position.GetPieces(kRook).GetCount() * kRookMaterialScore;
   phase -= position.GetPieces(kQueen).GetCount() * kQueenMaterialScore;
 
-  phase = (phase * 256 + kStartMaterialScore / 2) / kStartMaterialScore;
+  phase = phase * kEndPhaseValue + kStartMaterialScore / 2;
+  phase /= kStartMaterialScore;
   return phase;
 }
 

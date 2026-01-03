@@ -137,91 +137,109 @@ TEST(GetMaterialScore, Black) {
 }
 
 TEST(GetPlacementScore, White) {
-  EXPECT_THAT(GetPlacementScore<kWhite>(MakePosition("8: . . . . . . . ."
-                                                     "7: . . . . . . . ."
-                                                     "6: . . . . . . . ."
-                                                     "5: . . . P P . . ."
-                                                     "4: . . . . . . . ."
-                                                     "3: . . . . . . . ."
-                                                     "2: . . . . . . . ."
-                                                     "1: . . . . . . . ."
-                                                     "   a b c d e f g h"
-                                                     //
-                                                     "   w - - 0 1"),
-                                        kStartPhase),
-              Eq(50));
+  {
+    const auto [middle, end] =
+        GetPlacementScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                               "7: . . . . . . . ."
+                                               "6: . . . . . . . ."
+                                               "5: . . . P P . . ."
+                                               "4: . . . . . . . ."
+                                               "3: . . . . . . . ."
+                                               "2: . . . . . . . ."
+                                               "1: . . . . . . . ."
+                                               "   a b c d e f g h"
+                                               //
+                                               "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(50));
+    EXPECT_THAT(end, Eq(50));
+  }
 
-  EXPECT_THAT(GetPlacementScore<kWhite>(MakePosition("8: . . . . . . . ."
-                                                     "7: . . . . . . . ."
-                                                     "6: . . . . . . . ."
-                                                     "5: . . . . . . . ."
-                                                     "4: . . . p p . . ."
-                                                     "3: . . . . . . . ."
-                                                     "2: . . . . . . . ."
-                                                     "1: . . . . . . . ."
-                                                     "   a b c d e f g h"
-                                                     //
-                                                     "   w - - 0 1"),
-                                        kStartPhase),
-              Eq(0));
+  {
+    const auto [middle, end] =
+        GetPlacementScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                               "7: . . . . . . . ."
+                                               "6: . . . . . . . ."
+                                               "5: . . . . . . . ."
+                                               "4: . . . p p . . ."
+                                               "3: . . . . . . . ."
+                                               "2: . . . . . . . ."
+                                               "1: . . . . . . . ."
+                                               "   a b c d e f g h"
+                                               //
+                                               "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(0));
+    EXPECT_THAT(end, Eq(0));
+  }
 
-  EXPECT_THAT(GetPlacementScore<kWhite>(MakePosition("8: . . . . . . . ."
-                                                     "7: . . . . . . . ."
-                                                     "6: . . . . . . . ."
-                                                     "5: . . . . . . . ."
-                                                     "4: . . . . . . . ."
-                                                     "3: . . . . . . . ."
-                                                     "2: . . . . . . . ."
-                                                     "1: . . . . . . . K"
-                                                     "   a b c d e f g h"
-                                                     //
-                                                     "   w - - 0 1"),
-                                        kStartPhase),
-              Eq(20));
+  {
+    const auto [middle, end] =
+        GetPlacementScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                               "7: . . . . . . . ."
+                                               "6: . . . . . . . ."
+                                               "5: . . . . . . . ."
+                                               "4: . . . . . . . ."
+                                               "3: . . . . . . . ."
+                                               "2: . . . . . . . ."
+                                               "1: . . . . . . . K"
+                                               "   a b c d e f g h"
+                                               //
+                                               "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(20));
+    EXPECT_THAT(end, Eq(-50));
+  }
 
-  EXPECT_THAT(GetPlacementScore<kWhite>(MakePosition("8: Q . . . . . . ."
-                                                     "7: . . . . . . . ."
-                                                     "6: . . . . . . . ."
-                                                     "5: . . . . . . . ."
-                                                     "4: . . . . . . . ."
-                                                     "3: . . . . . . . ."
-                                                     "2: . . . . . . . ."
-                                                     "1: . . . . . . . K"
-                                                     "   a b c d e f g h"
-                                                     //
-                                                     "   w - - 0 1"),
-                                        kStartPhase),
-              Eq(0));
+  {
+    const auto [middle, end] =
+        GetPlacementScore<kWhite>(MakePosition("8: Q . . . . . . ."
+                                               "7: . . . . . . . ."
+                                               "6: . . . . . . . ."
+                                               "5: . . . . . . . ."
+                                               "4: . . . . . . . ."
+                                               "3: . . . . . . . ."
+                                               "2: . . . . . . . ."
+                                               "1: . . . . . . . K"
+                                               "   a b c d e f g h"
+                                               //
+                                               "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(0));
+    EXPECT_THAT(end, Eq(-70));
+  }
 }
 
 TEST(GetPlacementScore, Black) {
-  EXPECT_THAT(GetPlacementScore<kBlack>(MakePosition("8: . n . . . . . ."
-                                                     "7: . . . . . . . ."
-                                                     "6: . . . . . . . ."
-                                                     "5: . . . . . . . ."
-                                                     "4: . . . . . . . ."
-                                                     "3: . . . . . . . ."
-                                                     "2: . . . . . . . ."
-                                                     "1: . . . . . . . K"
-                                                     "   a b c d e f g h"
-                                                     //
-                                                     "   b - - 0 1"),
-                                        kStartPhase),
-              Eq(-40));
+  {
+    const auto [middle, end] =
+        GetPlacementScore<kBlack>(MakePosition("8: . n . . . . . ."
+                                               "7: . . . . . . . ."
+                                               "6: . . . . . . . ."
+                                               "5: . . . . . . . ."
+                                               "4: . . . . . . . ."
+                                               "3: . . . . . . . ."
+                                               "2: . . . . . . . ."
+                                               "1: . . . . . . . K"
+                                               "   a b c d e f g h"
+                                               //
+                                               "   b - - 0 1"));
+    EXPECT_THAT(middle, Eq(-40));
+    EXPECT_THAT(end, Eq(-40));
+  }
 
-  EXPECT_THAT(GetPlacementScore<kBlack>(MakePosition("8: . . . . . . . ."
-                                                     "7: . . . . . . . ."
-                                                     "6: . . . . . . . ."
-                                                     "5: . . . . p . . ."
-                                                     "4: . . . . . . . ."
-                                                     "3: . . . . . . . ."
-                                                     "2: . . . . . . . ."
-                                                     "1: . . . . . . . K"
-                                                     "   a b c d e f g h"
-                                                     //
-                                                     "   b - - 0 1"),
-                                        kStartPhase),
-              Eq(20));
+  {
+    const auto [middle, end] =
+        GetPlacementScore<kBlack>(MakePosition("8: . . . . . . . ."
+                                               "7: . . . . . . . ."
+                                               "6: . . . . . . . ."
+                                               "5: . . . . p . . ."
+                                               "4: . . . . . . . ."
+                                               "3: . . . . . . . ."
+                                               "2: . . . . . . . ."
+                                               "1: . . . . . . . K"
+                                               "   a b c d e f g h"
+                                               //
+                                               "   b - - 0 1"));
+    EXPECT_THAT(middle, Eq(20));
+    EXPECT_THAT(end, Eq(20));
+  }
 }
 
 TEST(CountDoubledPawns, White) {
@@ -456,7 +474,7 @@ TEST(CountBlockedPawns, Black) {
 }
 
 TEST(Evaluate, Starting) {
-  EXPECT_THAT(Evaluate(Position::Starting(), kStartPhase), Eq(0));
+  EXPECT_THAT(Evaluate(Position::Starting(), kStartPhaseValue), Eq(0));
 }
 
 TEST(Evaluate, MaterialImbalance) {
@@ -471,7 +489,7 @@ TEST(Evaluate, MaterialImbalance) {
                                     "   a b c d e f g h"
                                     //
                                     "   w - - 0 1"),
-                       kStartPhase),
+                       kStartPhaseValue),
               Eq(395));
 }
 
@@ -487,7 +505,7 @@ TEST(Evaluate, DoubledPawnPenalty) {
                                     "   a b c d e f g h"
                                     //
                                     "   w - - 0 1"),
-                       kStartPhase),
+                       kStartPhaseValue),
               Eq(-110));
 }
 

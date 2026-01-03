@@ -6,8 +6,17 @@
 
 namespace follychess {
 
+struct Score {
+  int middle = 0;
+  int end = 0;
+
+  constexpr Score operator+(const Score other) const {
+    return {.middle = middle + other.middle, .end = end + other.end};
+  }
+};
+
 template <Side Side>
-[[nodiscard]] int GetPlacementScore(const Position& position, int phase);
+[[nodiscard]] Score GetPlacementScore(const Position& position);
 
 template <Side Side>
 [[nodiscard]] int GetMaterialScore(const Position& position);
