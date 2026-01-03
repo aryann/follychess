@@ -13,7 +13,7 @@ void MakeMoves(std::size_t depth, Position& position) {
     return;
   }
 
-  for (const Move& move : GenerateMoves(position)) {
+  for (Move move : GenerateMoves(position)) {
     ScopedMove scoped_move(move, position);
     if (position.GetCheckers(~position.SideToMove())) {
       continue;
