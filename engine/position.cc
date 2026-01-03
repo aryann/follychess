@@ -279,25 +279,30 @@ std::expected<Position, std::string> Position::FromFen(std::string_view fen) {
 }
 
 UndoInfo Position::Do(const Move &move) {
-  // TODO(aryann): Reset the half move clock if there was a pawn move.
-  Piece victim = GetPiece(move.GetTo());
   const UndoInfo undo_info = {
       .move = move,
       .en_passant_target = en_passant_target_,
-      .captured_piece = victim,
+      .captured_piece =
+          move.IsNullMove() ? kEmptyPiece : GetPiece(move.GetTo()),
       .half_moves = half_moves_,
       .castling_rights = castling_rights_,
   };
 
-  if (victim == kEmptyPiece) {
+  if (move.IsNullMove()) {
+    side_to_move_ = ~side_to_move_;
+    zobrist_key_.UpdateSideToMove();
+    return undo_info;
+  }
+
+  if (undo_info.captured_piece == kEmptyPiece) {
     ++half_moves_;
   } else {
     DCHECK(GetSide(move.GetTo()) == ~side_to_move_);
 
-    pieces_[victim].Clear(move.GetTo());
+    pieces_[undo_info.captured_piece].Clear(move.GetTo());
     sides_[~side_to_move_].Clear(move.GetTo());
     half_moves_ = 0;
-    zobrist_key_.Update(move.GetTo(), victim, ~side_to_move_);
+    zobrist_key_.Update(move.GetTo(), undo_info.captured_piece, ~side_to_move_);
   }
 
   Piece piece = GetPiece(move.GetFrom());
@@ -352,6 +357,7 @@ UndoInfo Position::Do(const Move &move) {
     ++full_moves_;
   }
   side_to_move_ = ~side_to_move_;
+  zobrist_key_.UpdateSideToMove();
 
   zobrist_key_.ToggleEnPassantTarget(en_passant_target_);
   if (move.IsDoublePawnPush()) {
@@ -361,12 +367,18 @@ UndoInfo Position::Do(const Move &move) {
     en_passant_target_ = std::nullopt;
   }
 
-  zobrist_key_.UpdateSideToMove();
   return undo_info;
 }
 
 void Position::Undo(const UndoInfo &undo_info) {
   const Move &move = undo_info.move;
+
+  side_to_move_ = ~side_to_move_;
+  zobrist_key_.UpdateSideToMove();
+
+  if (move.IsNullMove()) {
+    return;
+  }
 
   zobrist_key_.ToggleEnPassantTarget(en_passant_target_);
   en_passant_target_ = undo_info.en_passant_target;
@@ -375,8 +387,6 @@ void Position::Undo(const UndoInfo &undo_info) {
   zobrist_key_.ToggleCastlingRights(castling_rights_);
   castling_rights_ = undo_info.castling_rights;
   zobrist_key_.ToggleCastlingRights(castling_rights_);
-
-  side_to_move_ = ~side_to_move_;
 
   if (move.IsPromotion()) {
     pieces_[move.GetPromotedPiece()].Clear(move.GetTo());
@@ -426,7 +436,6 @@ void Position::Undo(const UndoInfo &undo_info) {
     --full_moves_;
   }
   half_moves_ = undo_info.half_moves;
-  zobrist_key_.UpdateSideToMove();
 }
 
 void Position::InitKey() {

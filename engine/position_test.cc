@@ -1402,5 +1402,37 @@ TEST(HalfMoveClock, ResetsOnPawnMovesAndCaptures) {
   }
 }
 
+TEST(NullMove, DoAndUndo) {
+  std::string_view start =
+      "8: r n b q k b n r"
+      "7: p p p . p p p p"
+      "6: . . . . . . . ."
+      "5: . . . N . . . ."
+      "4: . . . . . . . ."
+      "3: . . . . . . . ."
+      "2: P P P P P P P P"
+      "1: R . B Q K B N R"
+      "   a b c d e f g h"
+      //
+      "   b KQkq - 0 2";
+  Position position = MakePosition(start);
+
+  UndoInfo undo_info = position.Do(Move::NullMove());
+  EXPECT_THAT(position, EqualsPosition("8: r n b q k b n r"
+                                       "7: p p p . p p p p"
+                                       "6: . . . . . . . ."
+                                       "5: . . . N . . . ."
+                                       "4: . . . . . . . ."
+                                       "3: . . . . . . . ."
+                                       "2: P P P P P P P P"
+                                       "1: R . B Q K B N R"
+                                       "   a b c d e f g h"
+                                       //
+                                       "   w KQkq - 0 2"));
+
+  position.Undo(undo_info);
+  EXPECT_THAT(position, EqualsPosition(start));
+}
+
 }  // namespace
 }  // namespace follychess
