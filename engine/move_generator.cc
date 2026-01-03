@@ -285,4 +285,57 @@ std::vector<Move> GenerateMoves(const Position &position) {
   return moves;
 }
 
+namespace {
+
+std::vector<Move> SelectLegalMoves(
+    const Position &position, const std::vector<Move> &pseudo_legal_moves) {
+  std::vector<Move> moves;
+  for (Move move : pseudo_legal_moves) {
+    Position new_position = position;
+    new_position.Do(move);
+    if (!new_position.GetCheckers(~new_position.SideToMove())) {
+      moves.push_back(move);
+    }
+  }
+  return moves;
+}
+
+}  // namespace
+
+template <Side Side>
+std::vector<Move> GenerateLegalMoves(Position position) {
+  if (position.SideToMove() != Side) {
+    position.Do(Move::NullMove());
+  }
+
+  std::vector<Move> pseudo_legal_moves;
+  if (position.GetCheckers(position.SideToMove())) {
+    GenerateMoves<kEvasion>(position, pseudo_legal_moves);
+  } else {
+    GenerateMoves<kQuiet>(position, pseudo_legal_moves);
+    GenerateMoves<kCapture>(position, pseudo_legal_moves);
+  }
+
+  return SelectLegalMoves(position, pseudo_legal_moves);
+}
+
+template std::vector<Move> GenerateLegalMoves<kWhite>(Position position);
+template std::vector<Move> GenerateLegalMoves<kBlack>(Position position);
+
+template <MoveType MoveType>
+std::vector<Move> GenerateLegalMoves(const Position &position) {
+  return SelectLegalMoves(position, GenerateMoves<MoveType>(position));
+}
+
+template std::vector<Move> GenerateLegalMoves<kCapture>(
+    const Position &position);
+
+std::vector<Move> GenerateLegalMoves(const Position &position) {
+  if (position.SideToMove() == kWhite) {
+    return GenerateLegalMoves<kWhite>(position);
+  } else {
+    return GenerateLegalMoves<kBlack>(position);
+  }
+}
+
 }  // namespace follychess

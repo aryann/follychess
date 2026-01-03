@@ -59,18 +59,12 @@ class AlphaBetaSearcher {
       return score;
     }
 
-    bool has_legal_moves = false;
-    std::vector<Move> moves = GenerateMoves(position_);
+    std::vector<Move> moves = GenerateLegalMoves(position_);
     OrderMoves(position_, moves);
 
     TranspositionTable::BoundType transposition_type = UpperBound;
     for (Move move : moves) {
       ScopedMove2 scoped_move(move, game_);
-      if (!IsLastMoveLegal()) {
-        continue;
-      }
-      has_legal_moves = true;
-
       const int score = -Search(-beta, -alpha, depth + 1);
 
       if (score >= beta) {
@@ -89,7 +83,7 @@ class AlphaBetaSearcher {
       }
     }
 
-    if (has_legal_moves) {
+    if (!moves.empty()) {
       transpositions_.Record(alpha, depth, transposition_type);
       return alpha;
     }
@@ -122,15 +116,10 @@ class AlphaBetaSearcher {
     }
     alpha = std::max(alpha, score);
 
-    std::vector<Move> moves = GenerateMoves<kCapture>(position_);
+    std::vector<Move> moves = GenerateLegalMoves<kCapture>(position_);
     OrderMoves(position_, moves);
     for (Move move : moves) {
       ScopedMove2 scoped_move(move, game_);
-      const bool is_legal = !position_.GetCheckers(~position_.SideToMove());
-      if (!is_legal) {
-        continue;
-      }
-
       score = -QuiescentSearch(-beta, -alpha, depth + 1);
 
       if (score >= beta) {
@@ -145,10 +134,6 @@ class AlphaBetaSearcher {
   [[nodiscard]] int GetScore() const {
     const int score = Evaluate(position_, CalculatePhase(position_));
     return position_.SideToMove() == kWhite ? score : -score;
-  }
-
-  [[nodiscard]] constexpr bool IsLastMoveLegal() const {
-    return !position_.GetCheckers(~position_.SideToMove());
   }
 
   [[nodiscard]] constexpr bool CurrentSideInCheck() const {

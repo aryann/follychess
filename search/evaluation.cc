@@ -1,5 +1,6 @@
 #include "search/evaluation.h"
 
+#include "engine/move_generator.h"
 #include "engine/position.h"
 
 namespace follychess {
@@ -203,7 +204,8 @@ template <Side Side>
   return Interpolate(placement_score, phase) +      //
          GetMaterialScore<Side>(position) +         //
          -50 * CountDoubledPawns<Side>(position) +  //
-         -50 * CountBlockedPawns<Side>(position);
+         -50 * CountBlockedPawns<Side>(position) +
+         0 * GenerateLegalMoves<Side>(position).size();
 }
 
 }  // namespace
