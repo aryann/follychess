@@ -61,7 +61,7 @@ class AlphaBetaSearcher {
     }
 
     std::vector<Move> moves = GenerateLegalMoves(position_);
-    OrderMoves(position_, moves);
+    OrderMoves(position_, Move::NullMove(), moves);
 
     TranspositionTable::BoundType transposition_type = UpperBound;
     for (Move move : moves) {
@@ -122,7 +122,7 @@ class AlphaBetaSearcher {
     alpha = std::max(alpha, score);
 
     std::vector<Move> moves = GenerateLegalMoves<kCapture>(position_);
-    OrderMoves(position_, moves);
+    OrderMoves(position_, Move::NullMove(), moves);
     for (Move move : moves) {
       ScopedMove2 scoped_move(move, game_);
       score = -QuiescentSearch(-beta, -alpha, depth + 1);

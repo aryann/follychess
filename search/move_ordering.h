@@ -8,7 +8,8 @@
 
 namespace follychess {
 
-void OrderMoves(const Position& position, std::vector<Move>& moves);
+void OrderMoves(const Position& position, Move priority_move,
+                std::vector<Move>& moves);
 
 }  // namespace follychess
 

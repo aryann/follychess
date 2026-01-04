@@ -9,7 +9,12 @@
 namespace follychess {
 namespace {
 
-[[nodiscard]] int MoveKey(const Position& position, Move move) {
+[[nodiscard]] int MoveKey(const Position& position, Move priority_move,
+                          Move move) {
+  if (priority_move == move) {
+    return 0;
+  }
+
   if (move.IsCapture()) {
     const Piece attacker = position.GetPiece(move.GetFrom());
     const Piece victim = position.GetPiece(move.GetTo());
@@ -42,8 +47,10 @@ namespace {
 
 }  // namespace
 
-void OrderMoves(const Position& position, std::vector<Move>& moves) {
-  std::ranges::sort(moves, std::less(), std::bind_front(MoveKey, position));
+void OrderMoves(const Position& position, Move priority_move,
+                std::vector<Move>& moves) {
+  std::ranges::sort(moves, std::less(),
+                    std::bind_front(MoveKey, position, priority_move));
 }
 
 }  // namespace follychess

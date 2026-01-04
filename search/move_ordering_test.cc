@@ -34,7 +34,7 @@ TEST(MoveOrdering, Captures) {
       "c6c5",
   });
 
-  OrderMoves(position, moves);
+  OrderMoves(position, Move::NullMove(), moves);
   EXPECT_THAT(moves, ElementsAreArray(MakeMoves({
                          "c6d5#c",  // Queen capture
                          "f3e2#c",  // Rook capture
@@ -67,7 +67,7 @@ TEST(MoveOrdering, Promotions) {
       "b1c3",
   });
 
-  OrderMoves(position, moves);
+  OrderMoves(position, Move::NullMove(), moves);
   EXPECT_THAT(moves, ElementsAreArray(MakeMoves({
                          "a7a8q",
                          "a7a8r",
@@ -97,7 +97,7 @@ TEST(MoveOrdering, Castling) {
       "e1g1#oo",
   });
 
-  OrderMoves(position, moves);
+  OrderMoves(position, Move::NullMove(), moves);
   EXPECT_THAT(moves, ElementsAreArray(MakeMoves({
                          "e1g1#oo",  // Kingside castling
                          "h1g1",     // Quiet rook move
@@ -124,10 +124,13 @@ TEST(MoveOrdering, PriorityHierarchy) {
       "e1c1#ooo",
       "g7g8q",
       "d4e6#c",
+      "d4c2",
   });
 
-  OrderMoves(position, moves);
+  Move priority_move = MakeMove("d4c2");
+  OrderMoves(position, priority_move, moves);
   EXPECT_THAT(moves, ElementsAreArray(MakeMoves({
+                         "d4c2",      // Priority move
                          "d4e6#c",    // Capture
                          "g7g8q",     // Quiet promotion
                          "e1c1#ooo",  // Queenside castling
