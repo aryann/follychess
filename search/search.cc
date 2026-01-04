@@ -25,14 +25,11 @@ class AlphaBetaSearcher {
         requested_search_depth_{options.depth},
         log_every_n_{options.log_every_n},
         logger_{options.logger},
+        best_move_{Move::NullMove()},
         nodes_{0},
         transpositions_{position_} {}
 
   [[nodiscard]] Move GetBestMove() {
-    if (best_move_) {
-      return *best_move_;
-    }
-
     start_time_ = std::chrono::system_clock::now();
 
     constexpr static int kAlpha = -100'000;
@@ -40,9 +37,8 @@ class AlphaBetaSearcher {
     Search(kAlpha, kBeta, 0);
     Log(requested_search_depth_);
 
-    DCHECK(best_move_.has_value());
-
-    return *best_move_;
+    DCHECK_NE(best_move_, Move::NullMove());
+    return best_move_;
   }
 
  private:
@@ -181,7 +177,7 @@ class AlphaBetaSearcher {
   const std::int64_t log_every_n_;
   const std::function<void(std::string_view)> logger_;
 
-  std::optional<Move> best_move_;
+  Move best_move_;
   PrincipalVariationTable pv_table_;
 
   std::chrono::system_clock::time_point start_time_;
