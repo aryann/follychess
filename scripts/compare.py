@@ -56,7 +56,7 @@ async def run_game(engines, db) -> None:
     moves = []
     while not board.is_game_over(claim_draw=True):
         engine = engines[curr % len(engines)]
-        result = await engine.play(board, chess.engine.Limit(depth=5, time=0.1))
+        result = await engine.play(board, chess.engine.Limit(time=0.1))
         curr += 1
         print(result.move, end=" ", flush=True)
         moves.append(str(result.move))
