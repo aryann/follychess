@@ -84,14 +84,14 @@ class AlphaBetaSearcher {
       }
     }
 
-    if (!moves.empty()) {
-      transpositions_.Record(alpha, depth, transposition_type);
-      return alpha;
-    }
-
     if (game_.GetRepetitionCount() >= 3) {
       // A draw can be claimed due to the threefold repetition rule.
       return 0;
+    }
+
+    if (!moves.empty()) {
+      transpositions_.Record(alpha, depth, transposition_type);
+      return alpha;
     }
 
     if (CurrentSideInCheck()) {
