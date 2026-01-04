@@ -204,8 +204,7 @@ template <Side Side>
   return Interpolate(placement_score, phase) +      //
          GetMaterialScore<Side>(position) +         //
          -50 * CountDoubledPawns<Side>(position) +  //
-         -50 * CountBlockedPawns<Side>(position) +
-         0 * GenerateLegalMoves<Side>(position).size();
+         -50 * CountBlockedPawns<Side>(position);
 }
 
 }  // namespace
