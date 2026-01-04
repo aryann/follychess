@@ -191,6 +191,43 @@ template int CountBlockedPawns<kBlack>(const Position& position);
 
 namespace {
 
+template <Side Side>
+[[nodiscard]] int CountOpenFileRooks(const Position& position,
+                                     Bitboard blockers) {
+  int count = 0;
+  Bitboard rooks = position.GetPieces(Side, kRook);
+  while (rooks) {
+    Square square = rooks.PopLeastSignificantBit();
+    Bitboard file = file::kFileMasks[GetFile(square)];
+    if (!(file & blockers)) {
+      ++count;
+    }
+  }
+  return count;
+}
+
+}  // namespace
+
+template <Side Side>
+[[nodiscard]] int CountSemiOpenFileRooks(const Position& position) {
+  Bitboard blockers = position.GetPieces(~Side, kPawn);
+  return CountOpenFileRooks<Side>(position, blockers);
+}
+
+template int CountSemiOpenFileRooks<kWhite>(const Position& position);
+template int CountSemiOpenFileRooks<kBlack>(const Position& position);
+
+template <Side Side>
+[[nodiscard]] int CountOpenFileRooks(const Position& position) {
+  Bitboard blockers = position.GetPieces(kPawn);
+  return CountOpenFileRooks<Side>(position, blockers);
+}
+
+template int CountOpenFileRooks<kWhite>(const Position& position);
+template int CountOpenFileRooks<kBlack>(const Position& position);
+
+namespace {
+
 [[nodiscard]] int Interpolate(Score score, int phase) {
   const int middle = score.middle * (kEndPhaseValue - phase);
   const int end = score.end * phase;
@@ -201,10 +238,12 @@ template <Side Side>
 [[nodiscard]] int Evaluate(const Position& position, int phase) {
   Score placement_score = GetPlacementScore<Side>(position);
 
-  return Interpolate(placement_score, phase) +      //
-         GetMaterialScore<Side>(position) +         //
-         -50 * CountDoubledPawns<Side>(position) +  //
-         -50 * CountBlockedPawns<Side>(position);
+  return Interpolate(placement_score, phase) +          //
+         GetMaterialScore<Side>(position) +             //
+         -50 * CountDoubledPawns<Side>(position) +      //
+         -50 * CountBlockedPawns<Side>(position) +      //
+         10 * CountSemiOpenFileRooks<Side>(position) +  //
+         15 * CountOpenFileRooks<Side>(position);
 }
 
 }  // namespace

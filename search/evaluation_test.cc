@@ -473,6 +473,79 @@ TEST(CountBlockedPawns, Black) {
               Eq(1));
 }
 
+TEST(CountSemiOpenFileRooks, White) {
+  EXPECT_THAT(CountSemiOpenFileRooks<kWhite>(MakePosition("8: . . . . . . . ."
+                                                          "7: . . p . . . . ."
+                                                          "6: . . . . . . . ."
+                                                          "5: . . . . . . . ."
+                                                          "4: . . . . . . . ."
+                                                          "3: . . . . . . . ."
+                                                          "2: . P . . . . . ."
+                                                          "1: R R R . . . . ."
+                                                          "   a b c d e f g h"
+                                                          //
+                                                          "   w - - 0 1")),
+              Eq(2));
+}
+
+TEST(CountSemiOpenFileRooks, Black) {
+  EXPECT_THAT(CountSemiOpenFileRooks<kBlack>(MakePosition("8: . . . . . r r r"
+                                                          "7: . . . . . . p ."
+                                                          "6: . . . . . . . ."
+                                                          "5: . . . . . . . ."
+                                                          "4: . . . . . . . ."
+                                                          "3: . . . . . . . ."
+                                                          "2: . . . . . P . ."
+                                                          "1: . . . . . . . ."
+                                                          "   a b c d e f g h"
+                                                          //
+                                                          "   w - - 0 1")),
+              Eq(2));
+}
+
+TEST(CountOpenFileRooks, White) {
+  EXPECT_THAT(CountOpenFileRooks<kWhite>(MakePosition("8: . . . . . . . ."
+                                                      "7: . . p . . . . ."
+                                                      "6: . . . . . . . ."
+                                                      "5: . . . . . . . ."
+                                                      "4: . . . . . . . ."
+                                                      "3: . . . . . . . ."
+                                                      "2: . P . . . . . ."
+                                                      "1: R R R . . . . ."
+                                                      "   a b c d e f g h"
+                                                      //
+                                                      "   w - - 0 1")),
+              Eq(1));
+
+  EXPECT_THAT(CountOpenFileRooks<kWhite>(MakePosition("8: . . . . . . . ."
+                                                      "7: . . . . . . . ."
+                                                      "6: . . . . . . . ."
+                                                      "5: . . . . R . . ."
+                                                      "4: . . . . . . . ."
+                                                      "3: . . . . . . . ."
+                                                      "2: . . . . . . . ."
+                                                      "1: . . . . R . . ."
+                                                      "   a b c d e f g h"
+                                                      //
+                                                      "   w - - 0 1")),
+              Eq(2));
+}
+
+TEST(CountOpenFileRooks, Black) {
+  EXPECT_THAT(CountOpenFileRooks<kBlack>(MakePosition("8: . . . . . r r r"
+                                                      "7: . . . . . . p ."
+                                                      "6: . . . . . . . ."
+                                                      "5: . . . . . . . ."
+                                                      "4: . . . . . . . ."
+                                                      "3: . . . . . . . ."
+                                                      "2: . . . . . P . ."
+                                                      "1: . . . . . . . ."
+                                                      "   a b c d e f g h"
+                                                      //
+                                                      "   w - - 0 1")),
+              Eq(1));
+}
+
 TEST(Evaluate, Starting) {
   EXPECT_THAT(Evaluate(Position::Starting(), kStartPhaseValue), Eq(0));
 }
@@ -490,7 +563,7 @@ TEST(Evaluate, MaterialImbalance) {
                                     //
                                     "   w - - 0 1"),
                        kStartPhaseValue),
-              Eq(395));
+              Eq(370));
 }
 
 TEST(Evaluate, DoubledPawnPenalty) {
