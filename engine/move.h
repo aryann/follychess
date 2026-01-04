@@ -174,7 +174,6 @@ static_assert(alignof(UndoInfo) == 2,
 
 template <>
 struct std::formatter<follychess::Move> : std::formatter<std::string> {
- public:
   template <class ParseContext>
   constexpr auto parse(ParseContext &context) {
     auto it = context.begin();

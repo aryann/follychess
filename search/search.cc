@@ -11,7 +11,8 @@
 #include "search/evaluation.h"
 #include "search/move_ordering.h"
 #include "search/phase.h"
-#include "transposition.h"
+#include "search/principal_variation.h"
+#include "search/transposition.h"
 
 namespace follychess {
 namespace {
@@ -47,6 +48,7 @@ class AlphaBetaSearcher {
   int Search(int alpha, const int beta, const int depth) {
     using enum TranspositionTable::BoundType;
 
+    pv_table_.RecordMove(depth, Move::NullMove());
     ++nodes_;
     MaybeLog(depth);
 
@@ -76,6 +78,8 @@ class AlphaBetaSearcher {
       if (score > alpha) {
         alpha = score;
         transposition_type = Exact;
+        pv_table_.RecordMove(depth, move);
+
         if (depth == 0) {
           // Store this move as the best move if and only if this is a root
           // node.
@@ -154,9 +158,10 @@ class AlphaBetaSearcher {
 
     const int selective_depth = depth + additional_depth;
 
-    logger_(std::format("info depth {} seldepth {} nodes {} nps {} tbhits {}",
-                        depth, selective_depth, nodes_, nodes_per_second,
-                        transpositions_.GetHits()));
+    logger_(
+        std::format("info depth {} seldepth {} nodes {} nps {} tbhits {} pv {}",
+                    depth, selective_depth, nodes_, nodes_per_second,
+                    transpositions_.GetHits(), pv_table_));
   }
 
   Game game_;
@@ -167,6 +172,7 @@ class AlphaBetaSearcher {
   const std::function<void(std::string_view)> logger_;
 
   std::optional<Move> best_move_;
+  PrincipalVariationTable pv_table_;
 
   std::chrono::system_clock::time_point start_time_;
   std::int64_t nodes_;

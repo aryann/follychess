@@ -1,7 +1,9 @@
 #ifndef FOLLYCHESS_SEARCH_PRINCIPAL_VARIATION_H_
 #define FOLLYCHESS_SEARCH_PRINCIPAL_VARIATION_H_
 
-#include "engine/position.h"
+#include <format>
+
+#include "engine/move.h"
 
 namespace follychess {
 
@@ -54,5 +56,22 @@ class PrincipalVariationTable {
 };
 
 }  // namespace follychess
+
+template <>
+struct std::formatter<follychess::PrincipalVariationTable>
+    : std::formatter<std::string> {
+  static auto format(const follychess::PrincipalVariationTable &table,
+                     std::format_context &context) {
+    auto out = context.out();
+    std::span<const follychess::Move> moves = table.GetPrincipalVariation();
+    if (!moves.empty()) {
+      out = std::format_to(out, "{}", moves[0]);
+    }
+    for (int i = 1; i < moves.size(); ++i) {
+      out = std::format_to(out, " {}", moves[i]);
+    }
+    return out;
+  }
+};
 
 #endif  // FOLLYCHESS_SEARCH_PRINCIPAL_VARIATION_H_

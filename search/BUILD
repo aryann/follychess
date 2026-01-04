@@ -99,6 +99,7 @@ cc_library(
     deps = [
         ":evaluation",
         ":move_ordering",
+        ":principal_variation",
         ":transposition",
         "//engine:move",
         "//engine:move_generator",
