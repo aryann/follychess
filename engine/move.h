@@ -37,6 +37,8 @@ class Move {
 
   static std::expected<Move, std::string> FromUCI(std::string_view input);
 
+  constexpr Move() : data_(0) {}
+
   constexpr static Move NullMove() { return Move(); }
 
   [[nodiscard]] constexpr Square GetFrom() const {
@@ -138,8 +140,6 @@ class Move {
   }
 
  private:
-  constexpr Move() : data_(0) {}
-
   [[nodiscard]] constexpr std::uint8_t GetFlags() const { return data_ >> 12; }
 
   // Stores the move state:

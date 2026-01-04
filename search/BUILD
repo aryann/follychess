@@ -72,6 +72,27 @@ cc_test(
 )
 
 cc_library(
+    name = "principal_variation",
+    srcs = [],
+    hdrs = ["principal_variation.h"],
+    deps = [
+        "//engine:move",
+    ],
+)
+
+cc_test(
+    name = "principal_variation_test",
+    srcs = ["principal_variation_test.cc"],
+    deps = [
+        ":principal_variation",
+        "//engine:move",
+        "//engine:position",
+        "//engine:testing",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "search",
     srcs = ["search.cc"],
     hdrs = ["search.h"],
