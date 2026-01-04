@@ -203,7 +203,7 @@ template <Side Side>
     if (!blockers) {
       if constexpr (Side == kWhite) {
         static constexpr std::array kWhiteScores = {
-            0, 0, 30, 50, 75, 100, 150, 0,
+            0, 150, 100, 75, 50, 30, 0, 0,
         };
         score += kWhiteScores[GetRank(square)];
 

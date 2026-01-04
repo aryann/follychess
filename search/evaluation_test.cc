@@ -126,6 +126,140 @@ TEST(PassedPawnMasks, Black) {
                              "   a b c d e f g h"));
 }
 
+TEST(GetPassedPawnScore, White) {
+  EXPECT_THAT(GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                      "7: . . . . . . . ."
+                                                      "6: . . . . . . . ."
+                                                      "5: . . . . P . . ."
+                                                      "4: . . . . . . . ."
+                                                      "3: . . . . . . . ."
+                                                      "2: . . . . . . . ."
+                                                      "1: . . . . . . . ."
+                                                      "   a b c d e f g h"
+                                                      //
+                                                      "   w - - 0 1")),
+              Eq(75));
+
+  EXPECT_THAT(GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                      "7: . . . . . . . ."
+                                                      "6: P . . . . . . ."
+                                                      "5: . . . . . . . P"
+                                                      "4: . . . . . . . ."
+                                                      "3: . . . . . . . ."
+                                                      "2: . . . . . . . ."
+                                                      "1: . . . . . . . ."
+                                                      "   a b c d e f g h"
+                                                      //
+                                                      "   w - - 0 1")),
+              Eq(175));
+
+  EXPECT_THAT(GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                      "7: . . . . . . . ."
+                                                      "6: . . . . . . . ."
+                                                      "5: . . . . p . . ."
+                                                      "4: . . . . P . . ."
+                                                      "3: . . . . . . . ."
+                                                      "2: . . . . . . . ."
+                                                      "1: . . . . . . . ."
+                                                      "   a b c d e f g h"
+                                                      //
+                                                      "   w - - 0 1")),
+              Eq(0));
+
+  EXPECT_THAT(GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                      "7: . . . . . . . ."
+                                                      "6: . . . . . . . ."
+                                                      "5: . . . p . . . ."
+                                                      "4: . . . . P . . ."
+                                                      "3: . . . . . . . ."
+                                                      "2: . . . . . . . ."
+                                                      "1: . . . . . . . ."
+                                                      "   a b c d e f g h"
+                                                      //
+                                                      "   w - - 0 1")),
+              Eq(0));
+
+  EXPECT_THAT(GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                      "7: . . . . . . . ."
+                                                      "6: . . . . . . . ."
+                                                      "5: . . . . . p . ."
+                                                      "4: . . . . P . . ."
+                                                      "3: . . . . . . . ."
+                                                      "2: . . . . . . . ."
+                                                      "1: . . . . . . . ."
+                                                      "   a b c d e f g h"
+                                                      //
+                                                      "   w - - 0 1")),
+              Eq(0));
+}
+
+TEST(GetPassedPawnScore, Black) {
+  EXPECT_THAT(GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
+                                                      "7: . . . . . . . ."
+                                                      "6: . . . . . . . ."
+                                                      "5: . . . . . . . ."
+                                                      "4: . . . . p . . ."
+                                                      "3: . . . . . . . ."
+                                                      "2: . . . . . . . ."
+                                                      "1: . . . . . . . ."
+                                                      "   a b c d e f g h"
+                                                      //
+                                                      "   w - - 0 1")),
+              Eq(75));
+
+  EXPECT_THAT(GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
+                                                      "7: . . . . . . . ."
+                                                      "6: . . . . . . . ."
+                                                      "5: . . . . . . . ."
+                                                      "4: . . . . . . . p"
+                                                      "3: p . . . . . . ."
+                                                      "2: . . . . . . . ."
+                                                      "1: . . . . . . . ."
+                                                      "   a b c d e f g h"
+                                                      //
+                                                      "   w - - 0 1")),
+              Eq(175));
+
+  EXPECT_THAT(GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
+                                                      "7: . . . . . . . ."
+                                                      "6: . . . . . . . ."
+                                                      "5: . . . . p . . ."
+                                                      "4: . . . . P . . ."
+                                                      "3: . . . . . . . ."
+                                                      "2: . . . . . . . ."
+                                                      "1: . . . . . . . ."
+                                                      "   a b c d e f g h"
+                                                      //
+                                                      "   w - - 0 1")),
+              Eq(0));
+
+  EXPECT_THAT(GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
+                                                      "7: . . . . . . . ."
+                                                      "6: . . . . . . . ."
+                                                      "5: . . . . p . . ."
+                                                      "4: . . . P . . . ."
+                                                      "3: . . . . . . . ."
+                                                      "2: . . . . . . . ."
+                                                      "1: . . . . . . . ."
+                                                      "   a b c d e f g h"
+                                                      //
+                                                      "   w - - 0 1")),
+              Eq(0));
+
+  EXPECT_THAT(GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
+                                                      "7: . . . . . . . ."
+                                                      "6: . . . . . . . ."
+                                                      "5: . . . . p . . ."
+                                                      "4: . . . . . P . ."
+                                                      "3: . . . . . . . ."
+                                                      "2: . . . . . . . ."
+                                                      "1: . . . . . . . ."
+                                                      "   a b c d e f g h"
+                                                      //
+                                                      "   w - - 0 1")),
+              Eq(0));
+}
+
 TEST(GetMaterialScore, White) {
   EXPECT_THAT(GetMaterialScore<kWhite>(Position::Starting()), Eq(23'900));
 
