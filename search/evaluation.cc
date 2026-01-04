@@ -191,9 +191,36 @@ template int CountBlockedPawns<kWhite>(const Position& position);
 template int CountBlockedPawns<kBlack>(const Position& position);
 
 template <Side Side>
-[[nodiscard]] int CountPassedPawns(const Position& position) {
-  return 0;
+[[nodiscard]] int GetPassedPawnScore(const Position& position) {
+  int score = 0;
+  Bitboard pawns = position.GetPieces(Side, kPawn);
+
+  while (pawns) {
+    const Square square = pawns.PopLeastSignificantBit();
+    const Bitboard blockers =
+        kPassedPawnMasks[Side][square] & position.GetPieces(~Side, kPawn);
+
+    if (!blockers) {
+      if constexpr (Side == kWhite) {
+        static constexpr std::array kWhiteScores = {
+            0, 0, 30, 50, 75, 100, 150, 0,
+        };
+        score += kWhiteScores[GetRank(square)];
+
+      } else {
+        static constexpr std::array kBlackScores = {
+            0, 0, 30, 50, 75, 100, 150, 0,
+        };
+        score += kBlackScores[GetRank(square)];
+      }
+    }
+  }
+
+  return score;
 }
+
+template int GetPassedPawnScore<kWhite>(const Position& position);
+template int GetPassedPawnScore<kBlack>(const Position& position);
 
 namespace {
 
@@ -203,8 +230,8 @@ template <Side Side>
   int count = 0;
   Bitboard rooks = position.GetPieces(Side, kRook);
   while (rooks) {
-    Square square = rooks.PopLeastSignificantBit();
-    Bitboard file = file::kFileMasks[GetFile(square)];
+    const Square square = rooks.PopLeastSignificantBit();
+    const Bitboard file = file::kFileMasks[GetFile(square)];
     if (!(file & blockers)) {
       ++count;
     }

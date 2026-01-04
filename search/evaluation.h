@@ -61,7 +61,7 @@ template <Side Side>
 [[nodiscard]] int CountBlockedPawns(const Position& position);
 
 template <Side Side>
-[[nodiscard]] int CountPassedPawns(const Position& position);
+[[nodiscard]] int GetPassedPawnScore(const Position& position);
 
 template <Side Side>
 [[nodiscard]] int CountSemiOpenFileRooks(const Position& position);
