@@ -10,6 +10,7 @@
 #include "engine/types.h"
 #include "search/evaluation.h"
 #include "search/move_ordering.h"
+#include "search/phase.h"
 #include "transposition.h"
 
 namespace follychess {

@@ -2,6 +2,7 @@
 
 #include "engine/move_generator.h"
 #include "engine/position.h"
+#include "search/phase.h"
 
 namespace follychess {
 namespace {
@@ -188,6 +189,11 @@ template <Side Side>
 
 template int CountBlockedPawns<kWhite>(const Position& position);
 template int CountBlockedPawns<kBlack>(const Position& position);
+
+template <Side Side>
+[[nodiscard]] int CountPassedPawns(const Position& position) {
+  return 0;
+}
 
 namespace {
 

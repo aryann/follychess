@@ -162,6 +162,8 @@ constexpr Bitboard k3 = k4 << 8;
 constexpr Bitboard k2 = k3 << 8;
 constexpr Bitboard k1 = k2 << 8;
 
+constexpr std::array kRankMasks = {k8, k7, k6, k5, k4, k3, k2, k1};
+
 }  // namespace rank
 
 namespace file {

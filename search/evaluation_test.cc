@@ -5,11 +5,126 @@
 
 #include "engine/position.h"
 #include "engine/testing.h"
+#include "search/phase.h"
 
 namespace follychess {
 namespace {
 
 using ::testing::Eq;
+
+TEST(PassedPawnMasks, White) {
+  EXPECT_THAT(kPassedPawnMasks[kWhite][E4],
+              EqualsBitboard("8: . . . X X X . ."
+                             "7: . . . X X X . ."
+                             "6: . . . X X X . ."
+                             "5: . . . X X X . ."
+                             "4: . . . . . . . ."
+                             "3: . . . . . . . ."
+                             "2: . . . . . . . ."
+                             "1: . . . . . . . ."
+                             "   a b c d e f g h"));
+
+  EXPECT_THAT(kPassedPawnMasks[kWhite][A4],
+              EqualsBitboard("8: X X . . . . . ."
+                             "7: X X . . . . . ."
+                             "6: X X . . . . . ."
+                             "5: X X . . . . . ."
+                             "4: . . . . . . . ."
+                             "3: . . . . . . . ."
+                             "2: . . . . . . . ."
+                             "1: . . . . . . . ."
+                             "   a b c d e f g h"));
+
+  EXPECT_THAT(kPassedPawnMasks[kWhite][H4],
+              EqualsBitboard("8: . . . . . . X X"
+                             "7: . . . . . . X X"
+                             "6: . . . . . . X X"
+                             "5: . . . . . . X X"
+                             "4: . . . . . . . ."
+                             "3: . . . . . . . ."
+                             "2: . . . . . . . ."
+                             "1: . . . . . . . ."
+                             "   a b c d e f g h"));
+
+  EXPECT_THAT(kPassedPawnMasks[kWhite][E7],
+              EqualsBitboard("8: . . . X X X . ."
+                             "7: . . . . . . . ."
+                             "6: . . . . . . . ."
+                             "5: . . . . . . . ."
+                             "4: . . . . . . . ."
+                             "3: . . . . . . . ."
+                             "2: . . . . . . . ."
+                             "1: . . . . . . . ."
+                             "   a b c d e f g h"));
+
+  EXPECT_THAT(kPassedPawnMasks[kWhite][E8],
+              EqualsBitboard("8: . . . . . . . ."
+                             "7: . . . . . . . ."
+                             "6: . . . . . . . ."
+                             "5: . . . . . . . ."
+                             "4: . . . . . . . ."
+                             "3: . . . . . . . ."
+                             "2: . . . . . . . ."
+                             "1: . . . . . . . ."
+                             "   a b c d e f g h"));
+}
+
+TEST(PassedPawnMasks, Black) {
+  EXPECT_THAT(kPassedPawnMasks[kBlack][E5],
+              EqualsBitboard("8: . . . . . . . ."
+                             "7: . . . . . . . ."
+                             "6: . . . . . . . ."
+                             "5: . . . . . . . ."
+                             "4: . . . X X X . ."
+                             "3: . . . X X X . ."
+                             "2: . . . X X X . ."
+                             "1: . . . X X X . ."
+                             "   a b c d e f g h"));
+
+  EXPECT_THAT(kPassedPawnMasks[kBlack][A5],
+              EqualsBitboard("8: . . . . . . . ."
+                             "7: . . . . . . . ."
+                             "6: . . . . . . . ."
+                             "5: . . . . . . . ."
+                             "4: X X . . . . . ."
+                             "3: X X . . . . . ."
+                             "2: X X . . . . . ."
+                             "1: X X . . . . . ."
+                             "   a b c d e f g h"));
+
+  EXPECT_THAT(kPassedPawnMasks[kBlack][H5],
+              EqualsBitboard("8: . . . . . . . ."
+                             "7: . . . . . . . ."
+                             "6: . . . . . . . ."
+                             "5: . . . . . . . ."
+                             "4: . . . . . . X X"
+                             "3: . . . . . . X X"
+                             "2: . . . . . . X X"
+                             "1: . . . . . . X X"
+                             "   a b c d e f g h"));
+
+  EXPECT_THAT(kPassedPawnMasks[kBlack][E2],
+              EqualsBitboard("8: . . . . . . . ."
+                             "7: . . . . . . . ."
+                             "6: . . . . . . . ."
+                             "5: . . . . . . . ."
+                             "4: . . . . . . . ."
+                             "3: . . . . . . . ."
+                             "2: . . . . . . . ."
+                             "1: . . . X X X . ."
+                             "   a b c d e f g h"));
+
+  EXPECT_THAT(kPassedPawnMasks[kBlack][E1],
+              EqualsBitboard("8: . . . . . . . ."
+                             "7: . . . . . . . ."
+                             "6: . . . . . . . ."
+                             "5: . . . . . . . ."
+                             "4: . . . . . . . ."
+                             "3: . . . . . . . ."
+                             "2: . . . . . . . ."
+                             "1: . . . . . . . ."
+                             "   a b c d e f g h"));
+}
 
 TEST(GetMaterialScore, White) {
   EXPECT_THAT(GetMaterialScore<kWhite>(Position::Starting()), Eq(23'900));
