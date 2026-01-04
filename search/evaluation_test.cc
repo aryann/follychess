@@ -802,7 +802,7 @@ TEST(Evaluate, Starting) {
 TEST(Evaluate, MaterialImbalance) {
   EXPECT_THAT(Evaluate(MakePosition("8: r . . . . . . k"
                                     "7: . . . . . . . ."
-                                    "6: . . . . . . . ."
+                                    "6: . . P . . . . ."
                                     "5: . . . . . . . ."
                                     "4: . . . . . . . ."
                                     "3: . . . . . . . ."
@@ -812,7 +812,7 @@ TEST(Evaluate, MaterialImbalance) {
                                     //
                                     "   w - - 0 1"),
                        kStartPhaseValue),
-              Eq(370));
+              Eq(590));
 }
 
 TEST(Evaluate, DoubledPawnPenalty) {

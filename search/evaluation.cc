@@ -199,19 +199,20 @@ template <Side Side>
     const Square square = pawns.PopLeastSignificantBit();
     const Bitboard blockers =
         kPassedPawnMasks[Side][square] & position.GetPieces(~Side, kPawn);
+    const int rank = GetRank(square);
 
     if (!blockers) {
       if constexpr (Side == kWhite) {
         static constexpr std::array kWhiteScores = {
             0, 150, 100, 75, 50, 30, 0, 0,
         };
-        score += kWhiteScores[GetRank(square)];
+        score += kWhiteScores[rank];
 
       } else {
         static constexpr std::array kBlackScores = {
             0, 0, 30, 50, 75, 100, 150, 0,
         };
-        score += kBlackScores[GetRank(square)];
+        score += kBlackScores[rank];
       }
     }
   }
@@ -276,7 +277,8 @@ template <Side Side>
          -50 * CountDoubledPawns<Side>(position) +      //
          -50 * CountBlockedPawns<Side>(position) +      //
          10 * CountSemiOpenFileRooks<Side>(position) +  //
-         15 * CountOpenFileRooks<Side>(position);
+         15 * CountOpenFileRooks<Side>(position) +      //
+         GetPassedPawnScore<Side>(position);
 }
 
 }  // namespace
