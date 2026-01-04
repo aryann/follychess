@@ -38,6 +38,8 @@ class AlphaBetaSearcher {
     constexpr static int kAlpha = -100'000;
     constexpr static int kBeta = 100'000;
     Search(kAlpha, kBeta, 0);
+    Log(requested_search_depth_);
+
     DCHECK(best_move_.has_value());
 
     return *best_move_;
@@ -113,6 +115,8 @@ class AlphaBetaSearcher {
   [[nodiscard]] int QuiescentSearch(int alpha, const int beta,
                                     const int depth) {
     ++nodes_;
+    const int ply = requested_search_depth_ + depth;
+    pv_table_.RecordMove(ply, Move::NullMove());
     MaybeLog(requested_search_depth_, depth);
 
     int score = GetScore();
@@ -130,7 +134,11 @@ class AlphaBetaSearcher {
       if (score >= beta) {
         return beta;
       }
-      alpha = std::max(alpha, score);
+
+      if (score > alpha) {
+        alpha = score;
+        pv_table_.RecordMove(ply, move);
+      }
     }
 
     return alpha;
@@ -145,12 +153,7 @@ class AlphaBetaSearcher {
     return position_.GetCheckers(position_.SideToMove());
   }
 
-  constexpr void MaybeLog(const int depth,
-                          const int additional_depth = 0) const {
-    if (nodes_ % log_every_n_ != 0) {
-      return;
-    }
-
+  constexpr void Log(const int depth, const int additional_depth = 0) const {
     const auto now = std::chrono::system_clock::now();
     const std::chrono::duration<double> elapsed = now - start_time_;
     const double elapsed_seconds = elapsed.count();
@@ -162,6 +165,13 @@ class AlphaBetaSearcher {
         std::format("info depth {} seldepth {} nodes {} nps {} tbhits {} pv {}",
                     depth, selective_depth, nodes_, nodes_per_second,
                     transpositions_.GetHits(), pv_table_));
+  }
+
+  constexpr void MaybeLog(const int depth,
+                          const int additional_depth = 0) const {
+    if (nodes_ % log_every_n_ == 0) {
+      Log(depth, additional_depth);
+    }
   }
 
   Game game_;
