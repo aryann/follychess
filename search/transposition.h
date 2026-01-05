@@ -21,22 +21,17 @@ class TranspositionTable {
       : position_{position}, hits_{0} {}
 
   [[nodiscard]] constexpr std::optional<int> Probe(int alpha, int beta,
-                                                   int depth);
+                                                   int remaining_depth);
 
-  constexpr void Record(int score, int depth, BoundType type);
+  constexpr void Record(int score, int remaining_depth, BoundType type);
 
   [[nodiscard]] constexpr std::int64_t GetHits() const { return hits_; }
-
-  constexpr void Clear() {
-    table_.clear();
-    hits_ = 0;
-  }
 
  private:
   static constexpr auto KEntries = 1 << 24;
 
   struct Entry {
-    int depth{0};
+    int remaining_depth{0};
     int score{0};
     BoundType type{BoundType::Exact};
   };
@@ -48,14 +43,14 @@ class TranspositionTable {
 };
 
 [[nodiscard]] constexpr std::optional<int> TranspositionTable::Probe(
-    int alpha, int beta, int depth) {
+    int alpha, int beta, int remaining_depth) {
   auto it = table_.find(position_.GetKey());
   if (it == table_.end()) {
     return std::nullopt;
   }
 
   const Entry& entry = it->second;
-  if (entry.depth < depth) {
+  if (entry.remaining_depth < remaining_depth) {
     return std::nullopt;
   }
 
@@ -78,10 +73,10 @@ class TranspositionTable {
   }
 }
 
-constexpr void TranspositionTable::Record(int score, int depth,
+constexpr void TranspositionTable::Record(int score, int remaining_depth,
                                           BoundType type) {
   table_[position_.GetKey()] = {
-      .depth = depth,
+      .remaining_depth = remaining_depth,
       .score = score,
       .type = type,
   };

@@ -32,8 +32,6 @@ class AlphaBetaSearcher {
     start_time_ = std::chrono::system_clock::now();
 
     for (int depth = 1; depth <= max_depth_; ++depth) {
-      transpositions_.Clear();
-
       constexpr static int kAlpha = -100'000;
       constexpr static int kBeta = 100'000;
       Search(kAlpha, kBeta, 0, depth);
@@ -52,7 +50,9 @@ class AlphaBetaSearcher {
     pv_table_.RecordMove(depth, Move::NullMove());
     ++nodes_;
 
-    if (std::optional<int> score = transpositions_.Probe(alpha, beta, depth)) {
+    const int remaining_depth = max_depth_ - depth;
+    if (std::optional<int> score =
+            transpositions_.Probe(alpha, beta, remaining_depth)) {
       return *score;
     }
 
