@@ -22,7 +22,7 @@ class AlphaBetaSearcher {
   AlphaBetaSearcher(const Game& game, const SearchOptions& options)
       : game_{game},
         position_{game_.GetPosition()},
-        requested_search_depth_{options.depth},
+        max_depth_{options.depth},
         logger_{options.logger},
         best_move_{Move::NullMove()},
         nodes_{0},
@@ -33,8 +33,8 @@ class AlphaBetaSearcher {
 
     constexpr static int kAlpha = -100'000;
     constexpr static int kBeta = 100'000;
-    Search(kAlpha, kBeta, 0);
-    Log(requested_search_depth_);
+    Search(kAlpha, kBeta, 0, max_depth_);
+    Log(max_depth_);
 
     DCHECK_NE(best_move_, Move::NullMove());
     return best_move_;
@@ -42,7 +42,7 @@ class AlphaBetaSearcher {
 
  private:
   // NOLINTNEXTLINE(misc-no-recursion)
-  int Search(int alpha, const int beta, const int depth) {
+  int Search(int alpha, const int beta, const int depth, const int max_depth) {
     using enum TranspositionTable::BoundType;
 
     pv_table_.RecordMove(depth, Move::NullMove());
@@ -52,8 +52,8 @@ class AlphaBetaSearcher {
       return *score;
     }
 
-    if (depth == requested_search_depth_) {
-      int score = QuiescentSearch(alpha, beta, 1);
+    if (depth == max_depth) {
+      int score = QuiescentSearch(alpha, beta, depth);
       transpositions_.Record(score, depth, Exact);
       return score;
     }
@@ -64,7 +64,7 @@ class AlphaBetaSearcher {
     TranspositionTable::BoundType transposition_type = UpperBound;
     for (Move move : moves) {
       ScopedMove2 scoped_move(move, game_);
-      const int score = -Search(-beta, -alpha, depth + 1);
+      const int score = -Search(-beta, -alpha, depth + 1, max_depth);
 
       if (score >= beta) {
         transpositions_.Record(score, depth, LowerBound);
@@ -109,8 +109,7 @@ class AlphaBetaSearcher {
   [[nodiscard]] int QuiescentSearch(int alpha, const int beta,
                                     const int depth) {
     ++nodes_;
-    const int ply = requested_search_depth_ + depth;
-    pv_table_.RecordMove(ply, Move::NullMove());
+    pv_table_.RecordMove(depth, Move::NullMove());
 
     int score = GetScore();
     if (score >= beta) {
@@ -130,7 +129,7 @@ class AlphaBetaSearcher {
 
       if (score > alpha) {
         alpha = score;
-        pv_table_.RecordMove(ply, move);
+        pv_table_.RecordMove(depth, move);
       }
     }
 
@@ -163,7 +162,7 @@ class AlphaBetaSearcher {
   Game game_;
   const Position& position_;
 
-  const int requested_search_depth_;
+  const int max_depth_;
   const std::function<void(std::string_view)> logger_;
 
   Move best_move_;
