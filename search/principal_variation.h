@@ -47,6 +47,8 @@ class PrincipalVariationTable {
     return {data_.data(), size};
   }
 
+  [[nodiscard]] Move GetBestMove() const { return data_[0]; }
+
  private:
   [[nodiscard]] static int GetIndex(int ply) { return ply * kMaxDepth; }
 

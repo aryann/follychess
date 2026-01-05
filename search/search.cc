@@ -24,7 +24,6 @@ class AlphaBetaSearcher {
         position_{game_.GetPosition()},
         max_depth_{options.depth},
         logger_{options.logger},
-        best_move_{Move::NullMove()},
         nodes_{0},
         transpositions_{position_} {}
 
@@ -38,8 +37,8 @@ class AlphaBetaSearcher {
       Log(depth);
     }
 
-    DCHECK_NE(best_move_, Move::NullMove());
-    return best_move_;
+    DCHECK_NE(pv_table_.GetBestMove(), Move::NullMove());
+    return pv_table_.GetBestMove();
   }
 
  private:
@@ -63,7 +62,7 @@ class AlphaBetaSearcher {
     }
 
     std::vector<Move> moves = GenerateLegalMoves(position_);
-    OrderMoves(position_, best_move_, moves);
+    OrderMoves(position_, pv_table_.GetBestMove(), moves);
 
     TranspositionTable::BoundType transposition_type = UpperBound;
     for (Move move : moves) {
@@ -79,12 +78,6 @@ class AlphaBetaSearcher {
         alpha = score;
         transposition_type = Exact;
         pv_table_.RecordMove(depth, move);
-
-        if (depth == 0) {
-          // Store this move as the best move if and only if this is a root
-          // node.
-          best_move_ = move;
-        }
       }
     }
 
@@ -122,7 +115,7 @@ class AlphaBetaSearcher {
     alpha = std::max(alpha, score);
 
     std::vector<Move> moves = GenerateLegalMoves<kCapture>(position_);
-    OrderMoves(position_, best_move_, moves);
+    OrderMoves(position_, pv_table_.GetBestMove(), moves);
     for (Move move : moves) {
       ScopedMove2 scoped_move(move, game_);
       score = -QuiescentSearch(-beta, -alpha, depth + 1);
@@ -169,7 +162,6 @@ class AlphaBetaSearcher {
   const int max_depth_;
   const std::function<void(std::string_view)> logger_;
 
-  Move best_move_;
   PrincipalVariationTable pv_table_;
 
   std::chrono::system_clock::time_point start_time_;
