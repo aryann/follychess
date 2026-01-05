@@ -23,7 +23,6 @@ class AlphaBetaSearcher {
       : game_{game},
         position_{game_.GetPosition()},
         requested_search_depth_{options.depth},
-        log_every_n_{options.log_every_n},
         logger_{options.logger},
         best_move_{Move::NullMove()},
         nodes_{0},
@@ -48,7 +47,6 @@ class AlphaBetaSearcher {
 
     pv_table_.RecordMove(depth, Move::NullMove());
     ++nodes_;
-    MaybeLog(depth);
 
     if (std::optional<int> score = transpositions_.Probe(alpha, beta, depth)) {
       return *score;
@@ -113,7 +111,6 @@ class AlphaBetaSearcher {
     ++nodes_;
     const int ply = requested_search_depth_ + depth;
     pv_table_.RecordMove(ply, Move::NullMove());
-    MaybeLog(requested_search_depth_, depth);
 
     int score = GetScore();
     if (score >= beta) {
@@ -163,18 +160,10 @@ class AlphaBetaSearcher {
                     transpositions_.GetHits(), pv_table_));
   }
 
-  constexpr void MaybeLog(const int depth,
-                          const int additional_depth = 0) const {
-    if (nodes_ % log_every_n_ == 0) {
-      Log(depth, additional_depth);
-    }
-  }
-
   Game game_;
   const Position& position_;
 
   const int requested_search_depth_;
-  const std::int64_t log_every_n_;
   const std::function<void(std::string_view)> logger_;
 
   Move best_move_;

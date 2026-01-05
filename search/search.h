@@ -8,22 +8,15 @@
 namespace follychess {
 
 struct SearchOptions {
-  SearchOptions& SetDepth(int depth) {
-    this->depth = depth;
+  SearchOptions& SetDepth(int value) {
+    depth = value;
     return *this;
   }
 
   int depth = 5;
 
-  SearchOptions& SetLogEveryN(std::int64_t log_every_n) {
-    this->log_every_n = log_every_n;
-    return *this;
-  }
-
-  std::int64_t log_every_n = std::numeric_limits<std::int64_t>::max();
-
-  SearchOptions& SetLogger(std::function<void(std::string_view)> logger) {
-    this->logger = logger;
+  SearchOptions& SetLogger(const std::function<void(std::string_view)>& value) {
+    logger = value;
     return *this;
   }
 

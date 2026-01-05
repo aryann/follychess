@@ -86,7 +86,6 @@ class Go : public Command {
     Move move = Search(state_.game,
                        SearchOptions()       //
                            .SetDepth(depth)  //
-                           .SetLogEveryN(1 << 10)
                            .SetLogger([&](std::string_view value) {
                              state_.printer.Println(std::cout, "{}", value);
                            }));
