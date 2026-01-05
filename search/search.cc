@@ -22,7 +22,6 @@ struct SearchContext {
 
   const std::function<void(std::string_view)> logger;
   std::chrono::system_clock::time_point start_time;
-  int max_depth;
 
   PrincipalVariationTable pv_table;
   TranspositionTable transpositions;
@@ -39,8 +38,16 @@ class AlphaBetaSearcher {
     Search(kAlpha, kBeta, 0, depth);
     Log(depth);
 
-    DCHECK_NE(context_.pv_table.GetBestMove(), Move::NullMove());
-    return context_.pv_table.GetBestMove();
+    Move best_move = context_.pv_table.GetBestMove();
+    if (best_move == Move::NullMove()) {
+      // If the Principal Variation table is empty, then it is likely due to a
+      // root transposition table cutoff. In this case, we check the
+      // transposition table for the best move.
+      context_.transpositions.Probe(position_, kAlpha, kBeta, 0, &best_move);
+    }
+
+    DCHECK_NE(best_move, Move::NullMove());
+    return best_move;
   }
 
  private:
@@ -51,20 +58,22 @@ class AlphaBetaSearcher {
     context_.pv_table.RecordMove(depth, Move::NullMove());
     ++nodes_;
 
-    const int remaining_depth = context_.max_depth - depth;
+    const int remaining_depth = max_depth - depth;
+    Move best_move;
     if (std::optional<int> score = context_.transpositions.Probe(
-            position_, alpha, beta, remaining_depth)) {
+            position_, alpha, beta, remaining_depth, &best_move)) {
       return *score;
     }
 
     if (depth == max_depth) {
       int score = QuiescentSearch(alpha, beta, depth);
-      context_.transpositions.Record(position_, score, depth, Exact);
+      context_.transpositions.Record(position_, score, remaining_depth, Exact,
+                                     Move::NullMove());
       return score;
     }
 
     std::vector<Move> moves = GenerateLegalMoves(position_);
-    OrderMoves(position_, context_.pv_table.GetBestMove(), moves);
+    OrderMoves(position_, best_move, moves);
 
     TranspositionTable::BoundType transposition_type = UpperBound;
     for (Move move : moves) {
@@ -72,7 +81,8 @@ class AlphaBetaSearcher {
       const int score = -Search(-beta, -alpha, depth + 1, max_depth);
 
       if (score >= beta) {
-        context_.transpositions.Record(position_, score, depth, LowerBound);
+        context_.transpositions.Record(position_, score, remaining_depth,
+                                       LowerBound, move);
         return beta;
       }
 
@@ -80,6 +90,7 @@ class AlphaBetaSearcher {
         alpha = score;
         transposition_type = Exact;
         context_.pv_table.RecordMove(depth, move);
+        best_move = move;
       }
     }
 
@@ -89,8 +100,8 @@ class AlphaBetaSearcher {
     }
 
     if (!moves.empty()) {
-      context_.transpositions.Record(position_, alpha, depth,
-                                     transposition_type);
+      context_.transpositions.Record(position_, alpha, remaining_depth,
+                                     transposition_type, best_move);
       return alpha;
     }
 
@@ -117,8 +128,12 @@ class AlphaBetaSearcher {
     }
     alpha = std::max(alpha, score);
 
+    Move best_move;
+    context_.transpositions.Probe(position_, alpha, beta, 0, &best_move);
+
     std::vector<Move> moves = GenerateLegalMoves<kCapture>(position_);
-    OrderMoves(position_, context_.pv_table.GetBestMove(), moves);
+    OrderMoves(position_, best_move, moves);
+
     for (Move move : moves) {
       ScopedMove2 scoped_move(move, context_.game);
       score = -QuiescentSearch(-beta, -alpha, depth + 1);
@@ -171,14 +186,13 @@ Move Search(const Game& game, const SearchOptions& options) {
       .game = game,
       .logger = options.logger,
       .start_time = std::chrono::system_clock::now(),
-      .max_depth = options.depth,
       .pv_table = PrincipalVariationTable(),
       .transpositions = TranspositionTable(),
   };
 
   AlphaBetaSearcher searcher(context);
   Move best_move = Move::NullMove();
-  for (int depth = 1; depth <= context.max_depth; ++depth) {
+  for (int depth = 1; depth <= options.depth; ++depth) {
     best_move = searcher.Search(depth);
   }
 
