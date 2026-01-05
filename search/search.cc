@@ -17,28 +17,30 @@
 namespace follychess {
 namespace {
 
+struct SearchContext {
+  Game game;
+
+  const std::function<void(std::string_view)> logger;
+  std::chrono::system_clock::time_point start_time;
+  int max_depth;
+
+  PrincipalVariationTable pv_table;
+  TranspositionTable transpositions;
+};
+
 class AlphaBetaSearcher {
  public:
-  AlphaBetaSearcher(const Game& game, const SearchOptions& options)
-      : game_{game},
-        position_{game_.GetPosition()},
-        max_depth_{options.depth},
-        logger_{options.logger},
-        nodes_{0},
-        transpositions_{position_} {}
+  explicit AlphaBetaSearcher(SearchContext& context)
+      : context_(context), position_(context.game.GetPosition()), nodes_(0) {}
 
-  [[nodiscard]] Move GetBestMove() {
-    start_time_ = std::chrono::system_clock::now();
+  [[nodiscard]] Move Search(int depth) {
+    constexpr static int kAlpha = -100'000;
+    constexpr static int kBeta = 100'000;
+    Search(kAlpha, kBeta, 0, depth);
+    Log(depth);
 
-    for (int depth = 1; depth <= max_depth_; ++depth) {
-      constexpr static int kAlpha = -100'000;
-      constexpr static int kBeta = 100'000;
-      Search(kAlpha, kBeta, 0, depth);
-      Log(depth);
-    }
-
-    DCHECK_NE(pv_table_.GetBestMove(), Move::NullMove());
-    return pv_table_.GetBestMove();
+    DCHECK_NE(context_.pv_table.GetBestMove(), Move::NullMove());
+    return context_.pv_table.GetBestMove();
   }
 
  private:
@@ -46,48 +48,49 @@ class AlphaBetaSearcher {
   int Search(int alpha, const int beta, const int depth, const int max_depth) {
     using enum TranspositionTable::BoundType;
 
-    pv_table_.RecordMove(depth, Move::NullMove());
+    context_.pv_table.RecordMove(depth, Move::NullMove());
     ++nodes_;
 
-    const int remaining_depth = max_depth_ - depth;
-    if (std::optional<int> score =
-            transpositions_.Probe(alpha, beta, remaining_depth)) {
+    const int remaining_depth = context_.max_depth - depth;
+    if (std::optional<int> score = context_.transpositions.Probe(
+            position_, alpha, beta, remaining_depth)) {
       return *score;
     }
 
     if (depth == max_depth) {
       int score = QuiescentSearch(alpha, beta, depth);
-      transpositions_.Record(score, depth, Exact);
+      context_.transpositions.Record(position_, score, depth, Exact);
       return score;
     }
 
     std::vector<Move> moves = GenerateLegalMoves(position_);
-    OrderMoves(position_, pv_table_.GetBestMove(), moves);
+    OrderMoves(position_, context_.pv_table.GetBestMove(), moves);
 
     TranspositionTable::BoundType transposition_type = UpperBound;
     for (Move move : moves) {
-      ScopedMove2 scoped_move(move, game_);
+      ScopedMove2 scoped_move(move, context_.game);
       const int score = -Search(-beta, -alpha, depth + 1, max_depth);
 
       if (score >= beta) {
-        transpositions_.Record(score, depth, LowerBound);
+        context_.transpositions.Record(position_, score, depth, LowerBound);
         return beta;
       }
 
       if (score > alpha) {
         alpha = score;
         transposition_type = Exact;
-        pv_table_.RecordMove(depth, move);
+        context_.pv_table.RecordMove(depth, move);
       }
     }
 
-    if (game_.GetRepetitionCount() >= 3) {
+    if (context_.game.GetRepetitionCount() >= 3) {
       // A draw can be claimed due to the threefold repetition rule.
       return 0;
     }
 
     if (!moves.empty()) {
-      transpositions_.Record(alpha, depth, transposition_type);
+      context_.transpositions.Record(position_, alpha, depth,
+                                     transposition_type);
       return alpha;
     }
 
@@ -106,7 +109,7 @@ class AlphaBetaSearcher {
   [[nodiscard]] int QuiescentSearch(int alpha, const int beta,
                                     const int depth) {
     ++nodes_;
-    pv_table_.RecordMove(depth, Move::NullMove());
+    context_.pv_table.RecordMove(depth, Move::NullMove());
 
     int score = GetScore();
     if (score >= beta) {
@@ -115,9 +118,9 @@ class AlphaBetaSearcher {
     alpha = std::max(alpha, score);
 
     std::vector<Move> moves = GenerateLegalMoves<kCapture>(position_);
-    OrderMoves(position_, pv_table_.GetBestMove(), moves);
+    OrderMoves(position_, context_.pv_table.GetBestMove(), moves);
     for (Move move : moves) {
-      ScopedMove2 scoped_move(move, game_);
+      ScopedMove2 scoped_move(move, context_.game);
       score = -QuiescentSearch(-beta, -alpha, depth + 1);
 
       if (score >= beta) {
@@ -126,7 +129,7 @@ class AlphaBetaSearcher {
 
       if (score > alpha) {
         alpha = score;
-        pv_table_.RecordMove(depth, move);
+        context_.pv_table.RecordMove(depth, move);
       }
     }
 
@@ -144,37 +147,42 @@ class AlphaBetaSearcher {
 
   constexpr void Log(const int depth, const int additional_depth = 0) const {
     const auto now = std::chrono::system_clock::now();
-    const std::chrono::duration<double> elapsed = now - start_time_;
+    const std::chrono::duration<double> elapsed = now - context_.start_time;
     const double elapsed_seconds = elapsed.count();
     auto nodes_per_second = static_cast<std::int64_t>(nodes_ / elapsed_seconds);
 
     const int selective_depth = depth + additional_depth;
 
-    logger_(
+    context_.logger(
         std::format("info depth {} seldepth {} nodes {} nps {} tbhits {} pv {}",
                     depth, selective_depth, nodes_, nodes_per_second,
-                    transpositions_.GetHits(), pv_table_));
+                    context_.transpositions.GetHits(), context_.pv_table));
   }
 
-  Game game_;
+  SearchContext& context_;
   const Position& position_;
-
-  const int max_depth_;
-  const std::function<void(std::string_view)> logger_;
-
-  PrincipalVariationTable pv_table_;
-
-  std::chrono::system_clock::time_point start_time_;
   std::int64_t nodes_;
-
-  TranspositionTable transpositions_;
 };
 
 }  // namespace
 
 Move Search(const Game& game, const SearchOptions& options) {
-  AlphaBetaSearcher searcher(game, options);
-  return searcher.GetBestMove();
+  SearchContext context = {
+      .game = game,
+      .logger = options.logger,
+      .start_time = std::chrono::system_clock::now(),
+      .max_depth = options.depth,
+      .pv_table = PrincipalVariationTable(),
+      .transpositions = TranspositionTable(),
+  };
+
+  AlphaBetaSearcher searcher(context);
+  Move best_move = Move::NullMove();
+  for (int depth = 1; depth <= context.max_depth; ++depth) {
+    best_move = searcher.Search(depth);
+  }
+
+  return best_move;
 }
 
 }  // namespace follychess
