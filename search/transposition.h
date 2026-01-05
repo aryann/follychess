@@ -25,7 +25,12 @@ class TranspositionTable {
 
   constexpr void Record(int score, int depth, BoundType type);
 
-  [[nodiscard]] constexpr std::int64_t GetHits() const { return hits_; };
+  [[nodiscard]] constexpr std::int64_t GetHits() const { return hits_; }
+
+  constexpr void Clear() {
+    table_.clear();
+    hits_ = 0;
+  }
 
  private:
   static constexpr auto KEntries = 1 << 24;
@@ -76,8 +81,8 @@ class TranspositionTable {
 constexpr void TranspositionTable::Record(int score, int depth,
                                           BoundType type) {
   table_[position_.GetKey()] = {
-      .score = score,
       .depth = depth,
+      .score = score,
       .type = type,
   };
 }

@@ -22,7 +22,7 @@ void BM_Search(benchmark::State& state, Args&&... args) {
 BENCHMARK_CAPTURE(  //
     BM_Search, Starting,
     R"(rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1)")
-    ->DenseRange(/* start = */ 1, /* limit = */ 6, /* step = */ 1);
+    ->DenseRange(/* start = */ 1, /* limit = */ 7, /* step = */ 1);
 
 BENCHMARK_CAPTURE(BM_Search, Position3,
                   R"(8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1)")

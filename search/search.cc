@@ -31,10 +31,14 @@ class AlphaBetaSearcher {
   [[nodiscard]] Move GetBestMove() {
     start_time_ = std::chrono::system_clock::now();
 
-    constexpr static int kAlpha = -100'000;
-    constexpr static int kBeta = 100'000;
-    Search(kAlpha, kBeta, 0, max_depth_);
-    Log(max_depth_);
+    for (int depth = 1; depth <= max_depth_; ++depth) {
+      transpositions_.Clear();
+
+      constexpr static int kAlpha = -100'000;
+      constexpr static int kBeta = 100'000;
+      Search(kAlpha, kBeta, 0, depth);
+      Log(depth);
+    }
 
     DCHECK_NE(best_move_, Move::NullMove());
     return best_move_;
