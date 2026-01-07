@@ -795,6 +795,177 @@ TEST(CountOpenFileRooks, Black) {
               Eq(1));
 }
 
+TEST(GetKingSafetyScore, WhiteCenter) {
+  {
+    // The king is in the center and has castling rights.
+    const auto [middle, end] =
+        GetKingSafetyScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . . . . ."
+                                                "4: . . . . . . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . . ."
+                                                "1: . . . . K . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   w QK - 0 1"));
+    EXPECT_THAT(middle, Eq(-25));
+    EXPECT_THAT(end, Eq(0));
+  }
+
+  {
+    // The king is in the center but has no castling rights.
+    const auto [middle, end] =
+        GetKingSafetyScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . . . . ."
+                                                "4: . . . . . . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . . ."
+                                                "1: . . . . K . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(-60));
+    EXPECT_THAT(end, Eq(0));
+  }
+}
+
+TEST(GetKingSafetyScore, WhiteKingside) {
+  {
+    // The king is castled and has its pawn shield.
+    const auto [middle, end] =
+        GetKingSafetyScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . . . . ."
+                                                "4: . . . . . . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . P P"
+                                                "1: . . . . . . K ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(40));
+    EXPECT_THAT(end, Eq(0));
+  }
+
+  {
+    // The king is castled but has a partial pawn shield.
+    const auto [middle, end] =
+        GetKingSafetyScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . . . . ."
+                                                "4: . . . . . . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . P ."
+                                                "1: . . . . . . K ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(20));
+    EXPECT_THAT(end, Eq(0));
+  }
+
+  {
+    // The king is castled but doesn't have a pawn shield.
+    const auto [middle, end] =
+        GetKingSafetyScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . . . . ."
+                                                "4: . . . . . . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . . P"
+                                                "1: . . . . . . K ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(-20));
+    EXPECT_THAT(end, Eq(0));
+  }
+}
+
+TEST(GetKingSafetyScore, WhiteQueenside) {
+  {
+    // The king is castled and has its pawn shield.
+    const auto [middle, end] =
+        GetKingSafetyScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . . . . ."
+                                                "4: . . . . . . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . P P . . . . ."
+                                                "1: . . K . . . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(40));
+    EXPECT_THAT(end, Eq(0));
+  }
+
+  {
+    // The king has moved one position to its normal castling square and has
+    // its pawn shield.
+    const auto [middle, end] =
+        GetKingSafetyScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . . . . ."
+                                                "4: . . . . . . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . P P . . . . ."
+                                                "1: . K . . . . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(40));
+    EXPECT_THAT(end, Eq(0));
+  }
+}
+
+TEST(GetKingSafetyScore, Black) {
+  {
+    // The king is castled and has its pawn shield.
+    const auto [middle, end] =
+        GetKingSafetyScore<kBlack>(MakePosition("8: . . . . . . k ."
+                                                "7: . . . . . . p p"
+                                                "6: . . . . . . . ."
+                                                "5: . . . . . . . ."
+                                                "4: . . . . . . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . . ."
+                                                "1: . . . . . . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   b - - 0 1"));
+    EXPECT_THAT(middle, Eq(40));
+    EXPECT_THAT(end, Eq(0));
+  }
+
+  {
+    // The king is in the middle.
+    const auto [middle, end] =
+        GetKingSafetyScore<kBlack>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . k . . ."
+                                                "4: . . . . . . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . . ."
+                                                "1: . . . . . . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   b - - 0 1"));
+    EXPECT_THAT(middle, Eq(-60));
+    EXPECT_THAT(end, Eq(0));
+  }
+}
+
 TEST(Evaluate, Starting) {
   EXPECT_THAT(Evaluate(Position::Starting(), kStartPhaseValue), Eq(0));
 }
@@ -829,6 +1000,22 @@ TEST(Evaluate, DoubledPawnPenalty) {
                                     "   w - - 0 1"),
                        kStartPhaseValue),
               Eq(-110));
+}
+
+TEST(Evaluate, CastledWhiteKing) {
+  EXPECT_THAT(Evaluate(MakePosition("8: r . . . k . . ."
+                                    "7: . . . . . . . p"
+                                    "6: . . . . . . . p"
+                                    "5: . . . . . . . ."
+                                    "4: . . . . . . . ."
+                                    "3: . . . . . . . ."
+                                    "2: . . . . . . P P"
+                                    "1: . . . . R . K ."
+                                    "   a b c d e f g h"
+                                    //
+                                    "   w - - 0 1"),
+                       kStartPhaseValue),
+              Eq(240));
 }
 
 }  // namespace
