@@ -64,7 +64,11 @@ class CliTest : public ::testing::Test {
 
   ~CliTest() override { std::cout.rdbuf(old_stdout_buffer_); }
 
-  std::string GetOutput() const { return stream_.str(); }
+  std::string GetOutput() {
+    std::string val = stream_.str();
+    stream_.str("");
+    return val;
+  }
 
   std::expected<void, std::string> Run(
       const std::vector<std::string_view>& command) {
@@ -104,8 +108,24 @@ TEST_F(CliTest, IsReady) {
 
 TEST_F(CliTest, Go) {
   ASSERT_THAT(Run({"go", "depth", "5"}).error_or(""), IsEmpty());
+  EXPECT_THAT(GetOutput(),
+              AllOf(                               //
+                  HasSubstr("info depth 1"),       //
+                  HasSubstr("info depth 2"),       //
+                  HasSubstr("info depth 3"),       //
+                  HasSubstr("info depth 4"),       //
+                  HasSubstr("info depth 5"),       //
+                  Not(HasSubstr("info depth 6")),  //
+                  HasSubstr("bestmove d2d4")));
 
-  EXPECT_THAT(GetOutput(), HasSubstr("bestmove d2d4"));
+  ASSERT_THAT(
+      Run({"go", "wtime", "1000", "btime", "1000", "depth", "2"}).error_or(""),
+      IsEmpty());
+  EXPECT_THAT(GetOutput(), AllOf(                               //
+                               HasSubstr("info depth 1"),       //
+                               HasSubstr("info depth 2"),       //
+                               Not(HasSubstr("info depth 3")),  //
+                               HasSubstr("bestmove d2d4")));
 }
 
 }  // namespace
