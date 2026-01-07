@@ -35,8 +35,8 @@ class AlphaBetaSearcher {
   [[nodiscard]] Move Search(int depth) {
     constexpr static int kAlpha = -100'000;
     constexpr static int kBeta = 100'000;
-    Search(kAlpha, kBeta, 0, depth);
-    Log(depth);
+    const int score = Search(kAlpha, kBeta, 0, depth);
+    Log(score, depth);
 
     Move best_move = context_.pv_table.GetBestMove();
     if (best_move == Move::NullMove()) {
@@ -52,7 +52,8 @@ class AlphaBetaSearcher {
 
  private:
   // NOLINTNEXTLINE(misc-no-recursion)
-  int Search(int alpha, const int beta, const int depth, const int max_depth) {
+  [[nodiscard]] int Search(int alpha, const int beta, const int depth,
+                           const int max_depth) {
     using enum TranspositionTable::BoundType;
 
     context_.pv_table.RecordMove(depth, Move::NullMove());
@@ -160,7 +161,8 @@ class AlphaBetaSearcher {
     return position_.GetCheckers(position_.SideToMove());
   }
 
-  constexpr void Log(const int depth, const int additional_depth = 0) const {
+  constexpr void Log(const int score, const int depth,
+                     const int additional_depth = 0) const {
     const auto now = std::chrono::system_clock::now();
     const std::chrono::duration<double> elapsed = now - context_.start_time;
     const double elapsed_seconds = elapsed.count();
@@ -168,10 +170,10 @@ class AlphaBetaSearcher {
 
     const int selective_depth = depth + additional_depth;
 
-    context_.logger(
-        std::format("info depth {} seldepth {} nodes {} nps {} tbhits {} pv {}",
-                    depth, selective_depth, nodes_, nodes_per_second,
-                    context_.transpositions.GetHits(), context_.pv_table));
+    context_.logger(std::format(
+        "info depth {} seldepth {} score cp {} nodes {} nps {} tbhits {} pv {}",
+        depth, selective_depth, score, nodes_, nodes_per_second,
+        context_.transpositions.GetHits(), context_.pv_table));
   }
 
   SearchContext& context_;
