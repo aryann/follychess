@@ -724,32 +724,32 @@ TEST(CountBlockedPawns, Black) {
 
 TEST(CountSemiOpenFileRooks, White) {
   EXPECT_THAT(CountSemiOpenFileRooks<kWhite>(MakePosition("8: . . . . . . . ."
-                                                          "7: . . p . . . . ."
+                                                          "7: . . p p . . . ."
                                                           "6: . . . . . . . ."
                                                           "5: . . . . . . . ."
                                                           "4: . . . . . . . ."
                                                           "3: . . . . . . . ."
                                                           "2: . P . . . . . ."
-                                                          "1: R R R . . . . ."
+                                                          "1: R R R R . . . ."
                                                           "   a b c d e f g h"
                                                           //
                                                           "   w - - 0 1")),
-              Eq(2));
+              Eq(3));
 }
 
 TEST(CountSemiOpenFileRooks, Black) {
-  EXPECT_THAT(CountSemiOpenFileRooks<kBlack>(MakePosition("8: . . . . . r r r"
+  EXPECT_THAT(CountSemiOpenFileRooks<kBlack>(MakePosition("8: . . . . r r r r"
                                                           "7: . . . . . . p ."
                                                           "6: . . . . . . . ."
                                                           "5: . . . . . . . ."
                                                           "4: . . . . . . . ."
                                                           "3: . . . . . . . ."
-                                                          "2: . . . . . P . ."
+                                                          "2: . . . . P P . ."
                                                           "1: . . . . . . . ."
                                                           "   a b c d e f g h"
                                                           //
                                                           "   w - - 0 1")),
-              Eq(2));
+              Eq(3));
 }
 
 TEST(CountOpenFileRooks, White) {

@@ -244,7 +244,7 @@ template <Side Side>
 
 template <Side Side>
 [[nodiscard]] int CountSemiOpenFileRooks(const Position& position) {
-  Bitboard blockers = position.GetPieces(~Side, kPawn);
+  Bitboard blockers = position.GetPieces(Side, kPawn);
   return CountOpenFileRooks<Side>(position, blockers);
 }
 
