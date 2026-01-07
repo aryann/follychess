@@ -69,6 +69,9 @@ template <Side Side>
 template <Side Side>
 [[nodiscard]] int CountOpenFileRooks(const Position& position);
 
+template <Side Side>
+[[nodiscard]] Score GetKingSafetyScore(const Position& position);
+
 [[nodiscard]] int Evaluate(const Position& position, int phase);
 
 }  // namespace follychess

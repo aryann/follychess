@@ -260,6 +260,62 @@ template <Side Side>
 template int CountOpenFileRooks<kWhite>(const Position& position);
 template int CountOpenFileRooks<kBlack>(const Position& position);
 
+template <Side Side>
+[[nodiscard]] Score GetKingSafetyScore(const Position& position) {
+  constexpr Bitboard kCenter = Side == kWhite ? Bitboard(E1) | Bitboard(D1)
+                                              : Bitboard(E8) | Bitboard(D8);
+
+  const Bitboard king = position.GetPieces(Side, kKing);
+  if (king & kCenter) {
+    const bool can_castle = position.GetCastlingRights().HasKingSide<Side>() ||
+                            position.GetCastlingRights().HasQueenSide<Side>();
+    return can_castle ? Score{.middle = -25, .end = 0}
+                      : Score{.middle = -60, .end = 0};
+  }
+
+  const Bitboard pawns = position.GetPieces(Side, kPawn);
+
+  constexpr Bitboard kKingSideZone = Side == kWhite
+                                         ? Bitboard(G1) | Bitboard(H1)
+                                         : Bitboard(G8) | Bitboard(H8);
+  if (king & kKingSideZone) {
+    constexpr Square kGPawn = Side == kWhite ? G2 : G7;
+    constexpr Square kHPawn = Side == kWhite ? H2 : H7;
+
+    if (pawns & kGPawn && pawns & kHPawn) {
+      return {.middle = 40, .end = 0};
+    }
+    if (pawns & kGPawn) {
+      return {.middle = 20, .end = 0};
+    }
+    return {.middle = -20, .end = 0};
+  }
+
+  constexpr Bitboard kQueenSideCastleZone = Side == kWhite
+                                                ? Bitboard(B1) | Bitboard(C1)
+                                                : Bitboard(C8) | Bitboard(B8);
+  if (king & kQueenSideCastleZone) {
+    constexpr Square kBPawn = Side == kWhite ? B2 : B7;
+    constexpr Square kCPawn = Side == kWhite ? C2 : C7;
+
+    if (pawns & kBPawn && pawns & kCPawn) {
+      return {.middle = 40, .end = 0};
+    }
+    if (pawns & kCPawn) {
+      return {.middle = 20, .end = 0};
+    }
+    return {.middle = -20, .end = 0};
+  }
+
+  // The king is not castled.
+  DCHECK(!position.GetCastlingRights().HasKingSide<Side>());
+  DCHECK(!position.GetCastlingRights().HasQueenSide<Side>());
+  return {.middle = -60, .end = 0};
+}
+
+template Score GetKingSafetyScore<kWhite>(const Position& position);
+template Score GetKingSafetyScore<kBlack>(const Position& position);
+
 namespace {
 
 [[nodiscard]] int Interpolate(Score score, int phase) {
@@ -270,9 +326,11 @@ namespace {
 
 template <Side Side>
 [[nodiscard]] int Evaluate(const Position& position, int phase) {
-  Score placement_score = GetPlacementScore<Side>(position);
+  const Score tapered_score =              //
+      GetPlacementScore<Side>(position) +  //
+      GetKingSafetyScore<Side>(position);
 
-  return Interpolate(placement_score, phase) +          //
+  return Interpolate(tapered_score, phase) +            //
          GetMaterialScore<Side>(position) +             //
          -50 * CountDoubledPawns<Side>(position) +      //
          -50 * CountBlockedPawns<Side>(position) +      //
