@@ -191,37 +191,34 @@ template int CountBlockedPawns<kWhite>(const Position& position);
 template int CountBlockedPawns<kBlack>(const Position& position);
 
 template <Side Side>
-[[nodiscard]] int GetPassedPawnScore(const Position& position) {
-  int score = 0;
+[[nodiscard]] Score GetPassedPawnScore(const Position& position) {
+  Score score = {.middle = 0, .end = 0};
   Bitboard pawns = position.GetPieces(Side, kPawn);
+
+  constexpr std::array kMiddleGameBonuses = {0, 0, 10, 30, 50, 75, 100, 150};
+  constexpr std::array kEndGameBonuses = {0, 0, 20, 40, 80, 120, 160, 250};
 
   while (pawns) {
     const Square square = pawns.PopLeastSignificantBit();
     const Bitboard blockers =
         kPassedPawnMasks[Side][square] & position.GetPieces(~Side, kPawn);
-    const int rank = GetRank(square);
 
     if (!blockers) {
+      int rank = GetRank(square);
       if constexpr (Side == kWhite) {
-        static constexpr std::array kWhiteScores = {
-            0, 150, 100, 75, 50, 30, 0, 0,
-        };
-        score += kWhiteScores[rank];
-
-      } else {
-        static constexpr std::array kBlackScores = {
-            0, 0, 30, 50, 75, 100, 150, 0,
-        };
-        score += kBlackScores[rank];
+        rank = 7 - rank;
       }
+
+      score.middle += kMiddleGameBonuses[rank];
+      score.end += kEndGameBonuses[rank];
     }
   }
 
   return score;
 }
 
-template int GetPassedPawnScore<kWhite>(const Position& position);
-template int GetPassedPawnScore<kBlack>(const Position& position);
+template Score GetPassedPawnScore<kWhite>(const Position& position);
+template Score GetPassedPawnScore<kBlack>(const Position& position);
 
 namespace {
 
@@ -326,17 +323,17 @@ namespace {
 
 template <Side Side>
 [[nodiscard]] int Evaluate(const Position& position, int phase) {
-  const Score tapered_score =              //
-      GetPlacementScore<Side>(position) +  //
-      GetKingSafetyScore<Side>(position);
+  const Score tapered_score =               //
+      GetPlacementScore<Side>(position) +   //
+      GetKingSafetyScore<Side>(position) +  //
+      GetPassedPawnScore<Side>(position);
 
   return Interpolate(tapered_score, phase) +            //
          GetMaterialScore<Side>(position) +             //
          -50 * CountDoubledPawns<Side>(position) +      //
          -50 * CountBlockedPawns<Side>(position) +      //
          10 * CountSemiOpenFileRooks<Side>(position) +  //
-         15 * CountOpenFileRooks<Side>(position) +      //
-         GetPassedPawnScore<Side>(position);
+         15 * CountOpenFileRooks<Side>(position);
 }
 
 }  // namespace

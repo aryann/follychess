@@ -125,139 +125,178 @@ TEST(PassedPawnMasks, Black) {
                              "1: . . . . . . . ."
                              "   a b c d e f g h"));
 }
-
 TEST(GetPassedPawnScore, White) {
-  EXPECT_THAT(GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
-                                                      "7: . . . . . . . ."
-                                                      "6: . . . . . . . ."
-                                                      "5: . . . . P . . ."
-                                                      "4: . . . . . . . ."
-                                                      "3: . . . . . . . ."
-                                                      "2: . . . . . . . ."
-                                                      "1: . . . . . . . ."
-                                                      "   a b c d e f g h"
-                                                      //
-                                                      "   w - - 0 1")),
-              Eq(75));
+  {
+    const auto [middle, end] =
+        GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . P . . ."
+                                                "4: . . . . . . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . . ."
+                                                "1: . . . . . . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(50));
+    EXPECT_THAT(end, Eq(80));
+  }
 
-  EXPECT_THAT(GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
-                                                      "7: . . . . . . . ."
-                                                      "6: P . . . . . . ."
-                                                      "5: . . . . . . . P"
-                                                      "4: . . . . . . . ."
-                                                      "3: . . . . . . . ."
-                                                      "2: . . . . . . . ."
-                                                      "1: . . . . . . . ."
-                                                      "   a b c d e f g h"
-                                                      //
-                                                      "   w - - 0 1")),
-              Eq(175));
+  {
+    const auto [middle, end] =
+        GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: P . . . . . . ."
+                                                "5: . . . . . . . P"
+                                                "4: . . . . . . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . . ."
+                                                "1: . . . . . . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(125));
+    EXPECT_THAT(end, Eq(200));
+  }
 
-  EXPECT_THAT(GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
-                                                      "7: . . . . . . . ."
-                                                      "6: . . . . . . . ."
-                                                      "5: . . . . p . . ."
-                                                      "4: . . . . P . . ."
-                                                      "3: . . . . . . . ."
-                                                      "2: . . . . . . . ."
-                                                      "1: . . . . . . . ."
-                                                      "   a b c d e f g h"
-                                                      //
-                                                      "   w - - 0 1")),
-              Eq(0));
+  {
+    const auto [middle, end] =
+        GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . p . . ."
+                                                "4: . . . . P . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . . ."
+                                                "1: . . . . . . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(0));
+    EXPECT_THAT(end, Eq(0));
+  }
 
-  EXPECT_THAT(GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
-                                                      "7: . . . . . . . ."
-                                                      "6: . . . . . . . ."
-                                                      "5: . . . p . . . ."
-                                                      "4: . . . . P . . ."
-                                                      "3: . . . . . . . ."
-                                                      "2: . . . . . . . ."
-                                                      "1: . . . . . . . ."
-                                                      "   a b c d e f g h"
-                                                      //
-                                                      "   w - - 0 1")),
-              Eq(0));
+  {
+    const auto [middle, end] =
+        GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . p . . . ."
+                                                "4: . . . . P . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . . ."
+                                                "1: . . . . . . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(0));
+    EXPECT_THAT(end, Eq(0));
+  }
 
-  EXPECT_THAT(GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
-                                                      "7: . . . . . . . ."
-                                                      "6: . . . . . . . ."
-                                                      "5: . . . . . p . ."
-                                                      "4: . . . . P . . ."
-                                                      "3: . . . . . . . ."
-                                                      "2: . . . . . . . ."
-                                                      "1: . . . . . . . ."
-                                                      "   a b c d e f g h"
-                                                      //
-                                                      "   w - - 0 1")),
-              Eq(0));
+  {
+    const auto [middle, end] =
+        GetPassedPawnScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . . p . ."
+                                                "4: . . . . P . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . . ."
+                                                "1: . . . . . . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(0));
+    EXPECT_THAT(end, Eq(0));
+  }
 }
 
 TEST(GetPassedPawnScore, Black) {
-  EXPECT_THAT(GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
-                                                      "7: . . . . . . . ."
-                                                      "6: . . . . . . . ."
-                                                      "5: . . . . . . . ."
-                                                      "4: . . . . p . . ."
-                                                      "3: . . . . . . . ."
-                                                      "2: . . . . . . . ."
-                                                      "1: . . . . . . . ."
-                                                      "   a b c d e f g h"
-                                                      //
-                                                      "   w - - 0 1")),
-              Eq(75));
+  {
+    const auto [middle, end] =
+        GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . . . . ."
+                                                "4: . . . . p . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . . ."
+                                                "1: . . . . . . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   b - - 0 1"));
+    EXPECT_THAT(middle, Eq(50));
+    EXPECT_THAT(end, Eq(80));
+  }
 
-  EXPECT_THAT(GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
-                                                      "7: . . . . . . . ."
-                                                      "6: . . . . . . . ."
-                                                      "5: . . . . . . . ."
-                                                      "4: . . . . . . . p"
-                                                      "3: p . . . . . . ."
-                                                      "2: . . . . . . . ."
-                                                      "1: . . . . . . . ."
-                                                      "   a b c d e f g h"
-                                                      //
-                                                      "   w - - 0 1")),
-              Eq(175));
+  {
+    const auto [middle, end] =
+        GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . . . . ."
+                                                "4: . . . . . . . p"
+                                                "3: p . . . . . . ."
+                                                "2: . . . . . . . ."
+                                                "1: . . . . . . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   b - - 0 1"));
+    EXPECT_THAT(middle, Eq(125));
+    EXPECT_THAT(end, Eq(200));
+  }
 
-  EXPECT_THAT(GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
-                                                      "7: . . . . . . . ."
-                                                      "6: . . . . . . . ."
-                                                      "5: . . . . p . . ."
-                                                      "4: . . . . P . . ."
-                                                      "3: . . . . . . . ."
-                                                      "2: . . . . . . . ."
-                                                      "1: . . . . . . . ."
-                                                      "   a b c d e f g h"
-                                                      //
-                                                      "   w - - 0 1")),
-              Eq(0));
+  {
+    const auto [middle, end] =
+        GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . p . . ."
+                                                "4: . . . . P . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . . ."
+                                                "1: . . . . . . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   b - - 0 1"));
+    EXPECT_THAT(middle, Eq(0));
+    EXPECT_THAT(end, Eq(0));
+  }
 
-  EXPECT_THAT(GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
-                                                      "7: . . . . . . . ."
-                                                      "6: . . . . . . . ."
-                                                      "5: . . . . p . . ."
-                                                      "4: . . . P . . . ."
-                                                      "3: . . . . . . . ."
-                                                      "2: . . . . . . . ."
-                                                      "1: . . . . . . . ."
-                                                      "   a b c d e f g h"
-                                                      //
-                                                      "   w - - 0 1")),
-              Eq(0));
+  {
+    const auto [middle, end] =
+        GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . p . . ."
+                                                "4: . . . P . . . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . . ."
+                                                "1: . . . . . . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   b - - 0 1"));
+    EXPECT_THAT(middle, Eq(0));
+    EXPECT_THAT(end, Eq(0));
+  }
 
-  EXPECT_THAT(GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
-                                                      "7: . . . . . . . ."
-                                                      "6: . . . . . . . ."
-                                                      "5: . . . . p . . ."
-                                                      "4: . . . . . P . ."
-                                                      "3: . . . . . . . ."
-                                                      "2: . . . . . . . ."
-                                                      "1: . . . . . . . ."
-                                                      "   a b c d e f g h"
-                                                      //
-                                                      "   w - - 0 1")),
-              Eq(0));
+  {
+    const auto [middle, end] =
+        GetPassedPawnScore<kBlack>(MakePosition("8: . . . . . . . ."
+                                                "7: . . . . . . . ."
+                                                "6: . . . . . . . ."
+                                                "5: . . . . p . . ."
+                                                "4: . . . . . P . ."
+                                                "3: . . . . . . . ."
+                                                "2: . . . . . . . ."
+                                                "1: . . . . . . . ."
+                                                "   a b c d e f g h"
+                                                //
+                                                "   b - - 0 1"));
+    EXPECT_THAT(middle, Eq(0));
+    EXPECT_THAT(end, Eq(0));
+  }
 }
 
 TEST(GetMaterialScore, White) {
@@ -983,7 +1022,7 @@ TEST(Evaluate, MaterialImbalance) {
                                     //
                                     "   w - - 0 1"),
                        kStartPhaseValue),
-              Eq(590));
+              Eq(565));
 }
 
 TEST(Evaluate, DoubledPawnPenalty) {

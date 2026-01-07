@@ -61,7 +61,7 @@ template <Side Side>
 [[nodiscard]] int CountBlockedPawns(const Position& position);
 
 template <Side Side>
-[[nodiscard]] int GetPassedPawnScore(const Position& position);
+[[nodiscard]] Score GetPassedPawnScore(const Position& position);
 
 // Returns the number of rooks on semi-open file. A semi-open file is a file
 // that contains no friendly pawns.
