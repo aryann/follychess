@@ -10,6 +10,7 @@ cc_library(
     hdrs = ["evaluation.h"],
     deps = [
         ":phase",
+        "//engine:attacks",
         "//engine:move",
         "//engine:move_generator",
         "//engine:position",

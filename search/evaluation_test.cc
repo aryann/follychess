@@ -778,6 +778,133 @@ TEST(CountBlockedPawns, Black) {
               Eq(1));
 }
 
+TEST(GetBishopMobilityScore, White) {
+  {
+    const auto [middle, end] =
+        GetBishopMobilityScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                    "7: . . . . . . . ."
+                                                    "6: . . . . . . . ."
+                                                    "5: . . . . . . . ."
+                                                    "4: . . . B . . . ."
+                                                    "3: . . . . . . . ."
+                                                    "2: . . . . . . . ."
+                                                    "1: . . . . . . . K"
+                                                    "   a b c d e f g h"
+                                                    //
+                                                    "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(65));
+    EXPECT_THAT(end, Eq(65));
+  }
+
+  {
+    const auto [middle, end] =
+        GetBishopMobilityScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                    "7: . . . . . . . ."
+                                                    "6: . . . . . . . ."
+                                                    "5: . . . . . . . ."
+                                                    "4: . . . . . . . ."
+                                                    "3: . . . . . . . ."
+                                                    "2: . P . . . . . ."
+                                                    "1: B . . . . . . K"
+                                                    "   a b c d e f g h"
+                                                    //
+                                                    "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(0));
+    EXPECT_THAT(end, Eq(0));
+  }
+
+  {
+    const auto [middle, end] =
+        GetBishopMobilityScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                    "7: . . . . . . . ."
+                                                    "6: . . . . . . . ."
+                                                    "5: . . . . . . . ."
+                                                    "4: . . . . . . . ."
+                                                    "3: . . . . . . . ."
+                                                    "2: . p . . . . . ."
+                                                    "1: B . . . . . . K"
+                                                    "   a b c d e f g h"
+                                                    //
+                                                    "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(5));
+    EXPECT_THAT(end, Eq(5));
+  }
+}
+
+TEST(GetBishopMobilityScore, Black) {
+  {
+    const auto [middle, end] =
+        GetBishopMobilityScore<kBlack>(MakePosition("8: . . . . . . . ."
+                                                    "7: . . . . . . . ."
+                                                    "6: . . p . . . . ."
+                                                    "5: . . . b . . . ."
+                                                    "4: . . . . P . . ."
+                                                    "3: . . . . . . . ."
+                                                    "2: . . . . . . . ."
+                                                    "1: . . . . . . . K"
+                                                    "   a b c d e f g h"
+                                                    //
+                                                    "   b - - 0 1"));
+    EXPECT_THAT(middle, Eq(35));
+    EXPECT_THAT(end, Eq(35));
+  }
+}
+
+TEST(GetQueenMobilityScore, White) {
+  {
+    const auto [middle, end] =
+        GetQueenMobilityScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                   "7: . . . . . . . ."
+                                                   "6: . . . . . . . ."
+                                                   "5: . . . . . . . ."
+                                                   "4: . . . Q . . . ."
+                                                   "3: . . . . . . . ."
+                                                   "2: . . . . . . . ."
+                                                   "1: . . . . . . . K"
+                                                   "   a b c d e f g h"
+                                                   //
+                                                   "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(27));
+    EXPECT_THAT(end, Eq(54));
+  }
+
+  {
+    const auto [middle, end] =
+        GetQueenMobilityScore<kWhite>(MakePosition("8: . . . . . . . ."
+                                                   "7: . . . . . . . ."
+                                                   "6: . . . . . . . ."
+                                                   "5: . . . . . . . ."
+                                                   "4: . . . . . . . ."
+                                                   "3: . . . . . . . ."
+                                                   "2: P P . . . . . ."
+                                                   "1: Q P . . . . . K"
+                                                   "   a b c d e f g h"
+                                                   //
+                                                   "   w - - 0 1"));
+    EXPECT_THAT(middle, Eq(0));
+    EXPECT_THAT(end, Eq(0));
+  }
+}
+
+TEST(GetQueenMobilityScore, Black) {
+  {
+    const auto [middle, end] =
+        GetQueenMobilityScore<kBlack>(MakePosition("8: . . . . . . . ."
+                                                   "7: . . . . . . . ."
+                                                   "6: . . . p . . . ."
+                                                   "5: . . . q . . . ."
+                                                   "4: . . . P . . . ."
+                                                   "3: . . . . . . . ."
+                                                   "2: . . . . . . . ."
+                                                   "1: . . . . . . . K"
+                                                   "   a b c d e f g h"
+                                                   //
+                                                   "   b - - 0 1"));
+    EXPECT_THAT(middle, Eq(21));
+    EXPECT_THAT(end, Eq(42));
+  }
+}
+
 TEST(CountSemiOpenFileRooks, White) {
   EXPECT_THAT(CountSemiOpenFileRooks<kWhite>(MakePosition("8: . . . . . . . ."
                                                           "7: . . p p . . . ."
@@ -1039,7 +1166,7 @@ TEST(Evaluate, MaterialImbalance) {
                                     //
                                     "   w - - 0 1"),
                        kStartPhaseValue),
-              Eq(565));
+              Eq(585));
 }
 
 TEST(Evaluate, DoubledPawnPenalty) {

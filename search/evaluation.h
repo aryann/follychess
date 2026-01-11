@@ -80,6 +80,12 @@ template <Side Side>
 template <Side Side>
 [[nodiscard]] Score GetPassedPawnScore(const Position& position);
 
+template <Side Side>
+[[nodiscard]] Score GetBishopMobilityScore(const Position& position);
+
+template <Side Side>
+[[nodiscard]] Score GetQueenMobilityScore(const Position& position);
+
 // Returns the number of rooks on semi-open file. A semi-open file is a file
 // that contains no friendly pawns.
 template <Side Side>

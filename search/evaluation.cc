@@ -17,6 +17,7 @@
 
 #include "search/evaluation.h"
 
+#include "engine/attacks.h"
 #include "engine/move_generator.h"
 #include "engine/position.h"
 #include "search/phase.h"
@@ -239,6 +240,44 @@ template Score GetPassedPawnScore<kBlack>(const Position& position);
 
 namespace {
 
+template <Side Side, Piece Piece>
+int CountMoves(const Position& position) {
+  int mobility = 0;
+
+  Bitboard pieces = position.GetPieces(Side, Piece);
+  const Bitboard blockers = position.GetPieces();
+  while (pieces) {
+    const Square square = pieces.PopLeastSignificantBit();
+    const Bitboard attacks =
+        GenerateAttacks<Piece>(square, blockers) & ~position.GetPieces(Side);
+    mobility += attacks.GetCount();
+  }
+
+  return mobility;
+}
+
+}  // namespace
+
+template <Side Side>
+Score GetBishopMobilityScore(const Position& position) {
+  const int mobility = CountMoves<Side, kBishop>(position) * 5;
+  return {.middle = mobility, .end = mobility};
+}
+
+template Score GetBishopMobilityScore<kWhite>(const Position& position);
+template Score GetBishopMobilityScore<kBlack>(const Position& position);
+
+template <Side Side>
+Score GetQueenMobilityScore(const Position& position) {
+  const int mobility = CountMoves<Side, kQueen>(position);
+  return {.middle = mobility * 1, .end = mobility * 2};
+}
+
+template Score GetQueenMobilityScore<kWhite>(const Position& position);
+template Score GetQueenMobilityScore<kBlack>(const Position& position);
+
+namespace {
+
 template <Side Side>
 [[nodiscard]] int CountOpenFileRooks(const Position& position,
                                      Bitboard blockers) {
@@ -340,10 +379,12 @@ namespace {
 
 template <Side Side>
 [[nodiscard]] int Evaluate(const Position& position, int phase) {
-  const Score tapered_score =               //
-      GetPlacementScore<Side>(position) +   //
-      GetKingSafetyScore<Side>(position) +  //
-      GetPassedPawnScore<Side>(position);
+  const Score tapered_score =                   //
+      GetPlacementScore<Side>(position) +       //
+      GetKingSafetyScore<Side>(position) +      //
+      GetPassedPawnScore<Side>(position) +      //
+      GetBishopMobilityScore<Side>(position) +  //
+      GetQueenMobilityScore<Side>(position);
 
   return Interpolate(tapered_score, phase) +            //
          GetMaterialScore<Side>(position) +             //
