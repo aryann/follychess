@@ -47,7 +47,7 @@ struct SearchContext {
 class AlphaBetaSearcher {
  public:
   explicit AlphaBetaSearcher(SearchContext& context)
-      : context_(context), position_(context.game.GetPosition()), nodes_(0) {}
+      : context_(context), game_(context.game), nodes_(0) {}
 
   [[nodiscard]] Move Search(int depth) {
     constexpr static int kAlpha = -100'000;
@@ -60,7 +60,8 @@ class AlphaBetaSearcher {
       // If the Principal Variation table is empty, then it is likely due to a
       // root transposition table cutoff. In this case, we check the
       // transposition table for the best move.
-      context_.transpositions.Probe(position_, kAlpha, kBeta, 0, &best_move);
+      context_.transpositions.Probe(game_.GetPosition(), kAlpha, kBeta, 0,
+                                    &best_move);
     }
 
     DCHECK_NE(best_move, Move::NullMove());
@@ -79,19 +80,19 @@ class AlphaBetaSearcher {
     const int remaining_depth = max_depth - depth;
     Move best_move;
     if (std::optional<int> score = context_.transpositions.Probe(
-            position_, alpha, beta, remaining_depth, &best_move)) {
+            game_.GetPosition(), alpha, beta, remaining_depth, &best_move)) {
       return *score;
     }
 
     if (depth == max_depth) {
       int score = QuiescentSearch(alpha, beta, depth);
-      context_.transpositions.Record(position_, score, remaining_depth, Exact,
-                                     Move::NullMove());
+      context_.transpositions.Record(game_.GetPosition(), score,
+                                     remaining_depth, Exact, Move::NullMove());
       return score;
     }
 
-    std::vector<Move> moves = GenerateLegalMoves(position_);
-    OrderMoves(position_, best_move, moves);
+    std::vector<Move> moves = GenerateLegalMoves(game_.GetPosition());
+    OrderMoves(game_.GetPosition(), best_move, moves);
 
     TranspositionTable::BoundType transposition_type = UpperBound;
     for (Move move : moves) {
@@ -99,8 +100,8 @@ class AlphaBetaSearcher {
       const int score = -Search(-beta, -alpha, depth + 1, max_depth);
 
       if (score >= beta) {
-        context_.transpositions.Record(position_, score, remaining_depth,
-                                       LowerBound, move);
+        context_.transpositions.Record(game_.GetPosition(), score,
+                                       remaining_depth, LowerBound, move);
         return beta;
       }
 
@@ -118,8 +119,9 @@ class AlphaBetaSearcher {
     }
 
     if (!moves.empty()) {
-      context_.transpositions.Record(position_, alpha, remaining_depth,
-                                     transposition_type, best_move);
+      context_.transpositions.Record(game_.GetPosition(), alpha,
+                                     remaining_depth, transposition_type,
+                                     best_move);
       return alpha;
     }
 
@@ -147,10 +149,11 @@ class AlphaBetaSearcher {
     alpha = std::max(alpha, score);
 
     Move best_move;
-    context_.transpositions.Probe(position_, alpha, beta, 0, &best_move);
+    context_.transpositions.Probe(game_.GetPosition(), alpha, beta, 0,
+                                  &best_move);
 
-    std::vector<Move> moves = GenerateLegalMoves<kCapture>(position_);
-    OrderMoves(position_, best_move, moves);
+    std::vector<Move> moves = GenerateLegalMoves<kCapture>(game_.GetPosition());
+    OrderMoves(game_.GetPosition(), best_move, moves);
 
     for (Move move : moves) {
       ScopedMove2 scoped_move(move, context_.game);
@@ -170,12 +173,13 @@ class AlphaBetaSearcher {
   }
 
   [[nodiscard]] int GetScore() const {
-    const int score = Evaluate(position_, CalculatePhase(position_));
-    return position_.SideToMove() == kWhite ? score : -score;
+    const int score =
+        Evaluate(game_.GetPosition(), CalculatePhase(game_.GetPosition()));
+    return game_.GetPosition().SideToMove() == kWhite ? score : -score;
   }
 
   [[nodiscard]] constexpr bool CurrentSideInCheck() const {
-    return position_.GetCheckers(position_.SideToMove());
+    return game_.GetPosition().GetCheckers(game_.GetPosition().SideToMove());
   }
 
   constexpr void Log(const int score, const int depth,
@@ -194,7 +198,7 @@ class AlphaBetaSearcher {
   }
 
   SearchContext& context_;
-  const Position& position_;
+  Game& game_;
   std::int64_t nodes_;
 };
 

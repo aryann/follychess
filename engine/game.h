@@ -24,34 +24,44 @@ namespace follychess {
 
 class Game {
  public:
-  explicit Game(const Position& position) : position_(position) {}
+  explicit Game(const Position& position) {
+    history_.push_back({
+        .key = position.GetKey(),
+        .position = position,
+    });
+  }
 
-  Game() : position_(Position::Starting()) {}
+  Game() : Game(Position::Starting()) {}
 
   void Do(Move move) {
+    DCHECK(!history_.empty());
+    Position position = history_.back().position;
+    position.Do(move);
+
     history_.push_back({
-        .key = position_.GetKey(),
-        .undo_info = position_.Do(move),
+        .key = position.GetKey(),
+        .position = position,
     });
   }
 
   void Undo() {
     DCHECK(!history_.empty());
-    position_.Undo(history_.back().undo_info);
     history_.pop_back();
   }
 
   [[nodiscard]] int GetRepetitionCount() const;
 
-  [[nodiscard]] const Position& GetPosition() const { return position_; }
+  [[nodiscard]] const Position& GetPosition() const {
+    DCHECK(!history_.empty());
+    return history_.back().position;
+  }
 
  private:
   struct State {
     std::uint64_t key{0};
-    UndoInfo undo_info;
+    Position position;
   };
 
-  Position position_;
   std::vector<State> history_;
 };
 

@@ -21,10 +21,10 @@ namespace follychess {
 
 [[nodiscard]] int Game::GetRepetitionCount() const {
   int repetitions = 1;
-  const std::uint64_t current_key = position_.GetKey();
+  const std::uint64_t current_key = GetPosition().GetKey();
 
-  const int start = std::ssize(history_) - 2;
-  const int limit = std::ssize(history_) - 1 - position_.GetHalfMoves();
+  const int start = std::ssize(history_) - 3;
+  const int limit = std::ssize(history_) - 1 - GetPosition().GetHalfMoves();
 
   for (int i = start; i >= limit; --i) {
     if (history_[i].key == current_key) {
