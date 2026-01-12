@@ -141,6 +141,7 @@ TEST(MoveOrdering, PriorityHierarchy) {
       "e1c1#ooo",
       "g7g8q",
       "d4e6#c",
+      "0000",
       "d4c2",
   });
 
@@ -148,6 +149,7 @@ TEST(MoveOrdering, PriorityHierarchy) {
   OrderMoves(position, priority_move, moves);
   EXPECT_THAT(moves, ElementsAreArray(MakeMoves({
                          "d4c2",      // Priority move
+                         "0000",      // Null move
                          "d4e6#c",    // Capture
                          "g7g8q",     // Quiet promotion
                          "e1c1#ooo",  // Queenside castling

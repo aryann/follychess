@@ -32,6 +32,10 @@ namespace {
     return 0;
   }
 
+  if (move.IsNullMove()) {
+    return 1;
+  }
+
   if (move.IsCapture()) {
     const Piece attacker = position.GetPiece(move.GetFrom());
     const Piece victim = position.GetPiece(move.GetTo());
