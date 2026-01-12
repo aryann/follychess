@@ -84,11 +84,21 @@ class AlphaBetaSearcher {
       return *score;
     }
 
-    if (depth == max_depth) {
+    if (depth >= max_depth) {
       int score = QuiescentSearch(alpha, beta, depth);
       context_.transpositions.Record(game_.GetPosition(), score,
                                      remaining_depth, Exact, Move::NullMove());
       return score;
+    }
+
+    if (NullPrune(depth, max_depth)) {
+      ScopedMove2 scoped_move(Move::NullMove(), context_.game);
+      constexpr int kDepthReduction = 2;
+      const int score =
+          -Search(-beta, -beta + 1, depth + 1 + kDepthReduction, max_depth);
+      if (score >= beta) {
+        return beta;
+      }
     }
 
     std::vector<Move> moves = GenerateLegalMoves(game_.GetPosition());
@@ -178,12 +188,30 @@ class AlphaBetaSearcher {
     return game_.GetPosition().SideToMove() == kWhite ? score : -score;
   }
 
-  [[nodiscard]] constexpr bool CurrentSideInCheck() const {
+  [[nodiscard]] bool CurrentSideInCheck() const {
     return game_.GetPosition().GetCheckers(game_.GetPosition().SideToMove());
   }
 
-  constexpr void Log(const int score, const int depth,
-                     const int additional_depth = 0) const {
+  [[nodiscard]] bool NullPrune(const int depth, const int max_depth) const {
+    const int remaining_depth = max_depth - depth;
+    const Position& position = game_.GetPosition();
+    const bool king_and_pawn_endgame =
+        (position.GetPieces(kKing) | position.GetPieces(kPawn)) ==
+        position.GetPieces();
+
+    return
+        // Don't prune the root.
+        depth > 0
+        // Don't prune too close to the leaf.
+        && remaining_depth >= 2
+        // Don't prune endgames that can result in Zugzwang.
+        && !king_and_pawn_endgame
+        // Don't prune if we're in check since it doesn't make sense.
+        && !CurrentSideInCheck();
+  }
+
+  void Log(const int score, const int depth,
+           const int additional_depth = 0) const {
     const auto now = std::chrono::system_clock::now();
     const std::chrono::duration<double> elapsed = now - context_.start_time;
     const double elapsed_seconds = elapsed.count();
