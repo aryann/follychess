@@ -129,6 +129,7 @@ cc_library(
     srcs = [],
     hdrs = ["transposition.h"],
     deps = [
+        ":evaluation",
         "//engine:position",
         "@abseil-cpp//absl/container:flat_hash_map",
     ],

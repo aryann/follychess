@@ -18,11 +18,11 @@
 #ifndef FOLLYCHESS_SEARCH_TRANSPOSITION_H_
 #define FOLLYCHESS_SEARCH_TRANSPOSITION_H_
 
-#include <array>
 #include <optional>
 
 #include "absl/container/flat_hash_map.h"
 #include "engine/position.h"
+#include "search/evaluation.h"
 
 namespace follychess {
 
@@ -34,19 +34,49 @@ class TranspositionTable {
     LowerBound,
   };
 
+  struct ProbeParams {
+    int alpha;
+    int beta;
+    int depth;
+    int remaining_depth;
+  };
+
+  struct RecordParams {
+    int depth;
+    int remaining_depth;
+  };
+
   explicit TranspositionTable() : hits_{0} {}
 
-  constexpr std::optional<int> Probe(const Position& position, int alpha,
-                                     int beta, int remaining_depth,
-                                     Move* best_move);
+  constexpr std::optional<int> Probe(const Position& position,
+                                     ProbeParams probe_params, Move* best_move);
 
   constexpr void Record(const Position& position, int score,
-                        int remaining_depth, BoundType type, Move best_move);
+                        RecordParams record_params, BoundType type,
+                        Move best_move);
 
   [[nodiscard]] constexpr std::int64_t GetHits() const { return hits_; }
 
  private:
-  static constexpr auto KEntries = 1 << 24;
+  [[nodiscard]] static int NormalizeScore(int score, int depth) {
+    if (score > kCheckMateThreshold) {
+      return score + depth;
+    }
+    if (score < -kCheckMateThreshold) {
+      return score - depth;
+    }
+    return score;
+  }
+
+  [[nodiscard]] static int DenormalizeScore(int score, int depth) {
+    if (score > kCheckMateThreshold) {
+      return score - depth;
+    }
+    if (score < -kCheckMateThreshold) {
+      return score + depth;
+    }
+    return score;
+  }
 
   struct Entry {
     Move best_move;
@@ -55,13 +85,13 @@ class TranspositionTable {
     BoundType type{BoundType::Exact};
   };
 
+  // TODO(aryann): Replace this with a more efficient data structure.
   absl::flat_hash_map<std::uint64_t, Entry> table_;
   std::int64_t hits_;
 };
 
 constexpr std::optional<int> TranspositionTable::Probe(const Position& position,
-                                                       int alpha, int beta,
-                                                       int remaining_depth,
+                                                       ProbeParams probe_params,
                                                        Move* best_move) {
   auto it = table_.find(position.GetKey());
   if (it == table_.end()) {
@@ -69,38 +99,43 @@ constexpr std::optional<int> TranspositionTable::Probe(const Position& position,
   }
 
   const Entry& entry = it->second;
+  const int score = DenormalizeScore(entry.score, probe_params.depth);
   *best_move = entry.best_move;
 
-  if (entry.remaining_depth < remaining_depth) {
+  if (entry.remaining_depth < probe_params.remaining_depth) {
     return std::nullopt;
   }
 
   switch (entry.type) {
     case BoundType::Exact:
       ++hits_;
-      return entry.score;
+      return score;
+
     case BoundType::UpperBound:
-      if (entry.score <= alpha) {
+      if (score <= probe_params.alpha) {
         ++hits_;
-        return alpha;
+        return probe_params.alpha;
       }
+      break;
+
     case BoundType::LowerBound:
-      if (entry.score >= beta) {
+      if (score >= probe_params.beta) {
         ++hits_;
-        return beta;
+        return probe_params.beta;
       }
-    default:
-      return std::nullopt;
+      break;
   }
+
+  return std::nullopt;
 }
 
 constexpr void TranspositionTable::Record(const Position& position, int score,
-                                          int remaining_depth, BoundType type,
-                                          Move best_move) {
+                                          RecordParams record_params,
+                                          BoundType type, Move best_move) {
   table_[position.GetKey()] = {
       .best_move = best_move,
-      .remaining_depth = remaining_depth,
-      .score = score,
+      .remaining_depth = record_params.remaining_depth,
+      .score = NormalizeScore(score, record_params.depth),
       .type = type,
   };
 }

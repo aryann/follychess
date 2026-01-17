@@ -22,6 +22,10 @@
 
 namespace follychess {
 
+constexpr int kBaseCheckMateScore = 20'000;
+constexpr int kCheckMateThreshold = 19'000;
+constexpr int kStalemateScore = 0;
+
 struct Score {
   int middle = 0;
   int end = 0;

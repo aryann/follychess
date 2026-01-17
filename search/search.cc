@@ -60,7 +60,13 @@ class AlphaBetaSearcher {
       // If the Principal Variation table is empty, then it is likely due to a
       // root transposition table cutoff. In this case, we check the
       // transposition table for the best move.
-      context_.transpositions.Probe(game_.GetPosition(), kAlpha, kBeta, 0,
+      context_.transpositions.Probe(game_.GetPosition(),
+                                    {
+                                        .alpha = kAlpha,
+                                        .beta = kBeta,
+                                        .depth = depth,
+                                        .remaining_depth = 0,
+                                    },
                                     &best_move);
     }
 
@@ -80,14 +86,25 @@ class AlphaBetaSearcher {
     const int remaining_depth = max_depth - depth;
     Move best_move;
     if (std::optional<int> score = context_.transpositions.Probe(
-            game_.GetPosition(), alpha, beta, remaining_depth, &best_move)) {
+            game_.GetPosition(),
+            {
+                .alpha = alpha,
+                .beta = beta,
+                .depth = depth,
+                .remaining_depth = remaining_depth,
+            },
+            &best_move)) {
       return *score;
     }
 
-    if (depth >= max_depth) {
-      int score = QuiescentSearch(alpha, beta, depth);
+    if (depth >= max_depth && !CurrentSideInCheck()) {
+      const int score = QuiescentSearch(alpha, beta, depth);
       context_.transpositions.Record(game_.GetPosition(), score,
-                                     remaining_depth, Exact, Move::NullMove());
+                                     {
+                                         .depth = depth,
+                                         .remaining_depth = remaining_depth,
+                                     },
+                                     Exact, Move::NullMove());
       return score;
     }
 
@@ -111,7 +128,11 @@ class AlphaBetaSearcher {
 
       if (score >= beta) {
         context_.transpositions.Record(game_.GetPosition(), score,
-                                       remaining_depth, LowerBound, move);
+                                       {
+                                           .depth = depth,
+                                           .remaining_depth = remaining_depth,
+                                       },
+                                       LowerBound, move);
         return beta;
       }
 
@@ -130,19 +151,19 @@ class AlphaBetaSearcher {
 
     if (!moves.empty()) {
       context_.transpositions.Record(game_.GetPosition(), alpha,
-                                     remaining_depth, transposition_type,
-                                     best_move);
+                                     {
+                                         .depth = depth,
+                                         .remaining_depth = remaining_depth,
+                                     },
+                                     transposition_type, best_move);
       return alpha;
     }
 
     if (CurrentSideInCheck()) {
-      constexpr int kBaseCheckMateScore = -20'000;
-
       // Favor checkmates closer to the root of the tree.
-      return kBaseCheckMateScore + depth;
+      return -kBaseCheckMateScore + depth;
     }
 
-    constexpr int kStalemateScore = 0;
     return kStalemateScore;
   }
 
@@ -159,7 +180,13 @@ class AlphaBetaSearcher {
     alpha = std::max(alpha, score);
 
     Move best_move;
-    context_.transpositions.Probe(game_.GetPosition(), alpha, beta, 0,
+    context_.transpositions.Probe(game_.GetPosition(),
+                                  {
+                                      .alpha = alpha,
+                                      .beta = beta,
+                                      .depth = depth,
+                                      .remaining_depth = 0,
+                                  },
                                   &best_move);
 
     std::vector<Move> moves = GenerateLegalMoves<kCapture>(game_.GetPosition());
