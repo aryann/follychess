@@ -237,6 +237,19 @@ class AlphaBetaSearcher {
         && !CurrentSideInCheck();
   }
 
+  static std::string LogScore(const int score) {
+    if (std::abs(score) > kCheckMateThreshold) {
+      int plies = (kBaseCheckMateScore - std::abs(score));
+      int moves = (plies + 1) / 2;
+      if (score < 0) {
+        moves *= -1;
+      }
+      return std::format("mate {}", moves);
+    }
+
+    return std::format("cp {}", score);
+  }
+
   void Log(const int score, const int depth,
            const int additional_depth = 0) const {
     const auto now = std::chrono::system_clock::now();
@@ -247,8 +260,8 @@ class AlphaBetaSearcher {
     const int selective_depth = depth + additional_depth;
 
     context_.logger(std::format(
-        "info depth {} seldepth {} score cp {} nodes {} nps {} tbhits {} pv {}",
-        depth, selective_depth, score, nodes_, nodes_per_second,
+        "info depth {} seldepth {} score {} nodes {} nps {} tbhits {} pv {}",
+        depth, selective_depth, LogScore(score), nodes_, nodes_per_second,
         context_.transpositions.GetHits(), context_.pv_table));
   }
 

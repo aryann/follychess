@@ -126,5 +126,24 @@ TEST(Search, Repetition) {
   }
 }
 
+TEST(Search, SpiteCheck) {
+  // Black will lose, but we expect the game to be delayed via a spite check.
+  Game game(
+      MakePosition("8: . . k r . b n r"
+                   "7: p . p . p p p p"
+                   "6: p . P . . q . ."
+                   "5: . . . P . . . ."
+                   "4: . . . P . . . ."
+                   "3: P Q N . . . . ."
+                   "2: . P . . . P P P"
+                   "1: R . B . K . . R"
+                   "a b c d e f g h"
+                   //
+                   "b KQ - 1 13"));
+
+  const Move move = Search(game, SearchOptions().SetDepth(6));
+  EXPECT_THAT(move, Eq(MakeMove("f6f2#c")));
+}
+
 }  // namespace
 }  // namespace follychess
