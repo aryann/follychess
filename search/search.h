@@ -21,6 +21,39 @@
 #include "engine/game.h"
 #include "engine/move.h"
 #include "engine/position.h"
+#include "search/evaluation.h"
+#include "search/principal_variation.h"
+
+namespace follychess {
+
+struct SearchInfo {
+  int depth;
+  int score;
+  std::optional<int> mate_in;
+  std::int64_t nodes;
+  std::int64_t node_per_second;
+  std::int64_t tbhits;
+  const PrincipalVariationTable& pv_table;
+};
+
+}  // namespace follychess
+
+template <>
+struct std::formatter<follychess::SearchInfo> : std::formatter<std::string> {
+  static auto format(const follychess::SearchInfo& info,
+                     std::format_context& context) {
+    std::string score = std::format("cp {}", info.score);
+    if (info.mate_in) {
+      score = std::format("mate {}", *info.mate_in);
+    }
+
+    auto out = context.out();
+    return std::format_to(
+        out, "info depth {} score {} nodes {} nps {} tbhits {} pv {}",
+        info.depth, score, info.nodes, info.node_per_second, info.tbhits,
+        info.pv_table);
+  }
+};
 
 namespace follychess {
 
@@ -32,12 +65,14 @@ struct SearchOptions {
 
   int depth = 5;
 
-  SearchOptions& SetLogger(const std::function<void(std::string_view)>& value) {
-    logger = value;
+  SearchOptions& SetInfoObserver(
+      const std::function<void(const SearchInfo&)>& value) {
+    info_observer = value;
     return *this;
   }
 
-  std::function<void(std::string_view)> logger = [](std::string_view) {};
+  std::function<void(const SearchInfo&)> info_observer = [](const SearchInfo&) {
+  };
 };
 
 Move Search(const Game& game, const SearchOptions& options = SearchOptions());

@@ -19,7 +19,6 @@
 #define FOLLYCHESS_CLI_COMMANDS_UCI_COMMAND_H_
 
 #include <iostream>
-#include <print>
 
 #include "cli/command.h"
 #include "cli/options.h"
@@ -99,8 +98,8 @@ class Go : public Command {
     Move move = Search(state_.game,
                        SearchOptions()       //
                            .SetDepth(depth)  //
-                           .SetLogger([&](std::string_view value) {
-                             state_.printer.Println(std::cout, "{}", value);
+                           .SetInfoObserver([&](const SearchInfo& info) {
+                             state_.printer.Println(std::cout, "{}", info);
                            }));
 
     state_.printer.Println(std::cout, "bestmove {}", move);

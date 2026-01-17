@@ -34,10 +34,23 @@
 namespace follychess {
 namespace {
 
+std::optional<int> GetMateIn(const int score) {
+  if (std::abs(score) < kCheckMateThreshold) {
+    return std::nullopt;
+  }
+
+  const int plies = (kBaseCheckMateScore - std::abs(score));
+  int moves = (plies + 1) / 2;
+  if (score < 0) {
+    moves *= -1;
+  }
+  return moves;
+}
+
 struct SearchContext {
   Game game;
 
-  const std::function<void(std::string_view)> logger;
+  std::function<void(const SearchInfo&)> info_observer;
   std::chrono::system_clock::time_point start_time;
 
   PrincipalVariationTable pv_table;
@@ -53,7 +66,7 @@ class AlphaBetaSearcher {
     constexpr static int kAlpha = -100'000;
     constexpr static int kBeta = 100'000;
     const int score = Search(kAlpha, kBeta, 0, depth);
-    Log(score, depth);
+    context_.info_observer(MakeSearchInfo(score, depth));
 
     Move best_move = context_.pv_table.GetBestMove();
     if (best_move == Move::NullMove()) {
@@ -237,32 +250,21 @@ class AlphaBetaSearcher {
         && !CurrentSideInCheck();
   }
 
-  static std::string LogScore(const int score) {
-    if (std::abs(score) > kCheckMateThreshold) {
-      int plies = (kBaseCheckMateScore - std::abs(score));
-      int moves = (plies + 1) / 2;
-      if (score < 0) {
-        moves *= -1;
-      }
-      return std::format("mate {}", moves);
-    }
-
-    return std::format("cp {}", score);
-  }
-
-  void Log(const int score, const int depth,
-           const int additional_depth = 0) const {
+  [[nodiscard]] SearchInfo MakeSearchInfo(const int score,
+                                          const int depth) const {
     const auto now = std::chrono::system_clock::now();
     const std::chrono::duration<double> elapsed = now - context_.start_time;
     const double elapsed_seconds = elapsed.count();
-    auto nodes_per_second = static_cast<std::int64_t>(nodes_ / elapsed_seconds);
 
-    const int selective_depth = depth + additional_depth;
-
-    context_.logger(std::format(
-        "info depth {} seldepth {} score {} nodes {} nps {} tbhits {} pv {}",
-        depth, selective_depth, LogScore(score), nodes_, nodes_per_second,
-        context_.transpositions.GetHits(), context_.pv_table));
+    return {
+        .depth = depth,
+        .score = score,
+        .mate_in = GetMateIn(score),
+        .nodes = nodes_,
+        .node_per_second = static_cast<std::int64_t>(nodes_ / elapsed_seconds),
+        .tbhits = context_.transpositions.GetHits(),
+        .pv_table = context_.pv_table,
+    };
   }
 
   SearchContext& context_;
@@ -275,7 +277,7 @@ class AlphaBetaSearcher {
 Move Search(const Game& game, const SearchOptions& options) {
   SearchContext context = {
       .game = game,
-      .logger = options.logger,
+      .info_observer = options.info_observer,
       .start_time = std::chrono::system_clock::now(),
       .pv_table = PrincipalVariationTable(),
       .transpositions = TranspositionTable(),
