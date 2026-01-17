@@ -31,6 +31,7 @@ namespace {
 
 using ::testing::ElementsAreArray;
 using ::testing::Eq;
+using ::testing::HasSubstr;
 
 constexpr int kMaxMovesAllowed = 10;
 
@@ -141,8 +142,15 @@ TEST(Search, SpiteCheck) {
                    //
                    "b KQ - 1 13"));
 
-  const Move move = Search(game, SearchOptions().SetDepth(6));
+  std::string last_info;
+  const Move move =
+      Search(game, SearchOptions()
+                       .SetInfoObserver([&last_info](const SearchInfo& info) {
+                         last_info = std::format("{}", info);
+                       })
+                       .SetDepth(6));
   EXPECT_THAT(move, Eq(MakeMove("f6f2#c")));
+  EXPECT_THAT(last_info, HasSubstr("score mate -3"));
 }
 
 }  // namespace
