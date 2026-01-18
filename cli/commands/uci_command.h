@@ -48,6 +48,20 @@ class Uci : public Command {
   CommandState& state_;
 };
 
+class UciNewGame : public Command {
+ public:
+  explicit UciNewGame(CommandState& state) : state_(state) {}
+
+  std::expected<void, std::string> Run(
+      std::vector<std::string_view> args) override {
+    state_.game = Game();
+    return {};
+  }
+
+ private:
+  CommandState& state_;
+};
+
 class SetOption : public Command {
  public:
   explicit SetOption(CommandState& state) : state_(state) {}

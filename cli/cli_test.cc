@@ -99,22 +99,44 @@ class CliTest : public ::testing::Test {
   std::streambuf* old_stdout_buffer_;
 };
 
+TEST_F(CliTest, Uci) {
+  ASSERT_THAT(Run({"uci"}).error_or(""), IsEmpty());
+
+  EXPECT_THAT(GetOutput(), Eq(Dedent(R"(
+    id name FollyChess
+    id author Aryan Naraghi
+
+    option name LogDirectory type string default <empty>
+    uciok)")));
+}
+
+TEST_F(CliTest, UciNewGame) {
+  ASSERT_THAT(Run({"position", "startpos", "moves", "d2d4"}).error_or(""),
+              IsEmpty());
+  ASSERT_THAT(Run({"d"}).error_or(""), IsEmpty());
+  EXPECT_THAT(GetOutput(), HasSubstr("b KQkq d3 0 1"));
+
+  ASSERT_THAT(Run({"ucinewgame"}).error_or(""), IsEmpty());
+  ASSERT_THAT(Run({"d"}).error_or(""), IsEmpty());
+  EXPECT_THAT(GetOutput(), HasSubstr("w KQkq - 0 1"));
+}
+
 TEST_F(CliTest, Display) {
   ASSERT_THAT(Run({"d"}).error_or(""), IsEmpty());
 
   EXPECT_THAT(GetOutput(), Eq(Dedent(R"(
-      8: r n b q k b n r
-      7: p p p p p p p p
-      6: . . . . . . . .
-      5: . . . . . . . .
-      4: . . . . . . . .
-      3: . . . . . . . .
-      2: P P P P P P P P
-      1: R N B Q K B N R
-         a b c d e f g h
+    8: r n b q k b n r
+    7: p p p p p p p p
+    6: . . . . . . . .
+    5: . . . . . . . .
+    4: . . . . . . . .
+    3: . . . . . . . .
+    2: P P P P P P P P
+    1: R N B Q K B N R
+       a b c d e f g h
 
-         w KQkq - 0 1
-      )")));
+       w KQkq - 0 1
+    )")));
 }
 
 TEST_F(CliTest, IsReady) {

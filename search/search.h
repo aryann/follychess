@@ -40,7 +40,7 @@ struct SearchInfo {
   //
   //   * Positive means the side to move can force a win (delivering mate).
   //   * Negative means the side to move is forced to lose (getting mated).
-  //q
+  //
   std::optional<int> mate_in;
 
   std::int64_t nodes;
