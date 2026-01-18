@@ -32,6 +32,7 @@ namespace {
 using ::testing::ElementsAreArray;
 using ::testing::Eq;
 using ::testing::HasSubstr;
+using ::testing::Optional;
 
 constexpr int kMaxMovesAllowed = 10;
 
@@ -142,15 +143,62 @@ TEST(Search, SpiteCheck) {
                    //
                    "b KQ - 1 13"));
 
-  std::string last_info;
-  const Move move =
-      Search(game, SearchOptions()
-                       .SetInfoObserver([&last_info](const SearchInfo& info) {
-                         last_info = std::format("{}", info);
-                       })
-                       .SetDepth(6));
+  SearchInfo info;
+  const Move move = Search(
+      game,
+      SearchOptions()
+          .SetInfoObserver([&info](const SearchInfo& curr) { info = curr; })
+          .SetDepth(6));
   EXPECT_THAT(move, Eq(MakeMove("f6f2#c")));
-  EXPECT_THAT(last_info, HasSubstr("score mate -3"));
+  EXPECT_THAT(info.mate_in, Optional(-3));
+}
+
+TEST(Search, WhiteMateInOne) {
+  Game game(
+      MakePosition("8: r . b q k . n r"
+                   "7: p p p p . p p p"
+                   "6: . . n . . . . ."
+                   "5: . . b . p . . ."
+                   "4: . . B . P . . ."
+                   "3: . . . . . Q . ."
+                   "2: P P P P . P P P"
+                   "1: R N B . K . N R"
+                   "   a b c d e f g h"
+                   //
+                   "w KQkq - 4 4"));
+
+  SearchInfo info;
+  const Move move = Search(
+      game,
+      SearchOptions()
+          .SetInfoObserver([&info](const SearchInfo& curr) { info = curr; })
+          .SetDepth(1));
+  EXPECT_THAT(move, Eq(MakeMove("f3f7#c")));
+  EXPECT_THAT(info.mate_in, Optional(1));
+}
+
+TEST(Search, BlackMateInOne) {
+  Game game(
+      MakePosition("8: r n b q k b n r"
+                   "7: p p p p . p p p"
+                   "6: . . . . . . . ."
+                   "5: . . . . p . . ."
+                   "4: . . . . . . P ."
+                   "3: . . . . . P . ."
+                   "2: P P P P P . . P"
+                   "1: R N B Q K B N R"
+                   "   a b c d e f g h"
+                   //
+                   "   b KQkq - 0 2"));
+
+  SearchInfo info;
+  const Move move = Search(
+      game,
+      SearchOptions()
+          .SetInfoObserver([&info](const SearchInfo& curr) { info = curr; })
+          .SetDepth(1));
+  EXPECT_THAT(move, Eq(MakeMove("d8h4")));
+  EXPECT_THAT(info.mate_in, Optional(1));
 }
 
 }  // namespace

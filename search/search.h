@@ -28,12 +28,25 @@ namespace follychess {
 
 struct SearchInfo {
   int depth;
+
+  // The evaluation score in centipawns, relative to the side to move.
+  //
+  //   * Positive values indicate an advantage for the side to move.
+  //   * Negative values indicate an advantage for the opponent.
   int score;
+
+  // If set, specifies the number of moves until checkmate. The score is
+  // relative to the side to move:
+  //
+  //   * Positive means the side to move can force a win (delivering mate).
+  //   * Negative means the side to move is forced to lose (getting mated).
+  //q
   std::optional<int> mate_in;
+
   std::int64_t nodes;
   std::int64_t node_per_second;
   std::int64_t tbhits;
-  const PrincipalVariationTable& pv_table;
+  std::string principal_variation;
 };
 
 }  // namespace follychess
@@ -51,7 +64,7 @@ struct std::formatter<follychess::SearchInfo> : std::formatter<std::string> {
     return std::format_to(
         out, "info depth {} score {} nodes {} nps {} tbhits {} pv {}",
         info.depth, score, info.nodes, info.node_per_second, info.tbhits,
-        info.pv_table);
+        info.principal_variation);
   }
 };
 

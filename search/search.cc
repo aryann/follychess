@@ -263,7 +263,7 @@ class AlphaBetaSearcher {
         .nodes = nodes_,
         .node_per_second = static_cast<std::int64_t>(nodes_ / elapsed_seconds),
         .tbhits = context_.transpositions.GetHits(),
-        .pv_table = context_.pv_table,
+        .principal_variation = std::format("{}", context_.pv_table),
     };
   }
 
