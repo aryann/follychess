@@ -26,6 +26,7 @@
 #include "engine/scoped_move.h"
 #include "engine/types.h"
 #include "search/evaluation.h"
+#include "search/killer_moves.h"
 #include "search/move_ordering.h"
 #include "search/phase.h"
 #include "search/principal_variation.h"
@@ -53,6 +54,7 @@ struct SearchContext {
   std::function<void(const SearchInfo&)> info_observer;
   std::chrono::system_clock::time_point start_time;
 
+  KillerMoves killer_moves;
   PrincipalVariationTable pv_table;
   TranspositionTable transpositions;
 };
@@ -146,6 +148,8 @@ class AlphaBetaSearcher {
                                            .remaining_depth = remaining_depth,
                                        },
                                        LowerBound, move);
+
+        context_.killer_moves.Set(depth, move);
         return beta;
       }
 

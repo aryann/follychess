@@ -31,6 +31,25 @@ cc_test(
 )
 
 cc_library(
+    name = "killer_moves",
+    hdrs = ["killer_moves.h"],
+    deps = [
+        "//engine:move",
+    ],
+)
+
+cc_test(
+    name = "killer_moves_test",
+    srcs = ["killer_moves_test.cc"],
+    deps = [
+        ":killer_moves",
+        "//engine:move",
+        "//engine:testing",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "move_ordering",
     srcs = ["move_ordering.cc"],
     hdrs = ["move_ordering.h"],
@@ -99,6 +118,7 @@ cc_library(
     hdrs = ["search.h"],
     deps = [
         ":evaluation",
+        ":killer_moves",
         ":move_ordering",
         ":principal_variation",
         ":transposition",
