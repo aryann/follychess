@@ -22,12 +22,13 @@
 
 #include "engine/move.h"
 #include "engine/position.h"
+#include "search/killer_moves.h"
 
 namespace follychess {
 namespace {
 
 [[nodiscard]] int MoveKey(const Position& position, Move priority_move,
-                          Move move) {
+                          const KillerMoves::Entry& killer_moves, Move move) {
   if (priority_move == move) {
     return 0;
   }
@@ -59,19 +60,29 @@ namespace {
     }
   }
 
+  // TODO(aryann): Enable this once history heuristic has been implemented.
+  // if (move == killer_moves.first) {
+  //   return 10'000;
+  // }
+  // if (move == killer_moves.second) {
+  //   return 10'001;
+  // }
+
   if (move.IsCastling()) {
-    return 10'000;
+    return 100'000;
   }
 
-  return 100'000;
+  return 1'000'000;
 }
 
 }  // namespace
 
 void OrderMoves(const Position& position, Move priority_move,
+                const KillerMoves::Entry& killer_moves,
                 std::vector<Move>& moves) {
-  std::ranges::sort(moves, std::less(),
-                    std::bind_front(MoveKey, position, priority_move));
+  std::ranges::sort(
+      moves, std::less(),
+      std::bind_front(MoveKey, position, priority_move, killer_moves));
 }
 
 }  // namespace follychess

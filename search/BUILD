@@ -54,6 +54,7 @@ cc_library(
     srcs = ["move_ordering.cc"],
     hdrs = ["move_ordering.h"],
     deps = [
+        ":killer_moves",
         "//engine:move",
         "//engine:position",
     ],

@@ -36,6 +36,11 @@ class KillerMoves {
     }
 
     Entry& entry = killer_moves_[depth];
+    if (move == entry.first) {
+      // Don't duplicate the move if it's already present.
+      return;
+    }
+
     entry.second = entry.first;
     entry.first = move;
   }

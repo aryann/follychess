@@ -22,10 +22,12 @@
 
 #include "engine/move.h"
 #include "engine/position.h"
+#include "search/killer_moves.h"
 
 namespace follychess {
 
 void OrderMoves(const Position& position, Move priority_move,
+                const KillerMoves::Entry& killer_moves,
                 std::vector<Move>& moves);
 
 }  // namespace follychess
