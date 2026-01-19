@@ -25,56 +25,51 @@
 #include "search/killer_moves.h"
 
 namespace follychess {
-namespace {
-
-[[nodiscard]] int MoveKey(const Position& position, Move priority_move,
-                          const KillerMoves::Entry& killer_moves, Move move) {
-  if (priority_move == move) {
-    return 0;
-  }
-
-  if (move.IsCapture()) {
-    const Piece attacker = position.GetPiece(move.GetFrom());
-    const Piece victim = position.GetPiece(move.GetTo());
-
-    const int victim_score = kKing - victim;
-    const int attacker_score = attacker;
-
-    return victim_score * static_cast<int>(kNumPieces) + attacker_score;
-  }
-
-  if (move.IsPromotion()) {
-    DCHECK_GT(kQueen, kRook);
-    DCHECK_GT(kRook, kBishop);
-    DCHECK_GT(kBishop, kKnight);
-
-    constexpr int kPromotionScale = 1'000;
-    return kPromotionScale + static_cast<int>(kNumPieces) -
-           move.GetPromotedPiece();
-  }
-
-  if (move.IsCastling()) {
-    return 10'000;
-  }
-
-  if (move == killer_moves.first) {
-    return 100'000;
-  }
-  if (move == killer_moves.second) {
-    return 100'001;
-  }
-
-  return 1'000'000;
-}
-
-}  // namespace
 
 void OrderMoves(const Position& position, Move priority_move,
                 const KillerMoves::Entry& killer_moves,
+                const HistoryHeuristic& history_heuristic,
                 std::vector<Move>& moves) {
-  std::ranges::sort(
-      moves, std::less(),
-      std::bind_front(MoveKey, position, priority_move, killer_moves));
+  auto sort_key = [&](Move move) {
+    if (priority_move == move) {
+      return 0;
+    }
+
+    if (move.IsCapture()) {
+      const Piece attacker = position.GetPiece(move.GetFrom());
+      const Piece victim = position.GetPiece(move.GetTo());
+
+      const int victim_score = kKing - victim;
+      const int attacker_score = attacker;
+
+      return victim_score * static_cast<int>(kNumPieces) + attacker_score;
+    }
+
+    if (move.IsPromotion()) {
+      DCHECK_GT(kQueen, kRook);
+      DCHECK_GT(kRook, kBishop);
+      DCHECK_GT(kBishop, kKnight);
+
+      constexpr int kPromotionScale = 1'000;
+      return kPromotionScale + static_cast<int>(kNumPieces) -
+             move.GetPromotedPiece();
+    }
+
+    if (move.IsCastling()) {
+      return 10'000;
+    }
+
+    if (move == killer_moves.first) {
+      return 100'000;
+    }
+    if (move == killer_moves.second) {
+      return 100'001;
+    }
+
+    return 1'000'000;
+  };
+
+  std::ranges::sort(moves, std::less(), sort_key);
 }
 
 }  // namespace follychess

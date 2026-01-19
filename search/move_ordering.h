@@ -22,12 +22,14 @@
 
 #include "engine/move.h"
 #include "engine/position.h"
+#include "search/history_heuristic.h"
 #include "search/killer_moves.h"
 
 namespace follychess {
 
 void OrderMoves(const Position& position, Move priority_move,
                 const KillerMoves::Entry& killer_moves,
+                const HistoryHeuristic& history_heuristic,
                 std::vector<Move>& moves);
 
 }  // namespace follychess

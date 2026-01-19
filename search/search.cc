@@ -142,7 +142,7 @@ class AlphaBetaSearcher {
 
     std::vector<Move> moves = GenerateLegalMoves(game_.GetPosition());
     OrderMoves(game_.GetPosition(), best_move, context_.killer_moves[ply],
-               moves);
+               context_.history_heuristic, moves);
 
     TranspositionTable::BoundType transposition_type = UpperBound;
     for (Move move : moves) {
@@ -216,7 +216,7 @@ class AlphaBetaSearcher {
 
     std::vector<Move> moves = GenerateLegalMoves<kCapture>(game_.GetPosition());
     OrderMoves(game_.GetPosition(), best_move, context_.killer_moves[ply],
-               moves);
+               context_.history_heuristic, moves);
 
     for (Move move : moves) {
       ScopedMove2 scoped_move(move, context_.game);

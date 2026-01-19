@@ -63,6 +63,7 @@ cc_library(
     srcs = ["move_ordering.cc"],
     hdrs = ["move_ordering.h"],
     deps = [
+        ":history_heuristic",
         ":killer_moves",
         "//engine:move",
         "//engine:position",
