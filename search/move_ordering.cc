@@ -33,10 +33,6 @@ namespace {
     return 0;
   }
 
-  if (move.IsNullMove()) {
-    return 1;
-  }
-
   if (move.IsCapture()) {
     const Piece attacker = position.GetPiece(move.GetFrom());
     const Piece victim = position.GetPiece(move.GetTo());
@@ -60,15 +56,15 @@ namespace {
     }
   }
 
-  if (move == killer_moves.first) {
+  if (move.IsCastling()) {
     return 10'000;
   }
-  if (move == killer_moves.second) {
-    return 10'001;
-  }
 
-  if (move.IsCastling()) {
+  if (move == killer_moves.first) {
     return 100'000;
+  }
+  if (move == killer_moves.second) {
+    return 100'001;
   }
 
   return 1'000'000;
