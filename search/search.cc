@@ -143,6 +143,7 @@ class AlphaBetaSearcher {
       const int score = -Search(-beta, -alpha, depth + 1, max_depth);
 
       if (score >= beta) {
+        // Beta cutoff.
         context_.transpositions.Record(game_.GetPosition(), score,
                                        {
                                            .depth = depth,
