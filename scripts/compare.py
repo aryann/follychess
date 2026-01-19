@@ -1,4 +1,5 @@
 import asyncio
+import dataclasses
 import datetime
 import json
 import os
@@ -12,14 +13,24 @@ import chess.pgn
 import chess.engine
 
 
-def _bazel_bin_dir():
-    return sys.argv[0].split('/bazel-bin/')[0] + '/bazel-bin/'
+@dataclasses.dataclass
+class Engine:
+    name: str
+    bin: str
+    engine: chess.engine.Protocol
+
+    def __init__(self, engine: str):
+        self.name, bin = engine.split(":")
+        self.bin = os.path.expanduser(bin)
+
+    async def start(self):
+        transport, self.engine = await chess.engine.popen_uci(self.bin)
 
 
-def _create_pgn(engines, board):
+def create_pgn(engines, board):
     game = chess.pgn.Game()
-    game.headers["White"] = engines[0].id.get("name")
-    game.headers["Black"] = engines[1].id.get("name")
+    game.headers["White"] = engines[0].engine.id.get("name")
+    game.headers["Black"] = engines[1].engine.id.get("name")
     game.headers["Date"] = datetime.date.today().strftime("%Y.%m.%d")
     game.headers["Result"] = board.result()
 
@@ -30,24 +41,7 @@ def _create_pgn(engines, board):
     return game
 
 
-async def start_stockfish():
-    stockfish = shutil.which("stockfish")
-    transport, engine = await chess.engine.popen_uci(stockfish)
-
-    await engine.configure({
-        "UCI_Elo": 1600,
-        "UCI_LimitStrength": True,
-    })
-    return engine
-
-
-async def start_follychess():
-    bin = os.path.join(_bazel_bin_dir(), 'cli', 'follychess')
-    transport, engine = await chess.engine.popen_uci(bin)
-    return engine
-
-
-async def run_game(engines, db) -> None:
+async def run_game(engines, db, invocation_id) -> None:
     random.shuffle(engines)
     curr = 0
 
@@ -55,8 +49,8 @@ async def run_game(engines, db) -> None:
     board = chess.Board()
     moves = []
     while not board.is_game_over(claim_draw=True):
-        engine = engines[curr % len(engines)]
-        result = await engine.play(board, chess.engine.Limit(time=0.1))
+        engine = engines[curr % len(engines)].engine
+        result = await engine.play(board, chess.engine.Limit(time=0.1, depth=5))
         curr += 1
         print(result.move, end=" ", flush=True)
         moves.append(str(result.move))
@@ -64,18 +58,28 @@ async def run_game(engines, db) -> None:
 
     end = datetime.datetime.now()
 
-    pgn = _create_pgn(engines, board)
+    pgn = create_pgn(engines, board)
     print(pgn)
+
+    winner = ''
+    if board.result() == '1-0':
+        winner = engines[0].name
+    elif board.result() == '0-1':
+        winner = engines[1].name
 
     db.execute(f"""
         INSERT INTO results (
+            invocation_id,
             start_time,
             end_time,
             white,
             black,
+            white_name,
+            black_name,
             white_params,
             black_params,
             outcome,
+            winner,
             uci_moves,
             pgn
         ) VALUES (
@@ -83,20 +87,28 @@ async def run_game(engines, db) -> None:
             ?,
             ?,
             ?,
+            ?,
+            ?,
+            ?,
             jsonb(?),
             jsonb(?),
+            ?,
             ?,
             ?,
             ?);
             """,
                (
+                   invocation_id,
                    start.isoformat(),
                    end.isoformat(),
-                   engines[0].id.get("name"),
-                   engines[1].id.get("name"),
-                   json.dumps(dict(engines[0].config.items())),
-                   json.dumps(dict(engines[1].config.items())),
+                   engines[0].name,
+                   engines[1].name,
+                   engines[0].engine.id.get("name"),
+                   engines[1].engine.id.get("name"),
+                   json.dumps(dict(engines[0].engine.config.items())),
+                   json.dumps(dict(engines[1].engine.config.items())),
                    board.result(),
+                   winner,
                    ' '.join(moves),
                    str(pgn),
                ))
@@ -112,13 +124,17 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS results (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            invocation_id TEXT,
             start_time TEXT,
             end_time TEXT,
             white TEXT,
             black TEXT,
+            white_name TEXT,
+            black_name TEXT,
             white_params BLOB,
             black_params BLOB,
             outcome TEXT,
+            winner TEXT,
             uci_moves TEXT,
             pgn TEXT
         );
@@ -128,15 +144,21 @@ def init_db():
 
 
 async def main() -> None:
-    db = init_db()
-    engines = []
-    try:
-        engines = [await start_stockfish(), await start_follychess()]
+    if len(sys.argv) != 4:
+        print(f"Usage: ${sys.argv[0]} INVOCATION_ID NAME_1:ENGINE_BIN_1 NAME_2: ENGINE_BIN_2", file=sys.stderr)
+        return
 
+    invocation_id, engine1, engine2 = sys.argv[1:4]
+    engines = [Engine(engine1), Engine(engine2)]
+    await engines[0].start()
+    await engines[1].start()
+
+    db = init_db()
+    try:
         while True:
-            result = await run_game(engines, db)
+            result = await run_game(engines, db, invocation_id)
             print()
-            print(f'{engines[0].id.get("name")}, {engines[1].id.get("name")}, {result}')
+            print(f'{engines[0].name}, {engines[1].name}, {result}')
 
             print()
             print("---")
@@ -144,7 +166,7 @@ async def main() -> None:
 
     finally:
         for engine in engines:
-            await engine.quit()
+            await engine.engine.quit()
 
 
 asyncio.run(main())
