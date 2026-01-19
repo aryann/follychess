@@ -44,16 +44,13 @@ namespace {
   }
 
   if (move.IsPromotion()) {
-    switch (move.GetPromotedPiece()) {
-      case kQueen:
-        return 1'000;
-      case kRook:
-        return 1'001;
-      case kBishop:
-        return 1'002;
-      default:
-        return 1'003;
-    }
+    DCHECK_GT(kQueen, kRook);
+    DCHECK_GT(kRook, kBishop);
+    DCHECK_GT(kBishop, kKnight);
+
+    constexpr int kPromotionScale = 1'000;
+    return kPromotionScale + static_cast<int>(kNumPieces) -
+           move.GetPromotedPiece();
   }
 
   if (move.IsCastling()) {

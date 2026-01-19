@@ -31,7 +31,7 @@ using ::testing::ElementsAreArray;
 TEST(MoveOrdering, Captures) {
   Position position = MakePosition(
       "8: . . . . . . . ."
-      "7: . . . . . . . ."
+      "7: . . . . n . . ."
       "6: . . p . . . . ."
       "5: . . . Q . . . ."
       "4: . . . . . . . ."
@@ -49,13 +49,15 @@ TEST(MoveOrdering, Captures) {
       "f3f2",
       "c6d5#c",
       "c6c5",
+      "e7d5#c",
   });
 
   OrderMoves(position, Move::NullMove(), {}, moves);
   EXPECT_THAT(moves, ElementsAreArray(MakeMoves({
-                         "c6d5#c",  // Queen capture
-                         "f3e2#c",  // Rook capture
-                         "a3b2#c",  // Pawn capture
+                         "c6d5#c",  // PxQ
+                         "e7d5#c",  // NxQ
+                         "f3e2#c",  // PxR
+                         "a3b2#c",  // PxP
                          "a3a2",
                          "f3f2",
                          "c6c5",
