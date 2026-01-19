@@ -1,10 +1,10 @@
 import asyncio
+import csv
 import dataclasses
 import datetime
+import io
 import json
 import os
-import random
-import shutil
 import sqlite3
 import sys
 
@@ -41,16 +41,14 @@ def create_pgn(engines, board):
     return game
 
 
-async def run_game(engines, db, invocation_id) -> None:
-    random.shuffle(engines)
+async def run_game(board, engines, db, invocation_id) -> None:
     curr = 0
-
     start = datetime.datetime.now()
-    board = chess.Board()
+
     moves = []
     while not board.is_game_over(claim_draw=True):
         engine = engines[curr % len(engines)].engine
-        result = await engine.play(board, chess.engine.Limit(time=0.1, depth=5))
+        result = await engine.play(board, chess.engine.Limit(time=0.1, depth=6))
         curr += 1
         print(result.move, end=" ", flush=True)
         moves.append(str(result.move))
@@ -143,26 +141,60 @@ def init_db():
     return conn
 
 
+def get_opening_pgns(path):
+    result = []
+    with open(os.path.expanduser(path)) as f:
+        reader = csv.reader(f, delimiter="\t")
+        next(reader)  # Skip header
+        for row in reader:
+            result.append(row[2])
+    return result
+
+
+def get_board_with_opening(pgn):
+    opening_moves = chess.pgn.read_game(io.StringIO(pgn))
+    board = chess.Board()
+    for move in opening_moves.mainline_moves():
+        board.push(move)
+    return board
+
+
 async def main() -> None:
-    if len(sys.argv) != 4:
-        print(f"Usage: ${sys.argv[0]} INVOCATION_ID NAME_1:ENGINE_BIN_1 NAME_2: ENGINE_BIN_2", file=sys.stderr)
+    if len(sys.argv) != 5:
+        print(f"Usage: ${sys.argv[0]} INVOCATION_ID NAME_1:ENGINE_BIN_1 NAME_2:ENGINE_BIN_2 OPENING_BOOK",
+              file=sys.stderr)
         return
 
-    invocation_id, engine1, engine2 = sys.argv[1:4]
-    engines = [Engine(engine1), Engine(engine2)]
-    await engines[0].start()
-    await engines[1].start()
+    invocation_id, engine1, engine2, opening_book = sys.argv[1:5]
+    engine1 = Engine(engine1)
+    engine2 = Engine(engine2)
+    await engine1.start()
+    await engine2.start()
+
+    openings = get_opening_pgns(opening_book)
 
     db = init_db()
     try:
-        while True:
-            result = await run_game(engines, db, invocation_id)
-            print()
-            print(f'{engines[0].name}, {engines[1].name}, {result}')
+        for opening in openings:
+            for engines in [[engine1, engine2], [engine2, engine1]]:
+                board = get_board_with_opening(opening)
 
-            print()
-            print("---")
-            print()
+                print()
+                print(f"Starting position:")
+                print()
+                print(board)
+                print()
+                result = await run_game(board, engines, db, invocation_id)
+                print()
+                print(f"Final position:")
+                print()
+                print(board)
+                print()
+                print(f"{engines[0].name}, {engines[1].name}, {result}")
+
+                print()
+                print("---")
+                print()
 
     finally:
         for engine in engines:
