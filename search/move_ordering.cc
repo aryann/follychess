@@ -60,13 +60,12 @@ namespace {
     }
   }
 
-  // TODO(aryann): Enable this once history heuristic has been implemented.
-  // if (move == killer_moves.first) {
-  //   return 10'000;
-  // }
-  // if (move == killer_moves.second) {
-  //   return 10'001;
-  // }
+  if (move == killer_moves.first) {
+    return 10'000;
+  }
+  if (move == killer_moves.second) {
+    return 10'001;
+  }
 
   if (move.IsCastling()) {
     return 100'000;
