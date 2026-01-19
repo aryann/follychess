@@ -124,6 +124,58 @@ TEST(MoveOrdering, Castling) {
                      })));
 }
 
+TEST(MoveOrdering, EnPassantCapture) {
+  Position position = MakePosition(
+      "8: . . . . . . . ."
+      "7: . . . . . . . ."
+      "6: . . . . . n . ."
+      "5: . . . . P . . ."
+      "4: . . p . . . . ."
+      "3: . . . . . . . ."
+      "2: P . . P . . . ."
+      "1: . . . . . . . ."
+      "   a b c d e f g h"
+      //
+      "   w - c3 0 1");
+
+  std::vector<Move> moves = MakeMoves({
+      "d2c3#ep",  // PxP (en passant)
+      "e5f6#c",   // PxN
+      "a2a3",     // Quiet move
+  });
+
+  OrderMoves(position, Move::NullMove(), {}, {}, moves);
+  EXPECT_THAT(moves, ElementsAreArray(MakeMoves({
+                         "e5f6#c",   // PxN
+                         "d2c3#ep",  // PxP (en passant)
+                         "a2a3",     // Quiet move
+                     })));
+}
+
+TEST(MoveOrdering, KillerAndHistoryMoves) {
+  Position position = Position::Starting();
+
+  KillerMoves::Entry killer_moves = {
+      .first = MakeMove("g1f3"),
+      .second = MakeMove("d2d4"),
+  };
+
+  HistoryHeuristic history_heuristic;
+  history_heuristic.Set(position, MakeMove("e2e4"), 2);
+
+  std::vector<Move> moves = MakeMoves({"e2e4", "d2d4", "g1f3", "b1c3", "a2a3"});
+  OrderMoves(position, Move::NullMove(), killer_moves, history_heuristic,
+             moves);
+
+  EXPECT_THAT(moves, ElementsAreArray(MakeMoves({
+                         "g1f3",  // First killer move
+                         "d2d4",  // Second killer move
+                         "e2e4",  // History heuristic move
+                         "b1c3",
+                         "a2a3",
+                     })));
+}
+
 TEST(MoveOrdering, PriorityHierarchy) {
   Position position = MakePosition(
       "8: . . . . . . . q"
