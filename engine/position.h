@@ -100,8 +100,8 @@ class Position {
 
   void InitKey();
 
-  std::array<Bitboard, kNumPieces> pieces_;
-  std::array<Bitboard, kNumSides> sides_;
+  std::array<Bitboard, kNumPieces> pieces_ = {};
+  std::array<Bitboard, kNumSides> sides_ = {};
 
   Side side_to_move_;
   CastlingRights castling_rights_;
