@@ -31,6 +31,15 @@ cc_test(
 )
 
 cc_library(
+    name = "history_heuristic",
+    srcs = [],
+    hdrs = ["history_heuristic.h"],
+    deps = [
+        "//engine:move",
+    ],
+)
+
+cc_library(
     name = "killer_moves",
     hdrs = ["killer_moves.h"],
     deps = [
@@ -119,6 +128,7 @@ cc_library(
     hdrs = ["search.h"],
     deps = [
         ":evaluation",
+        ":history_heuristic",
         ":killer_moves",
         ":move_ordering",
         ":principal_variation",

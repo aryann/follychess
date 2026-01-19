@@ -26,6 +26,7 @@
 #include "engine/scoped_move.h"
 #include "engine/types.h"
 #include "search/evaluation.h"
+#include "search/history_heuristic.h"
 #include "search/killer_moves.h"
 #include "search/move_ordering.h"
 #include "search/phase.h"
@@ -57,6 +58,7 @@ struct SearchContext {
   KillerMoves killer_moves;
   PrincipalVariationTable pv_table;
   TranspositionTable transpositions;
+  HistoryHeuristic history_heuristic;
 };
 
 class AlphaBetaSearcher {
@@ -155,8 +157,8 @@ class AlphaBetaSearcher {
                                            .depth = depth,
                                        },
                                        LowerBound, move);
-
         context_.killer_moves.Set(ply, move);
+        context_.history_heuristic.Set(game_.GetPosition(), move, depth);
         return beta;
       }
 
