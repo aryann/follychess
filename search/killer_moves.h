@@ -29,13 +29,13 @@ class KillerMoves {
     Move second = Move::NullMove();
   };
 
-  void Set(const int depth, const Move move) {
+  void Set(const int ply, const Move move) {
     if (move.IsCapture()) {
       // Killer moves must be quiet.
       return;
     }
 
-    Entry& entry = killer_moves_[depth];
+    Entry& entry = killer_moves_[ply];
     if (move == entry.first) {
       // Don't duplicate the move if it's already present.
       return;
@@ -45,10 +45,10 @@ class KillerMoves {
     entry.first = move;
   }
 
-  const Entry& operator[](const int depth) const {
-    DCHECK_GE(depth, 0);
-    DCHECK_LT(depth, kMaxDepth);
-    return killer_moves_[depth];
+  const Entry& operator[](const int ply) const {
+    DCHECK_GE(ply, 0);
+    DCHECK_LT(ply, kMaxDepth);
+    return killer_moves_[ply];
   }
 
  private:

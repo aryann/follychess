@@ -37,13 +37,13 @@ class TranspositionTable {
   struct ProbeParams {
     int alpha;
     int beta;
+    int ply;
     int depth;
-    int remaining_depth;
   };
 
   struct RecordParams {
+    int ply;
     int depth;
-    int remaining_depth;
   };
 
   explicit TranspositionTable() : hits_{0} {}
@@ -58,22 +58,22 @@ class TranspositionTable {
   [[nodiscard]] constexpr std::int64_t GetHits() const { return hits_; }
 
  private:
-  [[nodiscard]] static int NormalizeScore(int score, int depth) {
+  [[nodiscard]] static int NormalizeScore(const int score, const int ply) {
     if (score > kCheckMateThreshold) {
-      return score + depth;
+      return score + ply;
     }
     if (score < -kCheckMateThreshold) {
-      return score - depth;
+      return score - ply;
     }
     return score;
   }
 
-  [[nodiscard]] static int DenormalizeScore(int score, int depth) {
+  [[nodiscard]] static int DenormalizeScore(const int score, const int ply) {
     if (score > kCheckMateThreshold) {
-      return score - depth;
+      return score - ply;
     }
     if (score < -kCheckMateThreshold) {
-      return score + depth;
+      return score + ply;
     }
     return score;
   }
@@ -99,10 +99,10 @@ constexpr std::optional<int> TranspositionTable::Probe(const Position& position,
   }
 
   const Entry& entry = it->second;
-  const int score = DenormalizeScore(entry.score, probe_params.depth);
+  const int score = DenormalizeScore(entry.score, probe_params.ply);
   *best_move = entry.best_move;
 
-  if (entry.remaining_depth < probe_params.remaining_depth) {
+  if (entry.remaining_depth < probe_params.depth) {
     return std::nullopt;
   }
 
@@ -134,8 +134,8 @@ constexpr void TranspositionTable::Record(const Position& position, int score,
                                           BoundType type, Move best_move) {
   table_[position.GetKey()] = {
       .best_move = best_move,
-      .remaining_depth = record_params.remaining_depth,
-      .score = NormalizeScore(score, record_params.depth),
+      .remaining_depth = record_params.depth,
+      .score = NormalizeScore(score, record_params.ply),
       .type = type,
   };
 }

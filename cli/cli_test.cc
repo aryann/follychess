@@ -155,7 +155,7 @@ TEST_F(CliTest, Go) {
                   HasSubstr("info depth 4"),       //
                   HasSubstr("info depth 5"),       //
                   Not(HasSubstr("info depth 6")),  //
-                  HasSubstr("bestmove e2e4")));
+                  HasSubstr("bestmove d2d4")));
 
   ASSERT_THAT(
       Run({"go", "wtime", "1000", "btime", "1000", "depth", "2"}).error_or(""),
