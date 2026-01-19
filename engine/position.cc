@@ -306,8 +306,13 @@ UndoInfo Position::Do(const Move &move) {
   };
 
   if (move.IsNullMove()) {
+    zobrist_key_.ToggleEnPassantTarget(en_passant_target_);
+    en_passant_target_ = std::nullopt;
+    zobrist_key_.ToggleEnPassantTarget(en_passant_target_);
+
     side_to_move_ = ~side_to_move_;
     zobrist_key_.UpdateSideToMove();
+
     return undo_info;
   }
 
@@ -393,13 +398,13 @@ void Position::Undo(const UndoInfo &undo_info) {
   side_to_move_ = ~side_to_move_;
   zobrist_key_.UpdateSideToMove();
 
-  if (move.IsNullMove()) {
-    return;
-  }
-
   zobrist_key_.ToggleEnPassantTarget(en_passant_target_);
   en_passant_target_ = undo_info.en_passant_target;
   zobrist_key_.ToggleEnPassantTarget(en_passant_target_);
+
+  if (move.IsNullMove()) {
+    return;
+  }
 
   zobrist_key_.ToggleCastlingRights(castling_rights_);
   castling_rights_ = undo_info.castling_rights;

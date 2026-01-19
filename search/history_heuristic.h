@@ -48,7 +48,7 @@ class HistoryHeuristic {
   }
 
   [[nodiscard]] int Get(const Position& position, const Move move) const {
-    const Piece piece = position.GetPiece(move.GetTo());
+    const Piece piece = position.GetPiece(move.GetFrom());
     DCHECK_NE(piece, kEmptyPiece);
     return history_[position.SideToMove()][piece][move.GetTo()];
   }
