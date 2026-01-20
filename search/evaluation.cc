@@ -371,6 +371,46 @@ template Score GetKingSafetyScore<kBlack>(const Position& position);
 
 namespace {
 
+int CalculateChebyshevDistance(Square a, Square b) {
+  return std::max(std::abs(GetFile(a) - GetFile(b)),
+                  std::abs(GetRank(a) - GetRank(b)));
+}
+
+}  // namespace
+
+template <Side Side>
+[[nodiscard]] int GetMopUpScore(const Position& position) {
+  constexpr std::array<int, kNumSquares> kCenterManhattanDistance = {
+      6, 5, 4, 3, 3, 4, 5, 6,  //
+      5, 4, 3, 2, 2, 3, 4, 5,  //
+      4, 3, 2, 1, 1, 2, 3, 4,  //
+      3, 2, 1, 0, 0, 1, 2, 3,  //
+      3, 2, 1, 0, 0, 1, 2, 3,  //
+      4, 3, 2, 1, 1, 2, 3, 4,  //
+      5, 4, 3, 2, 2, 3, 4, 5,  //
+      6, 5, 4, 3, 3, 4, 5, 6,  //
+  };
+
+  const Square friendly_king = position.GetKing(Side);
+  const Square enemy_king = position.GetKing(~Side);
+
+  // Incentivizes pushing the enemy king to the edge.
+  const int push_to_edge_score = kCenterManhattanDistance[enemy_king];
+
+  // Incentivizes getting the friendly king close to the enemy king.
+  const int close_in_score =
+      CalculateChebyshevDistance(friendly_king, enemy_king);
+
+  // This formula is based on Chess 4.x
+  // (https://www.chessprogramming.org/Mop-up_Evaluation).
+  return (47 * push_to_edge_score + 16 * (140 - close_in_score)) / 10;
+}
+
+template int GetMopUpScore<kWhite>(const Position& position);
+template int GetMopUpScore<kBlack>(const Position& position);
+
+namespace {
+
 [[nodiscard]] int Interpolate(Score score, int phase) {
   const int middle = score.middle * (kEndPhaseValue - phase);
   const int end = score.end * phase;
@@ -386,12 +426,20 @@ template <Side Side>
       GetBishopMobilityScore<Side>(position) +  //
       GetQueenMobilityScore<Side>(position);
 
-  return Interpolate(tapered_score, phase) +            //
-         GetMaterialScore<Side>(position) +             //
-         -50 * CountDoubledPawns<Side>(position) +      //
-         -50 * CountBlockedPawns<Side>(position) +      //
-         10 * CountSemiOpenFileRooks<Side>(position) +  //
-         15 * CountOpenFileRooks<Side>(position);
+  const int material_score = GetMaterialScore<Side>(position);
+
+  int score = Interpolate(tapered_score, phase) +            //
+              material_score +                               //
+              -50 * CountDoubledPawns<Side>(position) +      //
+              -50 * CountBlockedPawns<Side>(position) +      //
+              10 * CountSemiOpenFileRooks<Side>(position) +  //
+              15 * CountOpenFileRooks<Side>(position);
+
+  if (material_score > 200 && !position.GetPieces(kPawn)) {
+    score += GetMopUpScore<Side>(position);
+  }
+
+  return score;
 }
 
 }  // namespace

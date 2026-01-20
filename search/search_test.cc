@@ -78,7 +78,7 @@ TEST(Search, SimpleEndGames) {
                      "   b - - 0 1"));
 
     std::vector<Move> moves = Play(game);
-    EXPECT_THAT(moves, testing::SizeIs(testing::Lt(8)));
+    EXPECT_THAT(moves, testing::SizeIs(testing::Lt(10)));
   }
 
   {

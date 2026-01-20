@@ -1149,6 +1149,76 @@ TEST(GetKingSafetyScore, Black) {
   }
 }
 
+TEST(GetMopUpScore, White) {
+  {
+    const Position position = MakePosition(
+        "8: . . . . k . . ."
+        "7: . . . . . . . ."
+        "6: . . . . . . . ."
+        "5: . . . . . . . ."
+        "4: . . . . . . . ."
+        "3: . . . . . . . ."
+        "2: . . . . . . . ."
+        "1: . . . . K . . ."
+        "   a b c d e f g h"
+        //
+        "   w - - 0 1");
+
+    EXPECT_THAT(GetMopUpScore<kWhite>(position), Eq(25));
+  }
+
+  {
+    const Position position = MakePosition(
+        "8: . . . . . . . k"
+        "7: . . . . . . . ."
+        "6: . . . . . . . ."
+        "5: . . . . . . . ."
+        "4: . . . K . . . ."
+        "3: . . . . . . . ."
+        "2: . . . . . . . ."
+        "1: . . . . . . . ."
+        "   a b c d e f g h"
+        //
+        "   w - - 0 1");
+
+    EXPECT_THAT(GetMopUpScore<kWhite>(position), Eq(44));
+  }
+
+  {
+    const Position position = MakePosition(
+        "8: . . . . . . . ."
+        "7: . . . . . . . ."
+        "6: . . . . . . . ."
+        "5: . . . k . . . ."
+        "4: . . . K . . . ."
+        "3: . . . . . . . ."
+        "2: . . . . . . . ."
+        "1: . . . . . . . ."
+        "   a b c d e f g h"
+        //
+        "   w - - 0 1");
+
+    EXPECT_THAT(GetMopUpScore<kWhite>(position), Eq(20));
+  }
+}
+
+TEST(GetMopUpScore, Black) {
+  const Position position = MakePosition(
+      "8: . . . . . . . k"
+      "7: . . . . . . . ."
+      "6: . . . . . . . ."
+      "5: . . . . . . . ."
+      "4: . . . K . . . ."
+      "3: . . . . . . . ."
+      "2: . . . . . . . ."
+      "1: . . . . . . . ."
+      "   a b c d e f g h"
+      //
+      "   b - - 0 1");
+
+  EXPECT_THAT(GetMopUpScore<kBlack>(position), Eq(20));
+}
+
 TEST(Evaluate, Starting) {
   EXPECT_THAT(Evaluate(Position::Starting(), kStartPhaseValue), Eq(0));
 }

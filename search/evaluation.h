@@ -101,6 +101,9 @@ template <Side Side>
 template <Side Side>
 [[nodiscard]] Score GetKingSafetyScore(const Position& position);
 
+template <Side Side>
+[[nodiscard]] int GetMopUpScore(const Position& position);
+
 [[nodiscard]] int Evaluate(const Position& position, int phase);
 
 }  // namespace follychess

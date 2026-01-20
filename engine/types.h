@@ -51,15 +51,15 @@ constexpr std::size_t kNumSquares = kRanks * kFiles;
 // if and only if the input is invalid.
 std::optional<Square> ParseSquare(std::string_view input);
 
-constexpr std::uint8_t GetRank(Square square) { return square / 8; }
+constexpr std::uint8_t GetRank(Square square) { return square / kRanks; }
 
-constexpr std::uint8_t GetFile(Square square) { return square % 8; }
+constexpr std::uint8_t GetFile(Square square) { return square % kFiles; }
 
 constexpr Square MakeSquare(std::uint8_t rank, std::uint8_t file) {
-    DCHECK_GE(rank, 0);
-    DCHECK_LT(rank, 8);
-    DCHECK_GE(file, 0);
-    DCHECK_LT(file, 8);
+  DCHECK_GE(rank, 0);
+  DCHECK_LT(rank, 8);
+  DCHECK_GE(file, 0);
+  DCHECK_LT(file, 8);
 
   return static_cast<Square>(rank * 8 + file);
 }
