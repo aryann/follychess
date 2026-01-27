@@ -1,4 +1,4 @@
-build --action_env=BAZEL_CXXOPTS="-std=c++23"
+build --action_env=BAZEL_CXXOPTS="-std=c++23" --macos_minimum_os=13.3 --host_macos_minimum_os=13.3
 
 # Address Sanitizer
 build:asan --strip=never
