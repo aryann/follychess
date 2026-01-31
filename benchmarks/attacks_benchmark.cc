@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+#include "absl/container/flat_hash_map.h"
 #include "benchmark/benchmark.h"
 #include "engine/attacks.h"
 #include "engine/types.h"
@@ -35,12 +36,6 @@ namespace {
   return GenerateSlidingAttacks<kNorth, kEast, kSouth, kWest>(square, occupied);
 }
 
-[[nodiscard]] Bitboard GenerateQueenAttacksOnTheFly(Square square,
-                                                    Bitboard occupied) {
-  return GenerateBishopAttacksOnTheFly(square, occupied) |
-         GenerateRookAttacksOnTheFly(square, occupied);
-}
-
 template <Piece Piece>
 [[nodiscard]] Bitboard GenerateAttacksOnTheFly(Square square,
                                                Bitboard occupied) {
@@ -48,11 +43,12 @@ template <Piece Piece>
 
   if constexpr (Piece == kBishop) {
     return GenerateBishopAttacksOnTheFly(square, occupied);
-  }
-  if constexpr (Piece == kRook) {
+  } else if constexpr (Piece == kRook) {
     return GenerateRookAttacksOnTheFly(square, occupied);
+  } else {
+    return GenerateAttacksOnTheFly<kBishop>(square, occupied) |
+           GenerateAttacksOnTheFly<kRook>(square, occupied);
   }
-  return GenerateQueenAttacksOnTheFly(square, occupied);
 }
 
 template <Piece Piece>
@@ -67,8 +63,76 @@ void BM_GenerateAttacksOnTheFly(benchmark::State& state) {
   }
 }
 
+template <Direction... Directions>
+[[nodiscard]] std::vector<Bitboard> GenerateOccupancies(Square square) {
+  Bitboard mask = (MakeRay<Directions>(square) | ...);
+  std::vector<Bitboard> occupancies = MakePowerSet(mask);
+  return occupancies;
+}
+
 template <Piece Piece>
-void BM_LookupAttacks(benchmark::State& state) {
+[[nodiscard]] std::vector<Bitboard> GenerateOccupancies(Square square) {
+  if constexpr (Piece == kBishop) {
+    return GenerateOccupancies<kNorthEast, kSouthEast, kSouthWest, kNorthWest>(
+        square);
+  } else if constexpr (Piece == kRook) {
+    return GenerateOccupancies<kNorth, kEast, kSouth, kWest>(square);
+  } else {
+    return GenerateOccupancies<kNorth, kNorthEast, kEast, kSouthEast, kSouth,
+                               kSouthWest, kWest, kNorthWest>(square);
+  }
+}
+
+template <Piece Piece>
+[[nodiscard]] auto GenerateAttacksHashTable() {
+  std::array<absl::flat_hash_map<Bitboard, Bitboard>, kNumSquares> result;
+  for (int square = kFirstSquare; square < kNumSquares; ++square) {
+    Square from = static_cast<Square>(square);
+    for (Bitboard occupied : GenerateOccupancies<Piece>(from)) {
+      result[from][occupied] = GenerateAttacksOnTheFly<Piece>(from, occupied);
+    }
+  }
+  return result;
+}
+
+template <Piece Piece>
+[[nodiscard]] Bitboard GetAttacksFromHashTable(Square square,
+                                               Bitboard occupied) {
+  static_assert(Piece == kBishop || Piece == kRook || Piece == kQueen);
+
+  if constexpr (Piece == kBishop) {
+    static std::array<absl::flat_hash_map<Bitboard, Bitboard>, kNumSquares>
+        kBishopAttacks = GenerateAttacksHashTable<kBishop>();
+    return kBishopAttacks[square][occupied];
+
+  } else if constexpr (Piece == kRook) {
+    static std::array<absl::flat_hash_map<Bitboard, Bitboard>, kNumSquares>
+        kRookAttacks = GenerateAttacksHashTable<kRook>();
+    return kRookAttacks[square][occupied];
+
+  } else {
+    static std::array<absl::flat_hash_map<Bitboard, Bitboard>, kNumSquares>
+        kQueenAttacks = GenerateAttacksHashTable<kQueen>();
+    return kQueenAttacks[square][occupied];
+  }
+}
+
+template <Piece Piece>
+void BM_LookupAttacksFromHashTable(benchmark::State& state) {
+  static_assert(Piece == kBishop || Piece == kRook || Piece == kQueen);
+
+  std::mt19937 engine(std::random_device{}());
+  std::uniform_int_distribution<std::uint64_t> dist(0);
+
+  for (auto _ : state) {
+    const auto square = static_cast<Square>(dist(engine) % kNumSquares);
+    Bitboard occupied(dist(engine));
+    benchmark::DoNotOptimize(GetAttacksFromHashTable<Piece>(square, occupied));
+  }
+}
+
+template <Piece Piece>
+void BM_LookupAttacksFromMagicTables(benchmark::State& state) {
   static_assert(Piece == kBishop || Piece == kRook || Piece == kQueen);
 
   std::mt19937 engine(std::random_device{}());
@@ -86,10 +150,15 @@ BENCHMARK(BM_GenerateAttacksOnTheFly<kBishop>);
 BENCHMARK(BM_GenerateAttacksOnTheFly<kRook>);
 BENCHMARK(BM_GenerateAttacksOnTheFly<kQueen>);
 
+// Use absl::flat_hash_map to lookup precomputed attacks:
+BENCHMARK(BM_LookupAttacksFromHashTable<kBishop>);
+BENCHMARK(BM_LookupAttacksFromHashTable<kRook>);
+BENCHMARK(BM_LookupAttacksFromHashTable<kQueen>);
+
 // Use magic bitboard to lookup precomputed attacks:
-BENCHMARK(BM_LookupAttacks<kBishop>);
-BENCHMARK(BM_LookupAttacks<kRook>);
-BENCHMARK(BM_LookupAttacks<kQueen>);
+BENCHMARK(BM_LookupAttacksFromMagicTables<kBishop>);
+BENCHMARK(BM_LookupAttacksFromMagicTables<kRook>);
+BENCHMARK(BM_LookupAttacksFromMagicTables<kQueen>);
 
 }  // namespace
 }  // namespace follychess

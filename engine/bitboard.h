@@ -162,6 +162,11 @@ class Bitboard {
 
   [[nodiscard]] constexpr auto Data() const { return data_; }
 
+  template <typename H>
+  friend H AbslHashValue(H h, const Bitboard &bitboard) {
+    return H::combine(std::move(h), bitboard.data_);
+  }
+
  private:
   std::uint64_t data_;
 };

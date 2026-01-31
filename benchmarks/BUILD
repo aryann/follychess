@@ -3,6 +3,7 @@ cc_binary(
     srcs = ["attacks_benchmark.cc"],
     deps = [
         "//engine:attacks",
+        "@abseil-cpp//absl/container:flat_hash_map",
         "@google_benchmark//:benchmark",
     ],
 )

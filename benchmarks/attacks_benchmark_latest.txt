@@ -1,17 +1,20 @@
-2025-12-02T20:32:40-08:00
-Running /private/var/tmp/_bazel_aryan/da5ded6585b5f0289d91e48210b8a75e/execroot/_main/bazel-out/darwin_arm64-opt/bin/benchmarks/attacks_benchmark
+2026-01-31T15:46:25-08:00
+Running /private/var/tmp/_bazel_aryan/7319055b4501a6d3ca80b76ba19a8b9a/execroot/_main/bazel-out/darwin_arm64-opt/bin/benchmarks/attacks_benchmark
 Run on (10 X 24 MHz CPU s)
 CPU Caches:
   L1 Data 64 KiB
   L1 Instruction 128 KiB
   L2 Unified 4096 KiB (x10)
-Load Average: 8.32, 6.60, 6.65
-------------------------------------------------------------------------------
-Benchmark                                    Time             CPU   Iterations
-------------------------------------------------------------------------------
-BM_GenerateAttacksOnTheFly<kBishop>       44.5 ns         43.7 ns     15507654
-BM_GenerateAttacksOnTheFly<kRook>         45.9 ns         45.6 ns     15273538
-BM_GenerateAttacksOnTheFly<kQueen>        58.7 ns         58.5 ns     11614209
-BM_LookupAttacks<kBishop>                 16.0 ns         16.0 ns     43777361
-BM_LookupAttacks<kRook>                   16.5 ns         16.4 ns     43622948
-BM_LookupAttacks<kQueen>                  16.1 ns         16.1 ns     43087529
+Load Average: 4.01, 4.62, 4.58
+-----------------------------------------------------------------------------------
+Benchmark                                         Time             CPU   Iterations
+-----------------------------------------------------------------------------------
+BM_GenerateAttacksOnTheFly<kBishop>            40.4 ns         40.4 ns     17328148
+BM_GenerateAttacksOnTheFly<kRook>              44.0 ns         44.0 ns     15898143
+BM_GenerateAttacksOnTheFly<kQueen>             57.2 ns         57.1 ns     12124361
+BM_LookupAttacksFromHashTable<kBishop>         67.5 ns         67.5 ns     10000000
+BM_LookupAttacksFromHashTable<kRook>           70.1 ns         70.1 ns     10000000
+BM_LookupAttacksFromHashTable<kQueen>          99.7 ns         97.8 ns     10911075
+BM_LookupAttacksFromMagicTables<kBishop>       15.5 ns         15.5 ns     45091471
+BM_LookupAttacksFromMagicTables<kRook>         15.5 ns         15.5 ns     45183736
+BM_LookupAttacksFromMagicTables<kQueen>        15.5 ns         15.5 ns     45081017

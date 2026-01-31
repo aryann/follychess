@@ -30,7 +30,7 @@ namespace follychess {
 
 template <Direction... Directions>
 consteval void MakePawnAttacks(std::array<Bitboard, kNumSquares> &attacks) {
-  for (int square = A8; square < kNumSquares; ++square) {
+  for (int square = kFirstSquare; square < kNumSquares; ++square) {
     Bitboard start(static_cast<Square>(square));
     attacks[square] = (start.Shift<Directions>() | ...);
   }
@@ -51,7 +51,7 @@ constexpr Bitboard GetPawnAttacks(Square square, Side side) {
 
 consteval auto GeneratePawnAttacks() {
   std::array<Bitboard, kNumSquares> attacks;
-  for (int square = A8; square < kNumSquares; ++square) {
+  for (int square = kFirstSquare; square < kNumSquares; ++square) {
     Bitboard start(static_cast<Square>(square));
     attacks[square] = kEmptyBoard                  //
                       | start.Shift<kNorthEast>()  //
@@ -64,7 +64,7 @@ consteval auto GeneratePawnAttacks() {
 
 consteval std::array<Bitboard, kNumSquares> GenerateKnightAttacks() {
   std::array<Bitboard, kNumSquares> attacks;
-  for (int square = A8; square < kNumSquares; ++square) {
+  for (int square = kFirstSquare; square < kNumSquares; ++square) {
     Bitboard start(static_cast<Square>(square));
     attacks[square] = kEmptyBoard                                  //
                       | start.Shift<kNorth>().Shift<kNorthEast>()  //
@@ -81,7 +81,7 @@ consteval std::array<Bitboard, kNumSquares> GenerateKnightAttacks() {
 
 consteval std::array<Bitboard, kNumSquares> GenerateKingAttacks() {
   std::array<Bitboard, kNumSquares> attacks;
-  for (int square = A8; square < kNumSquares; ++square) {
+  for (int square = kFirstSquare; square < kNumSquares; ++square) {
     Bitboard start(static_cast<Square>(square));
     attacks[square] = kEmptyBoard                  //
                       | start.Shift<kNorth>()      //
