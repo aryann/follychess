@@ -46,6 +46,7 @@ namespace follychess {
 // This layout matches the typical visual representation of a board, improving
 // code readability and debuggability.
 class Bitboard {
+  // ...
  public:
   constexpr explicit Bitboard(std::uint64_t data) : data_(data) {}
 
@@ -201,36 +202,36 @@ constexpr std::array kFileMasks = {kA, kB, kC, kD, kE, kF, kG, kH};
 constexpr Bitboard kEmptyBoard;
 constexpr Bitboard kEdges = file::kA | file::kH | rank::k1 | rank::k8;
 
-template <Direction D>
+template <Direction Direction>
 constexpr Bitboard Bitboard::Shift() const {
-  if constexpr (D == kNorth) {
+  if constexpr (Direction == kNorth) {
     return *this >> 8;
   }
 
-  if constexpr (D == kNorthEast) {
+  if constexpr (Direction == kNorthEast) {
     return *this >> 7 & ~file::kA;
   }
 
-  if constexpr (D == kEast) {
+  if constexpr (Direction == kEast) {
     return *this << 1 & ~file::kA;
   }
 
-  if constexpr (D == kSouthEast) {
+  if constexpr (Direction == kSouthEast) {
     return *this << 9 & ~file::kA;
   }
-  if constexpr (D == kSouth) {
+  if constexpr (Direction == kSouth) {
     return *this << 8;
   }
 
-  if constexpr (D == kSouthWest) {
+  if constexpr (Direction == kSouthWest) {
     return *this << 7 & ~file::kH;
   }
 
-  if constexpr (D == kWest) {
+  if constexpr (Direction == kWest) {
     return *this >> 1 & ~file::kH;
   }
 
-  if constexpr (D == kNorthWest) {
+  if constexpr (Direction == kNorthWest) {
     return *this >> 9 & ~file::kH;
   }
 
