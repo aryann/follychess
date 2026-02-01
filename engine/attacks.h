@@ -100,7 +100,7 @@ consteval std::array<Bitboard, kNumSquares> GenerateKingAttacks() {
                                                        Bitboard occupied) {
   const MagicEntry &magic = kSlidingAttackTables.bishop_magic_squares[square];
   occupied &= magic.mask;
-  std::uint64_t index = (magic.magic * occupied.Data()) >> magic.shift;
+  std::size_t index = (magic.magic * occupied.Data()) >> magic.shift;
   return kSlidingAttackTables.attacks[magic.attack_table_index + index];
 }
 
@@ -108,7 +108,7 @@ consteval std::array<Bitboard, kNumSquares> GenerateKingAttacks() {
                                                      Bitboard occupied) {
   const MagicEntry &magic = kSlidingAttackTables.rook_magic_squares[square];
   occupied &= magic.mask;
-  std::uint64_t index = (magic.magic * occupied.Data()) >> magic.shift;
+  std::size_t index = (magic.magic * occupied.Data()) >> magic.shift;
   return kSlidingAttackTables.attacks[magic.attack_table_index + index];
 }
 

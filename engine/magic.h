@@ -160,7 +160,7 @@ constexpr void FindMagicForSquare(Square from, std::size_t attack_table_index,
     bool found = true;
 
     for (int i = 0; i < occupancies.size(); ++i) {
-      std::uint64_t index = (magic * occupancies[i].Data()) >> shift;
+      std::size_t index = (magic * occupancies[i].Data()) >> shift;
       if (placements[index]) {
         found = false;
         ++attempt;
@@ -178,8 +178,8 @@ constexpr void FindMagicForSquare(Square from, std::size_t attack_table_index,
 
       magic_struct = {
           .mask = mask,
-          .shift = shift,
           .magic = magic,
+          .shift = shift,
           .attack_table_index = attack_table_index,
       };
       break;
