@@ -83,9 +83,9 @@ template <Piece Piece>
   }
 }
 
-template <Piece Piece>
-[[nodiscard]] auto GenerateAttacksHashTable() {
-  std::array<absl::flat_hash_map<Bitboard, Bitboard>, kNumSquares> result;
+template <template <typename...> class Map, Piece Piece>
+[[nodiscard]] auto GenerateAttacksMap() {
+  std::array<Map<Bitboard, Bitboard>, kNumSquares> result;
   for (int square = kFirstSquare; square < kNumSquares; ++square) {
     Square from = static_cast<Square>(square);
     for (Bitboard occupied : GenerateOccupancies<Piece>(from)) {
@@ -95,30 +95,29 @@ template <Piece Piece>
   return result;
 }
 
-template <Piece Piece>
-[[nodiscard]] Bitboard GetAttacksFromHashTable(Square square,
-                                               Bitboard occupied) {
+template <template <typename...> class Map, Piece Piece>
+[[nodiscard]] Bitboard GetAttacksFromMap(Square square, Bitboard occupied) {
   static_assert(Piece == kBishop || Piece == kRook || Piece == kQueen);
 
   if constexpr (Piece == kBishop) {
-    static std::array<absl::flat_hash_map<Bitboard, Bitboard>, kNumSquares>
-        kBishopAttacks = GenerateAttacksHashTable<kBishop>();
+    static std::array<Map<Bitboard, Bitboard>, kNumSquares> kBishopAttacks =
+        GenerateAttacksMap<Map, kBishop>();
     return kBishopAttacks[square][occupied];
 
   } else if constexpr (Piece == kRook) {
-    static std::array<absl::flat_hash_map<Bitboard, Bitboard>, kNumSquares>
-        kRookAttacks = GenerateAttacksHashTable<kRook>();
+    static std::array<Map<Bitboard, Bitboard>, kNumSquares> kRookAttacks =
+        GenerateAttacksMap<Map, kRook>();
     return kRookAttacks[square][occupied];
 
   } else {
-    static std::array<absl::flat_hash_map<Bitboard, Bitboard>, kNumSquares>
-        kQueenAttacks = GenerateAttacksHashTable<kQueen>();
+    static std::array<Map<Bitboard, Bitboard>, kNumSquares> kQueenAttacks =
+        GenerateAttacksMap<Map, kQueen>();
     return kQueenAttacks[square][occupied];
   }
 }
 
-template <Piece Piece>
-void BM_LookupAttacksFromHashTable(benchmark::State& state) {
+template <template <typename...> class Map, Piece Piece>
+void BM_LookupAttacksFrom(benchmark::State& state) {
   static_assert(Piece == kBishop || Piece == kRook || Piece == kQueen);
 
   std::mt19937 engine(std::random_device{}());
@@ -127,7 +126,8 @@ void BM_LookupAttacksFromHashTable(benchmark::State& state) {
   for (auto _ : state) {
     const auto square = static_cast<Square>(dist(engine) % kNumSquares);
     Bitboard occupied(dist(engine));
-    benchmark::DoNotOptimize(GetAttacksFromHashTable<Piece>(square, occupied));
+    benchmark::DoNotOptimize(GetAttacksFromMap<Map, Piece>(square, occupied));
+    benchmark::ClobberMemory();
   }
 }
 
@@ -151,9 +151,14 @@ BENCHMARK(BM_GenerateAttacksOnTheFly<kRook>);
 BENCHMARK(BM_GenerateAttacksOnTheFly<kQueen>);
 
 // Use absl::flat_hash_map to lookup precomputed attacks:
-BENCHMARK(BM_LookupAttacksFromHashTable<kBishop>);
-BENCHMARK(BM_LookupAttacksFromHashTable<kRook>);
-BENCHMARK(BM_LookupAttacksFromHashTable<kQueen>);
+BENCHMARK(BM_LookupAttacksFrom<absl::flat_hash_map, kBishop>);
+BENCHMARK(BM_LookupAttacksFrom<absl::flat_hash_map, kRook>);
+BENCHMARK(BM_LookupAttacksFrom<absl::flat_hash_map, kQueen>);
+
+// Use std::unordered_map to lookup precomputed attacks:
+BENCHMARK(BM_LookupAttacksFrom<std::unordered_map, kBishop>);
+BENCHMARK(BM_LookupAttacksFrom<std::unordered_map, kRook>);
+BENCHMARK(BM_LookupAttacksFrom<std::unordered_map, kQueen>);
 
 // Use magic bitboard to lookup precomputed attacks:
 BENCHMARK(BM_LookupAttacksFromMagicTables<kBishop>);

@@ -162,11 +162,6 @@ class Bitboard {
 
   [[nodiscard]] constexpr auto Data() const { return data_; }
 
-  template <typename H>
-  friend H AbslHashValue(H h, const Bitboard &bitboard) {
-    return H::combine(std::move(h), bitboard.data_);
-  }
-
  private:
   std::uint64_t data_;
 };
@@ -275,6 +270,13 @@ struct std::formatter<follychess::Bitboard> : std::formatter<std::string> {
     out = std::format_to(out, "\n");
 
     return out;
+  }
+};
+
+template <>
+struct std::hash<follychess::Bitboard> {
+  std::size_t operator()(const follychess::Bitboard &b) const noexcept {
+    return std::hash<uint64_t>()(b.Data());
   }
 };
 
