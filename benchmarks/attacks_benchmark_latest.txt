@@ -1,26 +1,26 @@
-2026-02-08T14:16:46-08:00
+2026-02-08T14:23:49-08:00
 Running /private/var/tmp/_bazel_aryan/7319055b4501a6d3ca80b76ba19a8b9a/execroot/_main/bazel-out/darwin_arm64-opt/bin/benchmarks/attacks_benchmark
 Run on (10 X 24 MHz CPU s)
 CPU Caches:
   L1 Data 64 KiB
   L1 Instruction 128 KiB
   L2 Unified 4096 KiB (x10)
-Load Average: 4.70, 5.30, 5.29
+Load Average: 9.88, 6.90, 5.88
 ---------------------------------------------------------------------------------------------
 Benchmark                                                   Time             CPU   Iterations
 ---------------------------------------------------------------------------------------------
-BM_GenerateAttacksOnTheFly<kBishop>                      22.1 ns         22.1 ns     31356528
-BM_GenerateAttacksOnTheFly<kRook>                        26.5 ns         26.5 ns     26628322
-BM_GenerateAttacksOnTheFly<kQueen>                       42.3 ns         42.3 ns     16406160
-BM_LookupAttacksFrom<absl::flat_hash_map, kBishop>       3.78 ns         3.78 ns    185898287
-BM_LookupAttacksFrom<absl::flat_hash_map, kRook>         8.04 ns         7.92 ns     90505538
-BM_LookupAttacksFrom<absl::flat_hash_map, kQueen>        38.2 ns         38.1 ns     17259092
-BM_LookupAttacksFrom<std::map, kBishop>                  26.2 ns         26.2 ns     26725718
-BM_LookupAttacksFrom<std::map, kRook>                    60.1 ns         60.0 ns     11458504
-BM_LookupAttacksFrom<std::map, kQueen>                    354 ns          354 ns      1767543
-BM_LookupAttacksFrom<std::unordered_map, kBishop>        7.87 ns         7.86 ns     88608343
-BM_LookupAttacksFrom<std::unordered_map, kRook>          10.3 ns         10.3 ns     64261452
-BM_LookupAttacksFrom<std::unordered_map, kQueen>         67.8 ns         67.7 ns     10656707
-BM_LookupAttacksFromMagicTables<kBishop>                 1.22 ns         1.22 ns    571009055
-BM_LookupAttacksFromMagicTables<kRook>                   1.26 ns         1.26 ns    552979374
-BM_LookupAttacksFromMagicTables<kQueen>                  1.97 ns         1.97 ns    354139895
+BM_GenerateAttacksOnTheFly<kBishop>                      22.2 ns         21.8 ns     33745348
+BM_GenerateAttacksOnTheFly<kRook>                        25.2 ns         25.2 ns     28033977
+BM_GenerateAttacksOnTheFly<kQueen>                       40.2 ns         40.2 ns     17496982
+BM_LookupAttacksFrom<absl::flat_hash_map, kBishop>       3.65 ns         3.65 ns    192545730
+BM_LookupAttacksFrom<absl::flat_hash_map, kRook>         7.70 ns         7.70 ns     88321389
+BM_LookupAttacksFrom<absl::flat_hash_map, kQueen>        33.4 ns         33.4 ns     20735826
+BM_LookupAttacksFrom<std::map, kBishop>                  26.7 ns         26.6 ns     25801220
+BM_LookupAttacksFrom<std::map, kRook>                    59.0 ns         58.9 ns     11554015
+BM_LookupAttacksFrom<std::map, kQueen>                    385 ns          385 ns      1702210
+BM_LookupAttacksFrom<std::unordered_map, kBishop>        7.97 ns         7.97 ns     88671573
+BM_LookupAttacksFrom<std::unordered_map, kRook>          10.5 ns         10.4 ns     66874082
+BM_LookupAttacksFrom<std::unordered_map, kQueen>         59.4 ns         59.4 ns     11378537
+BM_LookupAttacksFromMagicTables<kBishop>                 1.19 ns         1.19 ns    600152610
+BM_LookupAttacksFromMagicTables<kRook>                   1.25 ns         1.24 ns    572498794
+BM_LookupAttacksFromMagicTables<kQueen>                  2.03 ns         2.03 ns    362654841
