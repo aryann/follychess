@@ -24,52 +24,21 @@
 
 namespace follychess {
 
-[[nodiscard]] inline Bitboard GenerateBishopAttacksOnTheFly(Square square,
-                                                            Bitboard occupied) {
-  occupied &= kSlidingAttackTables.bishop_magic_squares[square].mask;
-  return GenerateSlidingAttacks<kNorthEast, kSouthEast, kSouthWest, kNorthWest>(
-      square, occupied);
-}
-
-[[nodiscard]] inline Bitboard GenerateRookAttacksOnTheFly(Square square,
-                                                          Bitboard occupied) {
-  occupied &= kSlidingAttackTables.rook_magic_squares[square].mask;
-  return GenerateSlidingAttacks<kNorth, kEast, kSouth, kWest>(square, occupied);
-}
-
 template <Piece Piece>
 [[nodiscard]] Bitboard GenerateAttacksOnTheFly(Square square,
                                                Bitboard occupied) {
   static_assert(Piece == kBishop || Piece == kRook || Piece == kQueen);
 
   if constexpr (Piece == kBishop) {
-    return GenerateBishopAttacksOnTheFly(square, occupied);
-  } else if constexpr (Piece == kRook) {
-    return GenerateRookAttacksOnTheFly(square, occupied);
-  } else {
-    return GenerateAttacksOnTheFly<kBishop>(square, occupied) |
-           GenerateAttacksOnTheFly<kRook>(square, occupied);
+    return GenerateSlidingAttacks<kNorthEast, kSouthEast, kSouthWest,
+                                  kNorthWest>(square, occupied);
   }
-}
-
-template <Direction... Directions>
-[[nodiscard]] std::vector<Bitboard> GenerateOccupancies(Square square) {
-  Bitboard mask = (MakeRay<Directions>(square) | ...);
-  std::vector<Bitboard> occupancies = MakePowerSet(mask);
-  return occupancies;
-}
-
-template <Piece Piece>
-[[nodiscard]] std::vector<Bitboard> GenerateOccupancies(Square square) {
-  if constexpr (Piece == kBishop) {
-    return GenerateOccupancies<kNorthEast, kSouthEast, kSouthWest, kNorthWest>(
-        square);
-  } else if constexpr (Piece == kRook) {
-    return GenerateOccupancies<kNorth, kEast, kSouth, kWest>(square);
-  } else {
-    return GenerateOccupancies<kNorth, kNorthEast, kEast, kSouthEast, kSouth,
-                               kSouthWest, kWest, kNorthWest>(square);
+  if constexpr (Piece == kRook) {
+    return GenerateSlidingAttacks<kNorth, kEast, kSouth, kWest>(square,
+                                                                occupied);
   }
+  return GenerateAttacksOnTheFly<kBishop>(square, occupied) |
+         GenerateAttacksOnTheFly<kRook>(square, occupied);
 }
 
 template <template <typename...> class Map, Piece Piece>
@@ -77,7 +46,17 @@ template <template <typename...> class Map, Piece Piece>
   std::array<Map<Bitboard, Bitboard>, kNumSquares> result;
   for (int square = kFirstSquare; square < kNumSquares; ++square) {
     const Square from = static_cast<Square>(square);
-    for (Bitboard occupied : GenerateOccupancies<Piece>(from)) {
+
+    Bitboard mask;
+    if constexpr (Piece == kBishop || Piece == kQueen) {
+      mask |= kSlidingAttackTables.bishop_magic_squares[square].mask;
+    }
+    if constexpr (Piece == kRook || Piece == kQueen) {
+      mask |= kSlidingAttackTables.rook_magic_squares[square].mask;
+    }
+
+    std::vector<Bitboard> occupancies = MakePowerSet(mask);
+    for (Bitboard occupied : occupancies) {
       result[from][occupied] = GenerateAttacksOnTheFly<Piece>(from, occupied);
     }
   }
@@ -95,18 +74,18 @@ template <template <typename...> class Map, Piece Piece>
   static const std::array<Map<Bitboard, Bitboard>, kNumSquares> kQueenAttacks =
       GenerateAttacksMap<Map, kQueen>();
 
-  if constexpr (Piece == kBishop || Piece == kQueen) {
-    occupied &= kSlidingAttackTables.bishop_magic_squares[square].mask;
-  }
-  if constexpr (Piece == kRook || Piece == kQueen) {
-    occupied &= kSlidingAttackTables.rook_magic_squares[square].mask;
-  }
+  Bitboard bishop_mask = kSlidingAttackTables.bishop_magic_squares[square].mask;
+  Bitboard rook_mask = kSlidingAttackTables.rook_magic_squares[square].mask;
 
   if constexpr (Piece == kBishop) {
+    occupied &= bishop_mask;
     return kBishopAttacks[square].find(occupied)->second;
   } else if constexpr (Piece == kRook) {
+    occupied &= rook_mask;
     return kRookAttacks[square].find(occupied)->second;
   } else {
+    Bitboard queen_mask = bishop_mask | rook_mask;
+    occupied &= queen_mask;
     return kQueenAttacks[square].find(occupied)->second;
   }
 }
