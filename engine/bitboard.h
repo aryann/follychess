@@ -124,7 +124,7 @@ class Bitboard {
     return *this;
   }
 
-  constexpr operator bool() const { return data_ != 0; }
+  constexpr explicit operator bool() const { return data_ != 0; }
 
   constexpr auto operator<=>(const Bitboard &other) const = default;
 

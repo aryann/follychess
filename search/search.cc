@@ -242,7 +242,9 @@ class AlphaBetaSearcher {
   }
 
   [[nodiscard]] bool CurrentSideInCheck() const {
-    return game_.GetPosition().GetCheckers(game_.GetPosition().SideToMove());
+    Bitboard checkers =
+        game_.GetPosition().GetCheckers(game_.GetPosition().SideToMove());
+    return checkers != kEmptyBoard;
   }
 
   [[nodiscard]] bool NullPrune(const int depth, const int ply) const {
