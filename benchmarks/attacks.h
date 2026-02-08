@@ -24,15 +24,15 @@
 
 namespace follychess {
 
-[[nodiscard]] Bitboard GenerateBishopAttacksOnTheFly(Square square,
-                                                     Bitboard occupied) {
+[[nodiscard]] inline Bitboard GenerateBishopAttacksOnTheFly(Square square,
+                                                            Bitboard occupied) {
   occupied &= kSlidingAttackTables.bishop_magic_squares[square].mask;
   return GenerateSlidingAttacks<kNorthEast, kSouthEast, kSouthWest, kNorthWest>(
       square, occupied);
 }
 
-[[nodiscard]] Bitboard GenerateRookAttacksOnTheFly(Square square,
-                                                   Bitboard occupied) {
+[[nodiscard]] inline Bitboard GenerateRookAttacksOnTheFly(Square square,
+                                                          Bitboard occupied) {
   occupied &= kSlidingAttackTables.rook_magic_squares[square].mask;
   return GenerateSlidingAttacks<kNorth, kEast, kSouth, kWest>(square, occupied);
 }
@@ -76,7 +76,7 @@ template <template <typename...> class Map, Piece Piece>
 [[nodiscard]] auto GenerateAttacksMap() {
   std::array<Map<Bitboard, Bitboard>, kNumSquares> result;
   for (int square = kFirstSquare; square < kNumSquares; ++square) {
-    Square from = static_cast<Square>(square);
+    const Square from = static_cast<Square>(square);
     for (Bitboard occupied : GenerateOccupancies<Piece>(from)) {
       result[from][occupied] = GenerateAttacksOnTheFly<Piece>(from, occupied);
     }
@@ -88,20 +88,26 @@ template <template <typename...> class Map, Piece Piece>
 [[nodiscard]] Bitboard GetAttacksFromMap(Square square, Bitboard occupied) {
   static_assert(Piece == kBishop || Piece == kRook || Piece == kQueen);
 
+  static const std::array<Map<Bitboard, Bitboard>, kNumSquares> kBishopAttacks =
+      GenerateAttacksMap<Map, kBishop>();
+  static const std::array<Map<Bitboard, Bitboard>, kNumSquares> kRookAttacks =
+      GenerateAttacksMap<Map, kRook>();
+  static const std::array<Map<Bitboard, Bitboard>, kNumSquares> kQueenAttacks =
+      GenerateAttacksMap<Map, kQueen>();
+
+  if constexpr (Piece == kBishop || Piece == kQueen) {
+    occupied &= kSlidingAttackTables.bishop_magic_squares[square].mask;
+  }
+  if constexpr (Piece == kRook || Piece == kQueen) {
+    occupied &= kSlidingAttackTables.rook_magic_squares[square].mask;
+  }
+
   if constexpr (Piece == kBishop) {
-    static const std::array<Map<Bitboard, Bitboard>, kNumSquares>
-        kBishopAttacks = GenerateAttacksMap<Map, kBishop>();
-    return kBishopAttacks[square].find(occupied)->first;
-
+    return kBishopAttacks[square].find(occupied)->second;
   } else if constexpr (Piece == kRook) {
-    static const std::array<Map<Bitboard, Bitboard>, kNumSquares> kRookAttacks =
-        GenerateAttacksMap<Map, kRook>();
-    return kRookAttacks[square].find(occupied)->first;
-
+    return kRookAttacks[square].find(occupied)->second;
   } else {
-    static const std::array<Map<Bitboard, Bitboard>, kNumSquares>
-        kQueenAttacks = GenerateAttacksMap<Map, kQueen>();
-    return kQueenAttacks[square].find(occupied)->first;
+    return kQueenAttacks[square].find(occupied)->second;
   }
 }
 
