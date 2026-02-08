@@ -28,11 +28,14 @@ template <Piece Piece>
 void BM_GenerateAttacksOnTheFly(benchmark::State& state) {
   std::mt19937 engine(std::random_device{}());
   std::uniform_int_distribution<std::uint64_t> dist(0);
+  int square = 0;
 
   for (auto _ : state) {
-    const auto square = static_cast<Square>(dist(engine) % kNumSquares);
     Bitboard occupied(dist(engine));
-    benchmark::DoNotOptimize(GenerateAttacksOnTheFly<Piece>(square, occupied));
+    benchmark::DoNotOptimize(
+        GenerateAttacksOnTheFly<Piece>(static_cast<Square>(square), occupied));
+
+    square = (square + 1) % kNumSquares;
   }
 }
 
@@ -42,12 +45,15 @@ void BM_LookupAttacksFrom(benchmark::State& state) {
 
   std::mt19937 engine(std::random_device{}());
   std::uniform_int_distribution<std::uint64_t> dist(0);
+  int square = 0;
 
   for (auto _ : state) {
-    const auto square = static_cast<Square>(dist(engine) % kNumSquares);
     Bitboard occupied(dist(engine));
-    benchmark::DoNotOptimize(GetAttacksFromMap<Map, Piece>(square, occupied));
+    benchmark::DoNotOptimize(
+        GetAttacksFromMap<Map, Piece>(static_cast<Square>(square), occupied));
     benchmark::ClobberMemory();
+
+    square = (square + 1) % kNumSquares;
   }
 }
 
@@ -57,11 +63,14 @@ void BM_LookupAttacksFromMagicTables(benchmark::State& state) {
 
   std::mt19937 engine(std::random_device{}());
   std::uniform_int_distribution<std::uint64_t> dist(0);
+  int square = 0;
 
   for (auto _ : state) {
-    const auto square = static_cast<Square>(dist(engine) % kNumSquares);
     Bitboard occupied(dist(engine));
-    benchmark::DoNotOptimize(GenerateAttacks<Piece>(square, occupied));
+    benchmark::DoNotOptimize(
+        GenerateAttacks<Piece>(static_cast<Square>(square), occupied));
+
+    square = (square + 1) % kNumSquares;
   }
 }
 
