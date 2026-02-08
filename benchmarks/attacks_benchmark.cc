@@ -25,7 +25,7 @@ namespace follychess {
 namespace {
 
 std::vector<Bitboard> GetRandomOccupancies() {
-  constexpr std::size_t kSampleSize = 1'000'000;
+  constexpr std::size_t kSampleSize = 10'000'000;
 
   std::mt19937 engine(std::random_device{}());
   std::uniform_int_distribution<std::uint64_t> dist(
@@ -57,8 +57,6 @@ void BM_GenerateAttacksOnTheFly(benchmark::State& state) {
 
 template <template <typename...> class Map, Piece Piece>
 void BM_LookupAttacksFrom(benchmark::State& state) {
-  static_assert(Piece == kBishop || Piece == kRook || Piece == kQueen);
-
   int square = 0;
   std::vector<Bitboard> occupancies = GetRandomOccupancies();
   int occupancy_index = 0;
@@ -67,7 +65,6 @@ void BM_LookupAttacksFrom(benchmark::State& state) {
     Bitboard occupied = occupancies[occupancy_index % occupancies.size()];
     benchmark::DoNotOptimize(GetAttacksFromMap<Map, Piece>(
         static_cast<Square>(square % kNumSquares), occupied));
-    benchmark::ClobberMemory();
 
     ++square;
     ++occupancy_index;
@@ -76,8 +73,6 @@ void BM_LookupAttacksFrom(benchmark::State& state) {
 
 template <Piece Piece>
 void BM_LookupAttacksFromMagicTables(benchmark::State& state) {
-  static_assert(Piece == kBishop || Piece == kRook || Piece == kQueen);
-
   int square = 0;
   std::vector<Bitboard> occupancies = GetRandomOccupancies();
   int occupancy_index = 0;

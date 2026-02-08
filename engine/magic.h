@@ -192,7 +192,7 @@ constexpr SlidingAttackTables GenerateSlidingAttackTables() {
   std::size_t rook_attack_table_index =
       SlidingAttackTables::kBishopTableSizePerSquare * kNumSquares;
 
-  for (int square = A8; square < kNumSquares; ++square) {
+  for (int square = kFirstSquare; square < kNumSquares; ++square) {
     const auto from = static_cast<Square>(square);
 
     // Generate the MagicEntry for a bishop on this square:

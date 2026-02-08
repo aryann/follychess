@@ -126,6 +126,8 @@ class Bitboard {
 
   constexpr operator bool() const { return data_ != 0; }
 
+  constexpr auto operator<=>(const Bitboard &other) const = default;
+
   [[nodiscard]] constexpr bool Get(Square square) const {
     return data_ & 1ULL << square;
   }

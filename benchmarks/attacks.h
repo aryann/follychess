@@ -58,14 +58,9 @@ template <template <typename...> class Map, Piece Piece>
     std::vector<Bitboard> occupancies = MakePowerSet(mask);
     for (Bitboard occupied : occupancies) {
       result[from][occupied] = GenerateAttacks<Piece>(from, occupied);
-
-      // if (from == A4 && Piece == kRook) {
-      //   LOG(INFO) << std::format(
-      //       "{}:\nmask:\n{}\n\noccupied:\n{}\n\nattacks:\n\n{}\n",
-      //       ToString(from), mask, occupied, result[from][occupied]);
-      // }
     }
   }
+
   return result;
 }
 
@@ -88,6 +83,7 @@ template <template <typename...> class Map, Piece Piece>
     return kBishopAttacks[square].find(occupied)->second;
   } else if constexpr (Piece == kRook) {
     occupied &= rook_mask;
+
     return kRookAttacks[square].find(occupied)->second;
   } else {
     Bitboard queen_mask = bishop_mask | rook_mask;
