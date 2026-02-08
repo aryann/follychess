@@ -17,39 +17,12 @@
 
 #include "absl/container/flat_hash_map.h"
 #include "benchmark/benchmark.h"
+#include "benchmarks/attacks.h"
 #include "engine/attacks.h"
 #include "engine/types.h"
 
 namespace follychess {
 namespace {
-
-[[nodiscard]] Bitboard GenerateBishopAttacksOnTheFly(Square square,
-                                                     Bitboard occupied) {
-  occupied &= kSlidingAttackTables.bishop_magic_squares[square].mask;
-  return GenerateSlidingAttacks<kNorthEast, kSouthEast, kSouthWest, kNorthWest>(
-      square, occupied);
-}
-
-[[nodiscard]] Bitboard GenerateRookAttacksOnTheFly(Square square,
-                                                   Bitboard occupied) {
-  occupied &= kSlidingAttackTables.rook_magic_squares[square].mask;
-  return GenerateSlidingAttacks<kNorth, kEast, kSouth, kWest>(square, occupied);
-}
-
-template <Piece Piece>
-[[nodiscard]] Bitboard GenerateAttacksOnTheFly(Square square,
-                                               Bitboard occupied) {
-  static_assert(Piece == kBishop || Piece == kRook || Piece == kQueen);
-
-  if constexpr (Piece == kBishop) {
-    return GenerateBishopAttacksOnTheFly(square, occupied);
-  } else if constexpr (Piece == kRook) {
-    return GenerateRookAttacksOnTheFly(square, occupied);
-  } else {
-    return GenerateAttacksOnTheFly<kBishop>(square, occupied) |
-           GenerateAttacksOnTheFly<kRook>(square, occupied);
-  }
-}
 
 template <Piece Piece>
 void BM_GenerateAttacksOnTheFly(benchmark::State& state) {
@@ -60,59 +33,6 @@ void BM_GenerateAttacksOnTheFly(benchmark::State& state) {
     const auto square = static_cast<Square>(dist(engine) % kNumSquares);
     Bitboard occupied(dist(engine));
     benchmark::DoNotOptimize(GenerateAttacksOnTheFly<Piece>(square, occupied));
-  }
-}
-
-template <Direction... Directions>
-[[nodiscard]] std::vector<Bitboard> GenerateOccupancies(Square square) {
-  Bitboard mask = (MakeRay<Directions>(square) | ...);
-  std::vector<Bitboard> occupancies = MakePowerSet(mask);
-  return occupancies;
-}
-
-template <Piece Piece>
-[[nodiscard]] std::vector<Bitboard> GenerateOccupancies(Square square) {
-  if constexpr (Piece == kBishop) {
-    return GenerateOccupancies<kNorthEast, kSouthEast, kSouthWest, kNorthWest>(
-        square);
-  } else if constexpr (Piece == kRook) {
-    return GenerateOccupancies<kNorth, kEast, kSouth, kWest>(square);
-  } else {
-    return GenerateOccupancies<kNorth, kNorthEast, kEast, kSouthEast, kSouth,
-                               kSouthWest, kWest, kNorthWest>(square);
-  }
-}
-
-template <template <typename...> class Map, Piece Piece>
-[[nodiscard]] auto GenerateAttacksMap() {
-  std::array<Map<Bitboard, Bitboard>, kNumSquares> result;
-  for (int square = kFirstSquare; square < kNumSquares; ++square) {
-    Square from = static_cast<Square>(square);
-    for (Bitboard occupied : GenerateOccupancies<Piece>(from)) {
-      result[from][occupied] = GenerateAttacksOnTheFly<Piece>(from, occupied);
-    }
-  }
-  return result;
-}
-
-template <template <typename...> class Map, Piece Piece>
-[[nodiscard]] Bitboard GetAttacksFromMap(Square square, Bitboard occupied) {
-  static_assert(Piece == kBishop || Piece == kRook || Piece == kQueen);
-
-  if constexpr (Piece == kBishop) {
-    static std::array<Map<Bitboard, Bitboard>, kNumSquares> kBishopAttacks =
-        GenerateAttacksMap<Map, kBishop>();
-    return kBishopAttacks[square][occupied];
-
-  } else if constexpr (Piece == kRook) {
-    static std::array<Map<Bitboard, Bitboard>, kNumSquares> kRookAttacks =
-        GenerateAttacksMap<Map, kRook>();
-    return kRookAttacks[square][occupied];
-
-  } else {
-    static std::array<Map<Bitboard, Bitboard>, kNumSquares> kQueenAttacks =
-        GenerateAttacksMap<Map, kQueen>();
-    return kQueenAttacks[square][occupied];
   }
 }
 
@@ -154,6 +74,11 @@ BENCHMARK(BM_GenerateAttacksOnTheFly<kQueen>);
 BENCHMARK(BM_LookupAttacksFrom<absl::flat_hash_map, kBishop>);
 BENCHMARK(BM_LookupAttacksFrom<absl::flat_hash_map, kRook>);
 BENCHMARK(BM_LookupAttacksFrom<absl::flat_hash_map, kQueen>);
+
+// Use std::map to lookup precomputed attacks:
+BENCHMARK(BM_LookupAttacksFrom<std::map, kBishop>);
+BENCHMARK(BM_LookupAttacksFrom<std::map, kRook>);
+BENCHMARK(BM_LookupAttacksFrom<std::map, kQueen>);
 
 // Use std::unordered_map to lookup precomputed attacks:
 BENCHMARK(BM_LookupAttacksFrom<std::unordered_map, kBishop>);
