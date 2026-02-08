@@ -204,9 +204,9 @@ TEST(GenerateAttacksOnTheFly, Queen) {
 
 TEST(GetAttacksFromMap, Bishop) {
   {
-    Bitboard occupied = kEmptyBoard;
+    Bitboard blockers = kEmptyBoard;
 
-    EXPECT_THAT((GetAttacksFromMap<std::map, kBishop>(D5, occupied)),
+    EXPECT_THAT((GetAttacksFromMap<std::map, kBishop>(D5, blockers)),
                 EqualsBitboard("8: X . . . . . X ."
                                "7: . X . . . X . ."
                                "6: . . X . X . . ."
@@ -220,24 +220,24 @@ TEST(GetAttacksFromMap, Bishop) {
 
   {
     Bitboard blockers(
-        "8: . . . . . . . ."
+        "8: . . . . . . . X"
         "7: . . . . . . . ."
-        "6: . . X . X . . ."
+        "6: . . . . . . . ."
         "5: . . . . . . . ."
-        "4: . . X . X . . ."
-        "3: . . . . . . . ."
+        "4: . . . . . X . ."
+        "3: X . . . X . . ."
         "2: . . . . . . . ."
-        "1: . . . . . . . ."
+        "1: . . . . . . . X"
         "   a b c d e f g h");
 
-    EXPECT_THAT((GetAttacksFromMap<std::map, kBishop>(D5, blockers)),
+    EXPECT_THAT((GetAttacksFromMap<std::map, kBishop>(C1, blockers)),
                 EqualsBitboard("8: . . . . . . . ."
                                "7: . . . . . . . ."
-                               "6: . . X . X . . ."
+                               "6: . . . . . . . ."
                                "5: . . . . . . . ."
-                               "4: . . X . X . . ."
-                               "3: . . . . . . . ."
-                               "2: . . . . . . . ."
+                               "4: . . . . . . . ."
+                               "3: X . . . X . . ."
+                               "2: . X . X . . . ."
                                "1: . . . . . . . ."
                                "   a b c d e f g h"));
   }
@@ -247,41 +247,122 @@ TEST(GetAttacksFromMap, Rook) {
   {
     Bitboard blockers(
         "8: . . . . . . . ."
-        "7: . . . X . . . ."
+        "7: . . . . . . . ."
         "6: . . . . . . . ."
-        "5: . X X . X . X ."
-        "4: . . . . . . . ."
+        "5: . . . . . . . ."
+        "4: X . . . . . . ."
         "3: . . . . . . . ."
-        "2: . . . X . . . ."
+        "2: . . . . . . . ."
+        "1: . . . X . . . ."
+        "   a b c d e f g h");
+
+    EXPECT_THAT((GetAttacksFromMap<std::map, kRook>(A1, blockers)),
+                EqualsBitboard("8: . . . . . . . ."
+                               "7: . . . . . . . ."
+                               "6: . . . . . . . ."
+                               "5: . . . . . . . ."
+                               "4: X . . . . . . ."
+                               "3: X . . . . . . ."
+                               "2: X . . . . . . ."
+                               "1: . X X X . . . ."
+                               "   a b c d e f g h"));
+  }
+
+  {
+    Bitboard blockers(
+        "8: . . . . . . . ."
+        "7: . . . . . . . ."
+        "6: . . . . . . . ."
+        "5: . . . . . . . ."
+        "4: . . X . X . . ."
+        "3: . . . . . . . ."
+        "2: . . . . . . . ."
         "1: . . . . . . . ."
         "   a b c d e f g h");
 
-    EXPECT_THAT((GetAttacksFromMap<std::map, kRook>(D5, blockers)),
-                EqualsBitboard("8: . . . . . . . ."
+    EXPECT_THAT((GetAttacksFromMap<std::map, kRook>(A4, blockers)),
+                EqualsBitboard("8: X . . . . . . ."
+                               "7: X . . . . . . ."
+                               "6: X . . . . . . ."
+                               "5: X . . . . . . ."
+                               "4: . X X . . . . ."
+                               "3: X . . . . . . ."
+                               "2: X . . . . . . ."
+                               "1: X . . . . . . ."
+                               "   a b c d e f g h"));
+  }
+
+  {
+    Bitboard blockers(
+        "8: . . . X . . . ."
+        "7: . . . . . . . ."
+        "6: . . . . . . . ."
+        "5: . . X . X . . ."
+        "4: . . . . . . . ."
+        "3: . . . . . . . ."
+        "2: . . . . . . . ."
+        "1: . . . . . . . ."
+        "   a b c d e f g h");
+
+    EXPECT_THAT((GetAttacksFromMap<std::map, kRook>(D1, blockers)),
+                EqualsBitboard("8: . . . X . . . ."
                                "7: . . . X . . . ."
                                "6: . . . X . . . ."
-                               "5: . . X . X . . ."
+                               "5: . . . X . . . ."
                                "4: . . . X . . . ."
                                "3: . . . X . . . ."
                                "2: . . . X . . . ."
-                               "1: . . . . . . . ."
+                               "1: X X X . X X X X"
                                "   a b c d e f g h"));
   }
 }
 
 TEST(GetAttacksFromMap, Queen) {
   {
-    Bitboard occupied = kEmptyBoard;
+    Bitboard blockers(
+        "8: . . . . . . . ."
+        "7: . . . . . . . ."
+        "6: . . X . . . . ."
+        "5: . . . . . . . ."
+        "4: . . . X . . . ."
+        "3: . . . . . X . ."
+        "2: . . . . . . . ."
+        "1: . . . . . . . ."
+        "   a b c d e f g h");
 
-    EXPECT_THAT((GetAttacksFromMap<std::map, kQueen>(A1, occupied)),
-                EqualsBitboard("8: X . . . . . . X"
-                               "7: X . . . . . X ."
-                               "6: X . . . . X . ."
-                               "5: X . . . X . . ."
-                               "4: X . . X . . . ."
-                               "3: X . X . . . . ."
-                               "2: X X . . . . . ."
-                               "1: . X X X X X X X"
+    EXPECT_THAT((GetAttacksFromMap<std::map, kQueen>(D5, blockers)),
+                EqualsBitboard("8: . . . X . . X ."
+                               "7: . . . X . X . ."
+                               "6: . . X X X . . ."
+                               "5: X X X . X X X X"
+                               "4: . . X X X . . ."
+                               "3: . X . . . X . ."
+                               "2: X . . . . . . ."
+                               "1: . . . . . . . ."
+                               "   a b c d e f g h"));
+  }
+
+  {
+    Bitboard blockers(
+        "8: X X X X X X X X"
+        "7: X X X X X X X X"
+        "6: X X X X X X X X"
+        "5: X X X X X X X X"
+        "4: X X X X X X X X"
+        "3: X X X X X X X X"
+        "2: X X X X X X X X"
+        "1: X X X X X X X X"
+        "   a b c d e f g h");
+
+    EXPECT_THAT((GetAttacksFromMap<std::map, kQueen>(E4, blockers)),
+                EqualsBitboard("8: . . . . . . . ."
+                               "7: . . . . . . . ."
+                               "6: . . . . . . . ."
+                               "5: . . . X X X . ."
+                               "4: . . . X . X . ."
+                               "3: . . . X X X . ."
+                               "2: . . . . . . . ."
+                               "1: . . . . . . . ."
                                "   a b c d e f g h"));
   }
 }

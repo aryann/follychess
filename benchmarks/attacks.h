@@ -57,7 +57,13 @@ template <template <typename...> class Map, Piece Piece>
 
     std::vector<Bitboard> occupancies = MakePowerSet(mask);
     for (Bitboard occupied : occupancies) {
-      result[from][occupied] = GenerateAttacksOnTheFly<Piece>(from, occupied);
+      result[from][occupied] = GenerateAttacks<Piece>(from, occupied);
+
+      if (from == A4 && Piece == kRook) {
+        LOG(INFO) << std::format(
+            "{}:\nmask:\n{}\n\noccupied:\n{}\n\nattacks:\n\n{}\n",
+            ToString(from), mask, occupied, result[from][occupied]);
+      }
     }
   }
   return result;
