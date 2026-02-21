@@ -1,34 +1,34 @@
-2026-01-11T16:45:10-08:00
+2026-02-21T15:01:33-08:00
 Running /private/var/tmp/_bazel_aryan/7319055b4501a6d3ca80b76ba19a8b9a/execroot/_main/bazel-out/darwin_arm64-opt/bin/benchmarks/search_benchmark
 Run on (10 X 24 MHz CPU s)
 CPU Caches:
   L1 Data 64 KiB
   L1 Instruction 128 KiB
   L2 Unified 4096 KiB (x10)
-Load Average: 5.28, 5.41, 6.40
+Load Average: 2.60, 2.82, 3.37
 ------------------------------------------------------------------------
 Benchmark                              Time             CPU   Iterations
 ------------------------------------------------------------------------
-BM_Search/Starting/1                4404 ns         4401 ns       159356
-BM_Search/Starting/2               27729 ns        27719 ns        25583
-BM_Search/Starting/3              423259 ns       422801 ns         1660
-BM_Search/Starting/4             3324884 ns      3323805 ns          210
-BM_Search/Starting/5            30880801 ns     30870182 ns           22
-BM_Search/Starting/6           144991142 ns    139472400 ns            5
-BM_Search/Starting/7          2455272999 ns   2450956000 ns            1
-BM_Search/Position3/1               2947 ns         2942 ns       239017
-BM_Search/Position3/2              68038 ns        67918 ns        10393
-BM_Search/Position3/3             236118 ns       235455 ns         2973
-BM_Search/Position3/4            1162338 ns      1160135 ns          599
-BM_Search/Position3/5            4009889 ns      4003983 ns          174
-BM_Search/Position3/6           12760952 ns     12743236 ns           55
-BM_Search/Position3/7           64329174 ns     64285455 ns           11
-BM_Search/Position3/8          279681770 ns    279616500 ns            2
-BM_Search/HighTransposition/1       3339 ns         3338 ns       226324
-BM_Search/HighTransposition/2      17947 ns        17936 ns        38864
-BM_Search/HighTransposition/3     124542 ns       124431 ns         5620
-BM_Search/HighTransposition/4     747366 ns       746917 ns          931
-BM_Search/HighTransposition/5    3979592 ns      3971209 ns          177
-BM_Search/HighTransposition/6   22122224 ns     22109531 ns           32
-BM_Search/HighTransposition/7  143911792 ns    143830200 ns            5
-BM_Search/HighTransposition/8  364165584 ns    364053000 ns            2
+BM_Search/Starting/1                4343 ns         4201 ns       160150
+BM_Search/Starting/2               28593 ns        28587 ns        24399
+BM_Search/Starting/3              149099 ns       148790 ns         4762
+BM_Search/Starting/4              896995 ns       894500 ns          788
+BM_Search/Starting/5             2755190 ns      2734688 ns          263
+BM_Search/Starting/6            22783108 ns     22747733 ns           30
+BM_Search/Starting/7            96400488 ns     95900857 ns            7
+BM_Search/Position3/1               3829 ns         3826 ns       180719
+BM_Search/Position3/2              52615 ns        52459 ns        13472
+BM_Search/Position3/3             163915 ns       162129 ns         4344
+BM_Search/Position3/4             228669 ns       228658 ns         2998
+BM_Search/Position3/5             551444 ns       551240 ns         1262
+BM_Search/Position3/6            4125560 ns      4123226 ns          168
+BM_Search/Position3/7            6181378 ns      6174911 ns          112
+BM_Search/Position3/8           57434132 ns     57352083 ns           12
+BM_Search/HighTransposition/1       3488 ns         3487 ns       201506
+BM_Search/HighTransposition/2      22071 ns        22056 ns        31768
+BM_Search/HighTransposition/3      50487 ns        50472 ns        13848
+BM_Search/HighTransposition/4     369905 ns       369626 ns         1888
+BM_Search/HighTransposition/5     847302 ns       846799 ns          820
+BM_Search/HighTransposition/6    4322804 ns      4320006 ns          162
+BM_Search/HighTransposition/7   17608734 ns     17590575 ns           40
+BM_Search/HighTransposition/8  120609028 ns    120351167 ns            6

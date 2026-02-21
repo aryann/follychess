@@ -169,3 +169,12 @@ cc_library(
         "@abseil-cpp//absl/container:flat_hash_map",
     ],
 )
+
+cc_test(
+    name = "transposition_test",
+    srcs = ["transposition_test.cc"],
+    deps = [
+        ":transposition",
+        "@googletest//:gtest_main",
+    ],
+)

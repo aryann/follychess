@@ -46,7 +46,13 @@ class TranspositionTable {
     int depth;
   };
 
-  explicit TranspositionTable() : hits_{0} {}
+  // Allocates the transposition table to fit within the specified memory limit.
+  // The final number of entries is rounded down to the nearest power of two.
+  // This enables fast bitwise indexing (`key & (size - 1)`) rather than slower
+  // modulo arithmetic (`key % size`).
+  explicit TranspositionTable(std::size_t size_mb = 256)
+      : entries_(std::bit_floor(size_mb * (2 << 20) / sizeof(Bucket))),
+        hits_(0) {}
 
   constexpr std::optional<int> Probe(const Position& position,
                                      ProbeParams probe_params, Move* best_move);
@@ -56,6 +62,8 @@ class TranspositionTable {
                         Move best_move);
 
   [[nodiscard]] constexpr std::int64_t GetHits() const { return hits_; }
+
+  [[nodiscard]] std::size_t size() const { return entries_.size(); }
 
  private:
   [[nodiscard]] static int NormalizeScore(const int score, const int ply) {
@@ -85,8 +93,19 @@ class TranspositionTable {
     BoundType type{BoundType::Exact};
   };
 
+  struct Bucket {
+    // On a hash collision, this entry is always overwritten by the newest
+    // evaluation.
+    Entry always_entry;
+
+    // On a hash collision, this entry is overwritten if and only if the new
+    // remaining_depth >= the stored remaining_depth.
+    Entry deep_entry;
+  };
+
   // TODO(aryann): Replace this with a more efficient data structure.
   absl::flat_hash_map<std::uint64_t, Entry> table_;
+  std::vector<Bucket> entries_;
   std::int64_t hits_;
 };
 
