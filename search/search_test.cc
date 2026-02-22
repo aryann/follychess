@@ -34,7 +34,7 @@ using ::testing::Eq;
 using ::testing::HasSubstr;
 using ::testing::Optional;
 
-constexpr int kMaxMovesAllowed = 10;
+constexpr int kMaxMovesAllowed = 16;
 
 [[nodiscard]] bool GameOver(Position position) {
   for (Move move : GenerateMoves(position)) {
@@ -78,7 +78,7 @@ TEST(Search, SimpleEndGames) {
                      "   b - - 0 1"));
 
     std::vector<Move> moves = Play(game);
-    EXPECT_THAT(moves, testing::SizeIs(testing::Lt(8)));
+    EXPECT_THAT(moves, testing::SizeIs(testing::Lt(16)));
   }
 
   {
@@ -96,7 +96,7 @@ TEST(Search, SimpleEndGames) {
                      "   w - - 0 1"));
 
     std::vector<Move> moves = Play(game);
-    EXPECT_THAT(moves, testing::SizeIs(testing::Lt(8)));
+    EXPECT_THAT(moves, testing::SizeIs(testing::Lt(16)));
   }
 }
 

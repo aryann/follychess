@@ -21,7 +21,7 @@ namespace follychess {
 
 [[nodiscard]] int Game::GetRepetitionCount() const {
   int repetitions = 1;
-  const std::uint64_t current_key = GetPosition().GetKey();
+  const ZobristKey current_key = GetPosition().GetKey();
 
   const int start = std::ssize(history_) - 3;
   const int limit = std::ssize(history_) - 1 - GetPosition().GetHalfMoves();

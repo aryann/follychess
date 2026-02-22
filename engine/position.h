@@ -89,7 +89,7 @@ class Position {
 
   void Undo(const UndoInfo &undo_info);
 
-  [[nodiscard]] std::uint64_t GetKey() const { return zobrist_key_.GetKey(); }
+  [[nodiscard]] ZobristKey GetKey() const { return zobrist_key_; }
 
  private:
   Position()
@@ -178,7 +178,7 @@ struct std::formatter<follychess::Position> : std::formatter<std::string> {
                          position.GetHalfMoves(), position.GetFullMoves());
 
     if (show_key) {
-      out = std::format_to(out, "   {:x}", position.GetKey());
+      out = std::format_to(out, "   {:x}", position.GetKey().GetValue());
     }
 
     return out;

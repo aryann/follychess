@@ -92,9 +92,11 @@ class ZobristKey {
     key_ ^= kZobristKeys.castling[castling_rights.Get()];
   }
 
-  [[nodiscard]] std::uint64_t GetKey() const { return key_; }
+  [[nodiscard]] std::uint64_t GetValue() const { return key_; }
 
   constexpr auto operator<=>(const ZobristKey& other) const = default;
+
+  constexpr explicit operator bool() const { return key_ != 0; }
 
  private:
   std::uint64_t key_;

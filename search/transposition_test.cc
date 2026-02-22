@@ -29,20 +29,20 @@ using ::testing::Optional;
 using ::testing::SizeIs;
 
 TEST(TranspositionTable, TableSize) {
-  EXPECT_THAT(TranspositionTable(1).size(), Eq(1 << 16));
+  EXPECT_THAT(TranspositionTable(1).size(), Eq(1 << 14));
 
-  EXPECT_THAT(TranspositionTable(100).size(), Eq(1 << 22));
-  EXPECT_THAT(TranspositionTable(101).size(), Eq(1 << 22));
-  EXPECT_THAT(TranspositionTable(102).size(), Eq(1 << 22));
-  EXPECT_THAT(TranspositionTable(120).size(), Eq(1 << 22));
-  EXPECT_THAT(TranspositionTable(125).size(), Eq(1 << 22));
-  EXPECT_THAT(TranspositionTable(126).size(), Eq(1 << 22));
-  EXPECT_THAT(TranspositionTable(127).size(), Eq(1 << 22));
+  EXPECT_THAT(TranspositionTable(94).size(), Eq(1 << 20));
+  EXPECT_THAT(TranspositionTable(95).size(), Eq(1 << 20));
 
-  EXPECT_THAT(TranspositionTable(128).size(), Eq(1 << 23));
-  EXPECT_THAT(TranspositionTable(130).size(), Eq(1 << 23));
+  EXPECT_THAT(TranspositionTable(96).size(), Eq(1 << 21));
+  EXPECT_THAT(TranspositionTable(97).size(), Eq(1 << 21));
+  EXPECT_THAT(TranspositionTable(125).size(), Eq(1 << 21));
+  EXPECT_THAT(TranspositionTable(126).size(), Eq(1 << 21));
+  EXPECT_THAT(TranspositionTable(127).size(), Eq(1 << 21));
+  EXPECT_THAT(TranspositionTable(128).size(), Eq(1 << 21));
+  EXPECT_THAT(TranspositionTable(130).size(), Eq(1 << 21));
 
-  EXPECT_THAT(TranspositionTable(256).size(), Eq(1 << 24));
+  EXPECT_THAT(TranspositionTable(256).size(), Eq(1 << 22));
 }
 
 }  // namespace

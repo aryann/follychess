@@ -18,7 +18,9 @@
 #ifndef FOLLYCHESS_SEARCH_TRANSPOSITION_H_
 #define FOLLYCHESS_SEARCH_TRANSPOSITION_H_
 
+#include <bit>
 #include <optional>
+#include <vector>
 
 #include "absl/container/flat_hash_map.h"
 #include "engine/position.h"
@@ -51,19 +53,18 @@ class TranspositionTable {
   // This enables fast bitwise indexing (`key & (size - 1)`) rather than slower
   // modulo arithmetic (`key % size`).
   explicit TranspositionTable(std::size_t size_mb = 256)
-      : entries_(std::bit_floor(size_mb * (2 << 20) / sizeof(Bucket))),
+      : table_(std::bit_floor(size_mb * (1 << 20) / sizeof(Bucket))),
         hits_(0) {}
 
-  constexpr std::optional<int> Probe(const Position& position,
-                                     ProbeParams probe_params, Move* best_move);
+  std::optional<int> Probe(const Position& position, ProbeParams probe_params,
+                           Move* best_move);
 
-  constexpr void Record(const Position& position, int score,
-                        RecordParams record_params, BoundType type,
-                        Move best_move);
+  void Record(const Position& position, int score, RecordParams record_params,
+              BoundType type, Move best_move);
 
-  [[nodiscard]] constexpr std::int64_t GetHits() const { return hits_; }
+  [[nodiscard]] std::int64_t GetHits() const { return hits_; }
 
-  [[nodiscard]] std::size_t size() const { return entries_.size(); }
+  [[nodiscard]] std::size_t size() const { return table_.size(); }
 
  private:
   [[nodiscard]] static int NormalizeScore(const int score, const int ply) {
@@ -87,11 +88,14 @@ class TranspositionTable {
   }
 
   struct Entry {
+    ZobristKey key;
     Move best_move;
     int remaining_depth{0};
     int score{0};
     BoundType type{BoundType::Exact};
   };
+
+  static_assert(sizeof(Entry) == 24);
 
   struct Bucket {
     // On a hash collision, this entry is always overwritten by the newest
@@ -103,29 +107,49 @@ class TranspositionTable {
     Entry deep_entry;
   };
 
-  // TODO(aryann): Replace this with a more efficient data structure.
-  absl::flat_hash_map<std::uint64_t, Entry> table_;
-  std::vector<Bucket> entries_;
+  static_assert(sizeof(Bucket) == 48);
+
+  [[nodiscard]] Bucket& GetBucket(const ZobristKey key) {
+    const std::size_t index = key.GetValue() & (table_.size() - 1);
+    return table_[index];
+  }
+
+  [[nodiscard]] const Entry* GetEntry(const ZobristKey key) {
+    const Bucket& bucket = GetBucket(key);
+
+    // Always check deep_entry first. If it's a hit, it's guaranteed to be
+    // >= the depth of always_entry.
+    if (bucket.deep_entry.key == key) {
+      return &bucket.deep_entry;
+    }
+
+    if (bucket.always_entry.key == key) {
+      return &bucket.always_entry;
+    }
+
+    return nullptr;
+  }
+
+  std::vector<Bucket> table_;
   std::int64_t hits_;
 };
 
-constexpr std::optional<int> TranspositionTable::Probe(const Position& position,
-                                                       ProbeParams probe_params,
-                                                       Move* best_move) {
-  auto it = table_.find(position.GetKey());
-  if (it == table_.end()) {
+inline std::optional<int> TranspositionTable::Probe(const Position& position,
+                                                    ProbeParams probe_params,
+                                                    Move* best_move) {
+  const Entry* entry = GetEntry(position.GetKey());
+  if (entry == nullptr) {
     return std::nullopt;
   }
 
-  const Entry& entry = it->second;
-  const int score = DenormalizeScore(entry.score, probe_params.ply);
-  *best_move = entry.best_move;
+  const int score = DenormalizeScore(entry->score, probe_params.ply);
+  *best_move = entry->best_move;
 
-  if (entry.remaining_depth < probe_params.depth) {
+  if (entry->remaining_depth < probe_params.depth) {
     return std::nullopt;
   }
 
-  switch (entry.type) {
+  switch (entry->type) {
     case BoundType::Exact:
       ++hits_;
       return score;
@@ -148,15 +172,23 @@ constexpr std::optional<int> TranspositionTable::Probe(const Position& position,
   return std::nullopt;
 }
 
-constexpr void TranspositionTable::Record(const Position& position, int score,
-                                          RecordParams record_params,
-                                          BoundType type, Move best_move) {
-  table_[position.GetKey()] = {
+inline void TranspositionTable::Record(const Position& position, int score,
+                                       RecordParams record_params,
+                                       BoundType type, Move best_move) {
+  const Entry new_entry = {
+      .key = position.GetKey(),
       .best_move = best_move,
       .remaining_depth = record_params.depth,
       .score = NormalizeScore(score, record_params.ply),
       .type = type,
   };
+
+  Bucket& bucket = GetBucket(position.GetKey());
+  bucket.always_entry = new_entry;
+  if (!bucket.deep_entry.key ||
+      new_entry.remaining_depth >= bucket.deep_entry.remaining_depth) {
+    bucket.deep_entry = new_entry;
+  }
 }
 
 }  // namespace follychess

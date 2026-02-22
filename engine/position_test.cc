@@ -1297,16 +1297,16 @@ TEST(Castling, BlackKing) {
 
 TEST(Position, Key) {
   Position position = Position::Starting();
-  std::uint64_t v0 = position.GetKey();
+  ZobristKey v0 = position.GetKey();
 
   {
     ScopedMove first(Move(E2, E4), position);
-    std::uint64_t v1 = position.GetKey();
+    ZobristKey v1 = position.GetKey();
     EXPECT_THAT(v1, Not(Eq(v0)));
 
     {
       ScopedMove second(Move(E7, E5), position);
-      std::uint64_t v2 = position.GetKey();
+      ZobristKey v2 = position.GetKey();
       EXPECT_THAT(v2, Not(Eq(v1)));
 
       {

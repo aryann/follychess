@@ -58,7 +58,7 @@ class Game {
 
  private:
   struct State {
-    std::uint64_t key{0};
+    ZobristKey key;
     Position position;
   };
 
