@@ -161,12 +161,11 @@ cc_test(
 
 cc_library(
     name = "transposition",
-    srcs = [],
+    srcs = ["transposition.cc"],
     hdrs = ["transposition.h"],
     deps = [
         ":evaluation",
         "//engine:position",
-        "@abseil-cpp//absl/container:flat_hash_map",
     ],
 )
 
