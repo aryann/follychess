@@ -54,6 +54,7 @@ class TranspositionTable {
   // modulo arithmetic (`key % size`).
   explicit TranspositionTable(std::size_t size_mb = 256)
       : table_(std::bit_floor(size_mb * (1 << 20) / sizeof(Bucket))),
+        probes_(0),
         hits_(0) {}
 
   std::optional<int> Probe(ZobristKey key, ProbeParams probe_params,
@@ -63,6 +64,15 @@ class TranspositionTable {
               BoundType type, Move best_move);
 
   [[nodiscard]] std::int64_t GetHits() const { return hits_; }
+
+  [[nodiscard]] std::int64_t GetMisses() const { return probes_ - hits_; }
+
+  [[nodiscard]] double GetHitRate() const {
+    if (probes_ == 0) {
+      return 0;
+    }
+    return static_cast<double>(hits_) / static_cast<double>(probes_);
+  }
 
   [[nodiscard]] std::size_t size() const { return table_.size(); }
 
@@ -102,6 +112,8 @@ class TranspositionTable {
   [[nodiscard]] const Entry* GetEntry(ZobristKey key) const;
 
   std::vector<Bucket> table_;
+
+  std::int64_t probes_;
   std::int64_t hits_;
 };
 

@@ -49,6 +49,8 @@ TEST(TranspositionTable, EmptyTable) {
   EXPECT_THAT(score, Eq(std::nullopt));
   EXPECT_THAT(best_move, Eq(Move::NullMove()));
   EXPECT_THAT(table.GetHits(), Eq(0));
+  EXPECT_THAT(table.GetMisses(), Eq(1));
+  EXPECT_THAT(table.GetHitRate(), Eq(0));
 }
 
 TEST(TranspositionTable, ExactScoreHit) {
@@ -65,6 +67,8 @@ TEST(TranspositionTable, ExactScoreHit) {
   EXPECT_THAT(score, Optional(50));
   EXPECT_THAT(best_move, Eq(MakeMove("e2e4")));
   EXPECT_THAT(table.GetHits(), Eq(1));
+  EXPECT_THAT(table.GetMisses(), Eq(0));
+  EXPECT_THAT(table.GetHitRate(), Eq(1));
 }
 
 TEST(TranspositionTable, LowerBoundBetaCutoff) {
@@ -79,11 +83,15 @@ TEST(TranspositionTable, LowerBoundBetaCutoff) {
       &best_move);
   EXPECT_THAT(score_cutoff, Optional(40));
   EXPECT_THAT(table.GetHits(), Eq(1));
+  EXPECT_THAT(table.GetMisses(), Eq(0));
 
   std::optional<int> score_no_cutoff = table.Probe(
       ZobristKey(123), {.alpha = -100, .beta = 60, .ply = 1, .depth = 5},
       &best_move);
   EXPECT_THAT(score_no_cutoff, Eq(std::nullopt));
+  EXPECT_THAT(table.GetHits(), Eq(1));
+  EXPECT_THAT(table.GetMisses(), Eq(1));
+  EXPECT_THAT(table.GetHitRate(), Eq(0.5));
 }
 
 TEST(TranspositionTable, UpperBoundAlphaCutoff) {

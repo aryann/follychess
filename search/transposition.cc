@@ -65,6 +65,7 @@ const TranspositionTable::Entry* TranspositionTable::GetEntry(
 std::optional<int> TranspositionTable::Probe(ZobristKey key,
                                              ProbeParams probe_params,
                                              Move* best_move) {
+  ++probes_;
   const Entry* entry = GetEntry(key);
   if (entry == nullptr) {
     return std::nullopt;
