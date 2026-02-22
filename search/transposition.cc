@@ -19,7 +19,8 @@
 
 #include <optional>
 
-#include "engine/position.h"
+#include "engine/move.h"
+#include "engine/zobrist.h"
 #include "search/evaluation.h"
 
 namespace follychess {
@@ -61,10 +62,10 @@ const TranspositionTable::Entry* TranspositionTable::GetEntry(
   return nullptr;
 }
 
-std::optional<int> TranspositionTable::Probe(const Position& position,
+std::optional<int> TranspositionTable::Probe(ZobristKey key,
                                              ProbeParams probe_params,
                                              Move* best_move) {
-  const Entry* entry = GetEntry(position.GetKey());
+  const Entry* entry = GetEntry(key);
   if (entry == nullptr) {
     return std::nullopt;
   }
@@ -99,18 +100,18 @@ std::optional<int> TranspositionTable::Probe(const Position& position,
   return std::nullopt;
 }
 
-void TranspositionTable::Record(const Position& position, int score,
+void TranspositionTable::Record(ZobristKey key, int score,
                                 RecordParams record_params, BoundType type,
                                 Move best_move) {
   const Entry new_entry = {
-      .key = position.GetKey(),
+      .key = key,
       .best_move = best_move,
       .remaining_depth = record_params.depth,
       .score = NormalizeScore(score, record_params.ply),
       .type = type,
   };
 
-  Bucket& bucket = GetBucket(position.GetKey());
+  Bucket& bucket = GetBucket(key);
   bucket.always_entry = new_entry;
   if (!bucket.deep_entry.key ||
       new_entry.remaining_depth >= bucket.deep_entry.remaining_depth) {

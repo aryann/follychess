@@ -78,7 +78,7 @@ class AlphaBetaSearcher {
       // If the Principal Variation table is empty, then it is likely due to a
       // root transposition table cutoff. In this case, we check the
       // transposition table for the best move.
-      context_.transpositions.Probe(game_.GetPosition(),
+      context_.transpositions.Probe(game_.GetPosition().GetKey(),
                                     {
                                         .alpha = kAlpha,
                                         .beta = kBeta,
@@ -108,7 +108,7 @@ class AlphaBetaSearcher {
 
     Move best_move;
     if (std::optional<int> score =
-            context_.transpositions.Probe(game_.GetPosition(),
+            context_.transpositions.Probe(game_.GetPosition().GetKey(),
                                           {
                                               .alpha = alpha,
                                               .beta = beta,
@@ -121,7 +121,7 @@ class AlphaBetaSearcher {
 
     if (depth <= 0 && !CurrentSideInCheck()) {
       const int score = QuiescentSearch(alpha, beta, ply);
-      context_.transpositions.Record(game_.GetPosition(), score,
+      context_.transpositions.Record(game_.GetPosition().GetKey(), score,
                                      {
                                          .ply = ply,
                                          .depth = depth,
@@ -151,7 +151,7 @@ class AlphaBetaSearcher {
 
       if (score >= beta) {
         // Beta cutoff.
-        context_.transpositions.Record(game_.GetPosition(), score,
+        context_.transpositions.Record(game_.GetPosition().GetKey(), score,
                                        {
                                            .ply = ply,
                                            .depth = depth,
@@ -176,7 +176,7 @@ class AlphaBetaSearcher {
     }
 
     if (!moves.empty()) {
-      context_.transpositions.Record(game_.GetPosition(), alpha,
+      context_.transpositions.Record(game_.GetPosition().GetKey(), alpha,
                                      {
                                          .ply = ply,
                                          .depth = depth,
@@ -205,7 +205,7 @@ class AlphaBetaSearcher {
     alpha = std::max(alpha, score);
 
     Move best_move;
-    context_.transpositions.Probe(game_.GetPosition(),
+    context_.transpositions.Probe(game_.GetPosition().GetKey(),
                                   {
                                       .alpha = alpha,
                                       .beta = beta,

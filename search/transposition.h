@@ -23,7 +23,8 @@
 #include <utility>
 #include <vector>
 
-#include "engine/position.h"
+#include "engine/move.h"
+#include "engine/zobrist.h"
 
 namespace follychess {
 
@@ -55,10 +56,10 @@ class TranspositionTable {
       : table_(std::bit_floor(size_mb * (1 << 20) / sizeof(Bucket))),
         hits_(0) {}
 
-  std::optional<int> Probe(const Position& position, ProbeParams probe_params,
+  std::optional<int> Probe(ZobristKey key, ProbeParams probe_params,
                            Move* best_move);
 
-  void Record(const Position& position, int score, RecordParams record_params,
+  void Record(ZobristKey key, int score, RecordParams record_params,
               BoundType type, Move best_move);
 
   [[nodiscard]] std::int64_t GetHits() const { return hits_; }

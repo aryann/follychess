@@ -165,7 +165,8 @@ cc_library(
     hdrs = ["transposition.h"],
     deps = [
         ":evaluation",
-        "//engine:position",
+        "//engine:move",
+        "//engine:zobrist",
     ],
 )
 
