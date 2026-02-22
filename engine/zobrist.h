@@ -74,6 +74,8 @@ class ZobristKey {
  public:
   ZobristKey() : key_(0ULL) {}
 
+  explicit ZobristKey(std::uint64_t key) : key_(key) {}
+
   constexpr void Update(const Square square, const Piece piece,
                         const Side side) {
     key_ ^= kZobristKeys.elements[square][piece][side];

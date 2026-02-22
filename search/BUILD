@@ -175,6 +175,7 @@ cc_test(
     srcs = ["transposition_test.cc"],
     deps = [
         ":transposition",
+        "//engine:testing",
         "@googletest//:gtest_main",
     ],
 )
