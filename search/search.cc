@@ -294,10 +294,10 @@ class AlphaBetaSearcher {
 
 }  // namespace
 
-Move Search(const Game& game, const SearchOptions& options) {
+Move Search(const Game& game, SearchOptions options) {
   SearchContext context = {
       .game = game,
-      .info_observer = options.info_observer,
+      .info_observer = std::move(options.info_observer),
       .start_time = std::chrono::steady_clock::now(),
       .pv_table = PrincipalVariationTable(),
       .transpositions = TranspositionTable(),

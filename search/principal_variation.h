@@ -26,7 +26,7 @@ namespace follychess {
 
 class PrincipalVariationTable {
  public:
-  explicit PrincipalVariationTable() : data_(kMaxDepth * kMaxDepth) {}
+  explicit PrincipalVariationTable() : data_(kMaxDepth * (kMaxDepth + 1) / 2) {}
 
   void RecordMove(int ply, Move move) {
     DCHECK_GE(ply, 0);
@@ -67,7 +67,9 @@ class PrincipalVariationTable {
   [[nodiscard]] Move GetBestMove() const { return data_[0]; }
 
  private:
-  [[nodiscard]] static int GetIndex(int ply) { return ply * kMaxDepth; }
+  [[nodiscard]] static int GetIndex(int ply) {
+    return ply * kMaxDepth - (ply * (ply - 1)) / 2;
+  }
 
   static constexpr int kMaxDepth = 128;
 

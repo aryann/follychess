@@ -17,6 +17,7 @@
 
 #include "perft.h"
 
+#include <iterator>
 #include <map>
 #include <thread>
 #include <vector>
@@ -31,7 +32,7 @@ namespace follychess {
 namespace {
 
 std::size_t RunPerft(std::size_t depth, std::size_t current_depth,
-                     Position &position, Move start_move,
+                     Position &position,
                      std::vector<std::size_t> &depth_counts) {
   ++depth_counts[current_depth];
 
@@ -49,7 +50,7 @@ std::size_t RunPerft(std::size_t depth, std::size_t current_depth,
       continue;
     }
     final_move_count +=
-        RunPerft(depth, current_depth + 1, position, start_move, depth_counts);
+        RunPerft(depth, current_depth + 1, position, depth_counts);
   }
 
   return final_move_count;
@@ -72,7 +73,7 @@ void RunPerft(std::size_t depth, const Position &position,
 
   std::vector<std::thread> threads;
 
-  for (int i = 0; i < initial_moves.size(); ++i) {
+  for (int i = 0; i < std::ssize(initial_moves); ++i) {
     threads.emplace_back([&, i]() {
       Move move = initial_moves[i];
 
@@ -83,7 +84,7 @@ void RunPerft(std::size_t depth, const Position &position,
       }
 
       all_move_counts[i] =
-          RunPerft(depth, 1, new_position, move, all_depth_counts[i]);
+          RunPerft(depth, 1, new_position, all_depth_counts[i]);
     });
   }
 
@@ -91,14 +92,14 @@ void RunPerft(std::size_t depth, const Position &position,
     thread.join();
   }
 
-  for (int i = 0; i < initial_moves.size(); ++i) {
+  for (int i = 0; i < std::ssize(initial_moves); ++i) {
     final_move_counts[initial_moves[i]] = all_move_counts[i];
   }
 
   final_depth_counts.resize(depth + 1, 0);
   final_depth_counts[0] = 1;
   for (const std::vector<std::size_t> &depth_counts : all_depth_counts) {
-    for (int i = 0; i < depth_counts.size(); ++i) {
+    for (int i = 0; i < std::ssize(depth_counts); ++i) {
       final_depth_counts[i] += depth_counts[i];
     }
   }

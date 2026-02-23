@@ -91,7 +91,7 @@ struct SearchOptions {
   };
 };
 
-Move Search(const Game& game, const SearchOptions& options = SearchOptions());
+Move Search(const Game& game, SearchOptions options = SearchOptions());
 
 }  // namespace follychess
 
