@@ -17,6 +17,7 @@
 
 #include "search/search.h"
 
+#include <chrono>
 #include <iostream>
 #include <vector>
 
@@ -53,7 +54,7 @@ struct SearchContext {
   Game game;
 
   std::function<void(const SearchInfo&)> info_observer;
-  std::chrono::system_clock::time_point start_time;
+  std::chrono::steady_clock::time_point start_time;
 
   KillerMoves killer_moves;
   PrincipalVariationTable pv_table;
@@ -271,7 +272,7 @@ class AlphaBetaSearcher {
 
   [[nodiscard]] SearchInfo MakeSearchInfo(const int score,
                                           const int depth) const {
-    const auto now = std::chrono::system_clock::now();
+    const auto now = std::chrono::steady_clock::now();
     const std::chrono::duration<double> elapsed = now - context_.start_time;
     const double elapsed_seconds = elapsed.count();
 
@@ -297,7 +298,7 @@ Move Search(const Game& game, const SearchOptions& options) {
   SearchContext context = {
       .game = game,
       .info_observer = options.info_observer,
-      .start_time = std::chrono::system_clock::now(),
+      .start_time = std::chrono::steady_clock::now(),
       .pv_table = PrincipalVariationTable(),
       .transpositions = TranspositionTable(),
   };
