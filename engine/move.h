@@ -127,7 +127,7 @@ class Move {
     out = std::format_to(out, "{}{}", GetFrom(), GetTo());
 
     if (IsPromotion()) {
-      static char kPieceChars[] = {'n', 'b', 'r', 'q'};
+      static constexpr char kPieceChars[] = {'n', 'b', 'r', 'q'};
       out =
           std::format_to(out, "{}", kPieceChars[GetPromotedPiece() - kKnight]);
     }

@@ -67,8 +67,8 @@ constexpr Square MakeSquare(std::uint8_t rank, std::uint8_t file) {
 }
 
 constexpr Square Reflect(const Square square) {
-  const int new_tank = 7 - GetRank(square);
-  return static_cast<Square>(new_tank * 8 + GetFile(square));
+  const int new_rank = 7 - GetRank(square);
+  return static_cast<Square>(new_rank * 8 + GetFile(square));
 }
 
 std::string ToString(Square square);

@@ -141,7 +141,9 @@ struct std::formatter<follychess::Position> : std::formatter<std::string> {
   auto format(const follychess::Position &position,
               std::format_context &context) const {
     auto GetSquare = [&](follychess::Square square) {
-      static char kPieceChars[] = {'P', 'N', 'B', 'R', 'Q', 'K', '.', '.'};
+      static constexpr char kPieceChars[] = {
+          'P', 'N', 'B', 'R', 'Q', 'K', '.', '.',
+      };
       char result = kPieceChars[static_cast<int>(position.GetPiece(square))];
 
       if (position.GetSide(square) == follychess::kBlack) {
