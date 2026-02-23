@@ -64,7 +64,7 @@ struct SearchContext {
 class AlphaBetaSearcher {
  public:
   explicit AlphaBetaSearcher(SearchContext& context)
-      : context_(context), game_(context.game), nodes_(0) {}
+      : context_(context), nodes_(0) {}
 
   [[nodiscard]] Move Search(const int depth) {
     constexpr int kAlpha = -100'000;
@@ -78,7 +78,7 @@ class AlphaBetaSearcher {
       // If the Principal Variation table is empty, then it is likely due to a
       // root transposition table cutoff. In this case, we check the
       // transposition table for the best move.
-      context_.transpositions.Probe(game_.GetPosition().GetKey(),
+      context_.transpositions.Probe(context_.game.GetPosition().GetKey(),
                                     {
                                         .alpha = kAlpha,
                                         .beta = kBeta,
@@ -108,7 +108,7 @@ class AlphaBetaSearcher {
 
     Move best_move;
     if (std::optional<int> score =
-            context_.transpositions.Probe(game_.GetPosition().GetKey(),
+            context_.transpositions.Probe(context_.game.GetPosition().GetKey(),
                                           {
                                               .alpha = alpha,
                                               .beta = beta,
@@ -121,7 +121,8 @@ class AlphaBetaSearcher {
 
     if (depth <= 0 && !CurrentSideInCheck()) {
       const int score = QuiescentSearch(alpha, beta, ply);
-      context_.transpositions.Record(game_.GetPosition().GetKey(), score,
+      context_.transpositions.Record(context_.game.GetPosition().GetKey(),
+                                     score,
                                      {
                                          .ply = ply,
                                          .depth = depth,
@@ -140,9 +141,9 @@ class AlphaBetaSearcher {
       }
     }
 
-    std::vector<Move> moves = GenerateLegalMoves(game_.GetPosition());
-    OrderMoves(game_.GetPosition(), best_move, context_.killer_moves[ply],
-               context_.history_heuristic, moves);
+    std::vector<Move> moves = GenerateLegalMoves(context_.game.GetPosition());
+    OrderMoves(context_.game.GetPosition(), best_move,
+               context_.killer_moves[ply], context_.history_heuristic, moves);
 
     TranspositionTable::BoundType transposition_type = UpperBound;
     for (Move move : moves) {
@@ -151,14 +152,16 @@ class AlphaBetaSearcher {
 
       if (score >= beta) {
         // Beta cutoff.
-        context_.transpositions.Record(game_.GetPosition().GetKey(), score,
+        context_.transpositions.Record(context_.game.GetPosition().GetKey(),
+                                       score,
                                        {
                                            .ply = ply,
                                            .depth = depth,
                                        },
                                        LowerBound, move);
         context_.killer_moves.Set(ply, move);
-        context_.history_heuristic.Set(game_.GetPosition(), move, depth);
+        context_.history_heuristic.Set(context_.game.GetPosition(), move,
+                                       depth);
         return beta;
       }
 
@@ -176,7 +179,8 @@ class AlphaBetaSearcher {
     }
 
     if (!moves.empty()) {
-      context_.transpositions.Record(game_.GetPosition().GetKey(), alpha,
+      context_.transpositions.Record(context_.game.GetPosition().GetKey(),
+                                     alpha,
                                      {
                                          .ply = ply,
                                          .depth = depth,
@@ -205,7 +209,7 @@ class AlphaBetaSearcher {
     alpha = std::max(alpha, score);
 
     Move best_move;
-    context_.transpositions.Probe(game_.GetPosition().GetKey(),
+    context_.transpositions.Probe(context_.game.GetPosition().GetKey(),
                                   {
                                       .alpha = alpha,
                                       .beta = beta,
@@ -214,9 +218,10 @@ class AlphaBetaSearcher {
                                   },
                                   &best_move);
 
-    std::vector<Move> moves = GenerateLegalMoves<kCapture>(game_.GetPosition());
-    OrderMoves(game_.GetPosition(), best_move, context_.killer_moves[ply],
-               context_.history_heuristic, moves);
+    std::vector<Move> moves =
+        GenerateLegalMoves<kCapture>(context_.game.GetPosition());
+    OrderMoves(context_.game.GetPosition(), best_move,
+               context_.killer_moves[ply], context_.history_heuristic, moves);
 
     for (Move move : moves) {
       ScopedMove2 scoped_move(move, context_.game);
@@ -236,19 +241,19 @@ class AlphaBetaSearcher {
   }
 
   [[nodiscard]] int GetScore() const {
-    const int score =
-        Evaluate(game_.GetPosition(), CalculatePhase(game_.GetPosition()));
-    return game_.GetPosition().SideToMove() == kWhite ? score : -score;
+    const int score = Evaluate(context_.game.GetPosition(),
+                               CalculatePhase(context_.game.GetPosition()));
+    return context_.game.GetPosition().SideToMove() == kWhite ? score : -score;
   }
 
   [[nodiscard]] bool CurrentSideInCheck() const {
-    Bitboard checkers =
-        game_.GetPosition().GetCheckers(game_.GetPosition().SideToMove());
+    Bitboard checkers = context_.game.GetPosition().GetCheckers(
+        context_.game.GetPosition().SideToMove());
     return checkers != kEmptyBoard;
   }
 
   [[nodiscard]] bool NullPrune(const int depth, const int ply) const {
-    const Position& position = game_.GetPosition();
+    const Position& position = context_.game.GetPosition();
     const bool king_and_pawn_endgame =
         (position.GetPieces(kKing) | position.GetPieces(kPawn)) ==
         position.GetPieces();
@@ -283,7 +288,6 @@ class AlphaBetaSearcher {
   }
 
   SearchContext& context_;
-  Game& game_;
   std::int64_t nodes_;
 };
 

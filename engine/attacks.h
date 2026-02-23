@@ -44,8 +44,8 @@ consteval auto MakePawnAttacks() {
 }
 
 constexpr Bitboard GetPawnAttacks(Square square, Side side) {
-  static std::array<std::array<Bitboard, kNumSquares>, kNumSides> kPawnAttacks =
-      MakePawnAttacks();
+  static constexpr std::array<std::array<Bitboard, kNumSquares>, kNumSides>
+      kPawnAttacks = MakePawnAttacks();
   return kPawnAttacks[side][square];
 }
 
@@ -118,13 +118,13 @@ template <Piece Piece>
   static_assert(Piece != kPawn);
 
   if constexpr (Piece == kKnight) {
-    static std::array<Bitboard, kNumSquares> kKnightAttacks =
+    static constexpr std::array<Bitboard, kNumSquares> kKnightAttacks =
         GenerateKnightAttacks();
     return kKnightAttacks[square];
   }
 
   if constexpr (Piece == kKing) {
-    static std::array<Bitboard, kNumSquares> kKingAttacks =
+    static constexpr std::array<Bitboard, kNumSquares> kKingAttacks =
         GenerateKingAttacks();
     return kKingAttacks[square];
   }
