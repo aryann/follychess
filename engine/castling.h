@@ -66,9 +66,9 @@ class CastlingRights {
     static_assert(Side == kWhite || Side == kBlack);
 
     if constexpr (Side == kWhite) {
-      return rights_ & kWhiteKing;
+      return (rights_ & kWhiteKing) != 0;
     } else {
-      return rights_ & kBlackKing;
+      return (rights_ & kBlackKing) != 0;
     }
   }
 

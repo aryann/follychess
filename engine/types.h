@@ -86,7 +86,10 @@ enum Side : std::uint8_t {
 
 constexpr std::size_t kNumSides = 2;
 
-constexpr Side operator~(Side side) { return side == kWhite ? kBlack : kWhite; }
+constexpr Side operator~(Side side) {
+  DCHECK(side == kWhite || side == kBlack);
+  return side == kWhite ? kBlack : kWhite;
+}
 
 enum Direction : std::int8_t {
   kNorth = -8,

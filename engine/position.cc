@@ -192,8 +192,8 @@ std::expected<void, std::string> ParseBoard(
   return {};
 }
 
-std::expected<CastlingRights, std::string> SetCastlingRights(
-    std::string_view input, CastlingRights &rights) {
+std::expected<void, std::string> SetCastlingRights(std::string_view input,
+                                                   CastlingRights &rights) {
   if (input == "-") {
     return {};
   }

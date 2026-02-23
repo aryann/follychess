@@ -112,7 +112,7 @@ std::expected<Move, std::string> Move::FromUCI(std::string_view input) {
 }
 
 std::ostream &operator<<(std::ostream &os, const Move &move) {
-  static bool kFull = true;
+  constexpr bool kFull = true;
   move.FormatTo(std::ostream_iterator<char>(os), kFull);
   return os;
 }

@@ -20,6 +20,7 @@
 
 #include <optional>
 #include <random>
+#include <tuple>
 
 #include "engine/castling.h"
 #include "engine/types.h"
@@ -39,15 +40,15 @@ struct ZobristKeys {
 };
 
 inline ZobristKeys::ZobristKeys() : elements(), en_passant_files(), castling() {
+  static_assert(std::tuple_size_v<decltype(elements)> == kNumSquares);
+  static_assert(std::tuple_size_v<decltype(elements)::value_type> ==
+                kNumPieces);
+
   std::mt19937 engine(std::random_device{}());
   std::uniform_int_distribution<std::uint64_t> dist(0);
 
   for (int i = 0; i < kNumSquares; ++i) {
-    DCHECK_EQ(elements.size(), kNumSquares);
-
     for (int j = 0; j < kNumPieces; ++j) {
-      DCHECK_EQ(elements[i].size(), kNumPieces);
-
       for (int k = 0; k < kNumSides; ++k) {
         DCHECK_EQ(elements[i][j].size(), kNumSides);
         elements[i][j][k] = dist(engine);
