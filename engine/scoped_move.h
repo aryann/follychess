@@ -31,7 +31,7 @@ namespace follychess {
 // to restore the previous state.
 class ScopedMove {
  public:
-  ScopedMove(const Move &move, Position &position)
+  ScopedMove(Move move, Position &position)
       : position_(position), undo_info_(position.Do(move)) {}
 
   ~ScopedMove() { position_.Undo(undo_info_); }
@@ -51,7 +51,7 @@ class ScopedMove {
 
 class ScopedMove2 {
  public:
-  ScopedMove2(const Move &move, Game &game) : game_(game) { game.Do(move); }
+  ScopedMove2(Move move, Game &game) : game_(game) { game.Do(move); }
 
   ~ScopedMove2() { game_.Undo(); }
 

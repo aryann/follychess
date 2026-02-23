@@ -18,16 +18,18 @@
 #ifndef FOLLYCHESS_ENGINE_GAME_H_
 #define FOLLYCHESS_ENGINE_GAME_H_
 
+#include <utility>
+
 #include "engine/position.h"
 
 namespace follychess {
 
 class Game {
  public:
-  explicit Game(const Position& position) {
+  explicit Game(Position position) {
     history_.push_back({
         .key = position.GetKey(),
-        .position = position,
+        .position = std::move(position),
     });
   }
 
