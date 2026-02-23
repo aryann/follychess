@@ -65,7 +65,7 @@ MATCHER_P(EqualsBitboard, expected,
                    << "      Expected:                Actual:\n"
                    << "      ---------                -------";
 
-  for (int i = 0; i < expected_parts.size(); ++i) {
+  for (int i = 0; i < std::ssize(expected_parts); ++i) {
     *result_listener << '\n'
                      << expected_parts[i] << "      " << actual_parts[i];
     if (expected_parts[i] != actual_parts[i]) {
@@ -102,7 +102,7 @@ MATCHER_P(EqualsPosition, expected, "") {
                    << "      ---------                  -------";
 
   int max_line_length = std::ssize(expected_parts.front()) + 2;
-  for (int i = 0; i < expected_parts.size(); ++i) {
+  for (int i = 0; i < std::ssize(expected_parts); ++i) {
     *result_listener << '\n' << expected_parts[i];
 
     for (int j = 0; j < max_line_length - std::ssize(expected_parts[i]); ++j) {

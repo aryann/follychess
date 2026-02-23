@@ -19,7 +19,6 @@
 #define FOLLYCHESS_ENGINE_GAME_H_
 
 #include "engine/position.h"
-#include "position.h"
 
 namespace follychess {
 

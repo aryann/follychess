@@ -26,7 +26,7 @@ namespace follychess {
   const int start = std::ssize(history_) - 3;
   const int limit = std::ssize(history_) - 1 - GetPosition().GetHalfMoves();
 
-  for (int i = start; i >= limit; --i) {
+  for (int i = start; i >= std::max(limit, 0); --i) {
     if (history_[i].key == current_key) {
       ++repetitions;
     }

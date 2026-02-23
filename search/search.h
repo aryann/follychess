@@ -82,9 +82,8 @@ struct SearchOptions {
 
   int depth = 5;
 
-  SearchOptions& SetInfoObserver(
-      const std::function<void(const SearchInfo&)>& value) {
-    info_observer = value;
+  SearchOptions& SetInfoObserver(std::function<void(const SearchInfo&)> value) {
+    info_observer = std::move(value);
     return *this;
   }
 
