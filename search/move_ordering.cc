@@ -87,13 +87,12 @@ consteval auto GenerateMvvLvaTable() {
 
 constexpr auto kMvvLvaTable = GenerateMvvLvaTable();
 
-constexpr int kPriorityMoveScale = 100'000'000;
-constexpr int kCaptureScale = 10'000'000;
-constexpr int kPromotionScale = 1'000'000;
-constexpr int kCastlingScale = 100'000;
-constexpr int kKillerMoveScale = 10'000;
-constexpr int kHistoryHeuristicScale = 1'000;
-
+constexpr int kPriorityMoveScale = 1'000'000'000;
+constexpr int kCaptureScale = 100'000'000;
+constexpr int kPromotionScale = 10'000'000;
+constexpr int kCastlingScale = 1'000'000;
+constexpr int kKillerMoveScale = 100'000;
+constexpr int kHistoryHeuristicScale = 10'000;
 }  // namespace
 
 std::string join(const std::vector<Move>& moves) {
@@ -143,7 +142,7 @@ void OrderMoves(const Position& position, Move priority_move,
     }
 
     const int history_score = history_heuristic.Get(position, move);
-    DCHECK_LT(history_score, 1'000);
+    DCHECK_LT(history_score, kKillerMoveScale - kHistoryHeuristicScale);
     return kHistoryHeuristicScale + history_score;
   };
 
