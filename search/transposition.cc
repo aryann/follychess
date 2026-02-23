@@ -25,6 +25,19 @@
 
 namespace follychess {
 
+TranspositionTable::Metrics TranspositionTable::GetMetrics() const {
+  double hit_rate = 0;
+  if (probes_ != 0) {
+    hit_rate = static_cast<double>(hits_) / static_cast<double>(probes_);
+  }
+
+  return {
+      .hits = hits_,
+      .misses = probes_ - hits_,
+      .hit_rate = hit_rate,
+  };
+}
+
 int TranspositionTable::NormalizeScore(const int score, const int ply) {
   if (score > kCheckMateThreshold) {
     return score + ply;

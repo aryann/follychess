@@ -48,6 +48,12 @@ class TranspositionTable {
     int depth;
   };
 
+  struct Metrics {
+    std::int64_t hits;
+    std::int64_t misses;
+    double hit_rate;
+  };
+
   // Allocates the transposition table to fit within the specified memory limit.
   // The final number of entries is rounded down to the nearest power of two.
   // This enables fast bitwise indexing (`key & (size - 1)`) rather than slower
@@ -63,16 +69,7 @@ class TranspositionTable {
   void Record(ZobristKey key, int score, RecordParams record_params,
               BoundType type, Move best_move);
 
-  [[nodiscard]] std::int64_t GetHits() const { return hits_; }
-
-  [[nodiscard]] std::int64_t GetMisses() const { return probes_ - hits_; }
-
-  [[nodiscard]] double GetHitRate() const {
-    if (probes_ == 0) {
-      return 0;
-    }
-    return static_cast<double>(hits_) / static_cast<double>(probes_);
-  }
+  [[nodiscard]] Metrics GetMetrics() const;
 
   [[nodiscard]] std::size_t size() const { return table_.size(); }
 

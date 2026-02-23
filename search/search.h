@@ -23,6 +23,7 @@
 #include "engine/position.h"
 #include "search/evaluation.h"
 #include "search/principal_variation.h"
+#include "transposition.h"
 
 namespace follychess {
 
@@ -45,7 +46,7 @@ struct SearchInfo {
 
   std::int64_t nodes;
   std::int64_t node_per_second;
-  std::int64_t tbhits;
+  TranspositionTable::Metrics transposition_table_metrics;
   std::string principal_variation;
 };
 
@@ -61,10 +62,13 @@ struct std::formatter<follychess::SearchInfo> : std::formatter<std::string> {
     }
 
     auto out = context.out();
-    return std::format_to(
-        out, "info depth {} score {} nodes {} nps {} tbhits {} pv {}",
-        info.depth, score, info.nodes, info.node_per_second, info.tbhits,
-        info.principal_variation);
+    return std::format_to(out,
+                          "info depth {} score {} nodes {} nps {} tthits {} "
+                          "tthitrate {:.2f} pv {}",
+                          info.depth, score, info.nodes, info.node_per_second,
+                          info.transposition_table_metrics.hits,
+                          info.transposition_table_metrics.hit_rate,
+                          info.principal_variation);
   }
 };
 

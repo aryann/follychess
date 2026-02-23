@@ -275,8 +275,9 @@ class AlphaBetaSearcher {
         .score = score,
         .mate_in = GetMateIn(score),
         .nodes = nodes_,
-        .node_per_second = static_cast<std::int64_t>(nodes_ / elapsed_seconds),
-        .tbhits = context_.transpositions.GetHits(),
+        .node_per_second = static_cast<std::int64_t>(
+            static_cast<double>(nodes_) / elapsed_seconds),
+        .transposition_table_metrics = context_.transpositions.GetMetrics(),
         .principal_variation = std::format("{}", context_.pv_table),
     };
   }
