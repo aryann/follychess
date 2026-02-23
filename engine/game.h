@@ -19,6 +19,7 @@
 #define FOLLYCHESS_ENGINE_GAME_H_
 
 #include "engine/position.h"
+#include "position.h"
 
 namespace follychess {
 
@@ -35,13 +36,14 @@ class Game {
 
   void Do(Move move) {
     DCHECK(!history_.empty());
-    Position position = history_.back().position;
-    position.Do(move);
 
-    history_.push_back({
-        .key = position.GetKey(),
-        .position = position,
-    });
+    // Extends the history:
+    history_.push_back(history_.back());
+
+    // Mutates the last position in place:
+    Position& position = history_.back().position;
+    position.Do(move);
+    history_.back().key = position.GetKey();
   }
 
   void Undo() {
