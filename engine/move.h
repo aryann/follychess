@@ -28,7 +28,7 @@
 
 namespace follychess {
 
-class Move {
+class [[nodiscard]] Move {
  public:
   // This scheme is forward-compatible with the scheme documented at
   // https://www.chessprogramming.org/Encoding_Moves.

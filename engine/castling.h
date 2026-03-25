@@ -47,7 +47,7 @@ constexpr Bitboard GetQueenSideCastlingPath() {
   }
 }
 
-class CastlingRights {
+class [[nodiscard]] CastlingRights {
  public:
   enum Flags : std::uint8_t {
     kNoCastlingRights = /* */ 0b0000,
