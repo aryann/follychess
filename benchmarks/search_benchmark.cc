@@ -32,7 +32,7 @@ void BM_Search(benchmark::State& state, Args&&... args) {
   Game game(position.value());
 
   for (auto _ : state) {
-    Search(game, SearchOptions().SetDepth(depth));
+    (void)Search(game, SearchOptions().SetDepth(depth));
   }
 }
 

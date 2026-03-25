@@ -154,7 +154,7 @@ template <Side Side, Piece Piece>
 }  // namespace
 
 template <Side Side>
-[[nodiscard]] Score GetPlacementScore(const Position& position) {
+Score GetPlacementScore(const Position& position) {
   return GetPlacementScore<Side, kPawn>(position) +
          GetPlacementScore<Side, kKnight>(position) +
          GetPlacementScore<Side, kBishop>(position) +
@@ -167,7 +167,7 @@ template Score GetPlacementScore<kWhite>(const Position& position);
 template Score GetPlacementScore<kBlack>(const Position& position);
 
 template <Side Side>
-[[nodiscard]] int GetMaterialScore(const Position& position) {
+int GetMaterialScore(const Position& position) {
   return 20'000 * position.GetPieces(Side, kKing).GetCount() +
          900 * position.GetPieces(Side, kQueen).GetCount() +
          500 * position.GetPieces(Side, kRook).GetCount() +
@@ -180,7 +180,7 @@ template int GetMaterialScore<kWhite>(const Position& position);
 template int GetMaterialScore<kBlack>(const Position& position);
 
 template <Side Side>
-[[nodiscard]] int CountDoubledPawns(const Position& position) {
+int CountDoubledPawns(const Position& position) {
   const Bitboard pawns = position.GetPieces(Side, kPawn);
   int count = 0;
   for (Bitboard file : file::kFileMasks) {
@@ -199,7 +199,7 @@ template int CountDoubledPawns<kWhite>(const Position& position);
 template int CountDoubledPawns<kBlack>(const Position& position);
 
 template <Side Side>
-[[nodiscard]] int CountBlockedPawns(const Position& position) {
+int CountBlockedPawns(const Position& position) {
   const Bitboard pawns = position.GetPieces(Side, kPawn);
   constexpr Direction forward = Side == kWhite ? kNorth : kSouth;
   return (pawns.Shift<forward>() & position.GetPieces()).GetCount();
@@ -209,7 +209,7 @@ template int CountBlockedPawns<kWhite>(const Position& position);
 template int CountBlockedPawns<kBlack>(const Position& position);
 
 template <Side Side>
-[[nodiscard]] Score GetPassedPawnScore(const Position& position) {
+Score GetPassedPawnScore(const Position& position) {
   Score score = {.middle = 0, .end = 0};
   Bitboard pawns = position.GetPieces(Side, kPawn);
 
@@ -296,7 +296,7 @@ template <Side Side>
 }  // namespace
 
 template <Side Side>
-[[nodiscard]] int CountSemiOpenFileRooks(const Position& position) {
+int CountSemiOpenFileRooks(const Position& position) {
   Bitboard blockers = position.GetPieces(Side, kPawn);
   return CountOpenFileRooks<Side>(position, blockers);
 }
@@ -305,7 +305,7 @@ template int CountSemiOpenFileRooks<kWhite>(const Position& position);
 template int CountSemiOpenFileRooks<kBlack>(const Position& position);
 
 template <Side Side>
-[[nodiscard]] int CountOpenFileRooks(const Position& position) {
+int CountOpenFileRooks(const Position& position) {
   Bitboard blockers = position.GetPieces(kPawn);
   return CountOpenFileRooks<Side>(position, blockers);
 }
@@ -314,7 +314,7 @@ template int CountOpenFileRooks<kWhite>(const Position& position);
 template int CountOpenFileRooks<kBlack>(const Position& position);
 
 template <Side Side>
-[[nodiscard]] Score GetKingSafetyScore(const Position& position) {
+Score GetKingSafetyScore(const Position& position) {
   constexpr Bitboard kCenter = Side == kWhite ? Bitboard(E1) | Bitboard(D1)
                                               : Bitboard(E8) | Bitboard(D8);
 
@@ -396,7 +396,7 @@ template <Side Side>
 
 }  // namespace
 
-[[nodiscard]] int Evaluate(const Position& position, int phase) {
+int Evaluate(const Position& position, int phase) {
   return Evaluate<kWhite>(position, phase) - Evaluate<kBlack>(position, phase);
 }
 

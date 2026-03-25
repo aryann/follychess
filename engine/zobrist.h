@@ -71,7 +71,7 @@ inline ZobristKeys::ZobristKeys() : elements(), en_passant_files(), castling() {
 // defined as a constexpr variable.
 inline const ZobristKeys kZobristKeys;
 
-class ZobristKey {
+class [[nodiscard]] ZobristKey {
  public:
   ZobristKey() : key_(0ULL) {}
 

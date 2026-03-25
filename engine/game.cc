@@ -19,7 +19,7 @@
 
 namespace follychess {
 
-[[nodiscard]] int Game::GetRepetitionCount() const {
+int Game::GetRepetitionCount() const {
   int repetitions = 1;
   const ZobristKey current_key = GetPosition().GetKey();
 
