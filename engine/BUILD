@@ -33,7 +33,7 @@ cc_test(
 
 cc_library(
     name = "bitboard",
-    srcs = ["bitboard.cc"],
+    srcs = [],
     hdrs = ["bitboard.h"],
     deps = [
         ":types",

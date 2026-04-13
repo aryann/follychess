@@ -48,10 +48,10 @@ template <template <typename...> class Map, Piece Piece>
 
     Bitboard mask;
     if constexpr (Piece == kBishop || Piece == kQueen) {
-      mask |= kSlidingAttackTables.bishop_magic_squares[square].mask;
+      mask |= kSliderAttacks.bishop_magic_squares[square].mask;
     }
     if constexpr (Piece == kRook || Piece == kQueen) {
-      mask |= kSlidingAttackTables.rook_magic_squares[square].mask;
+      mask |= kSliderAttacks.rook_magic_squares[square].mask;
     }
 
     std::vector<Bitboard> occupancies = MakePowerSet(mask);
@@ -74,8 +74,8 @@ Bitboard GetAttacksFromMap(Square square, Bitboard occupied) {
   static const std::array<Map<Bitboard, Bitboard>, kNumSquares> kQueenAttacks =
       GenerateAttacksMap<Map, kQueen>();
 
-  Bitboard bishop_mask = kSlidingAttackTables.bishop_magic_squares[square].mask;
-  Bitboard rook_mask = kSlidingAttackTables.rook_magic_squares[square].mask;
+  Bitboard bishop_mask = kSliderAttacks.bishop_magic_squares[square].mask;
+  Bitboard rook_mask = kSliderAttacks.rook_magic_squares[square].mask;
 
   if constexpr (Piece == kBishop) {
     occupied &= bishop_mask;

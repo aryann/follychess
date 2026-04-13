@@ -96,21 +96,26 @@ consteval std::array<Bitboard, kNumSquares> GenerateKingAttacks() {
   return attacks;
 }
 
-constexpr Bitboard GenerateBishopAttacks(Square square, Bitboard occupied) {
-  const MagicEntry &magic = kSlidingAttackTables.bishop_magic_squares[square];
-  occupied &= magic.mask;
-  std::size_t index = (magic.magic * occupied.Data()) >> magic.shift;
-  return kSlidingAttackTables.attacks[magic.attack_table_index + index];
-}
+class MagicSliderAttacks {
+ public:
+  static constexpr Bitboard GenerateBishopAttacks(Square square,
+                                                  Bitboard occupied) {
+    const MagicEntry &magic = kSliderAttacks.bishop_magic_squares[square];
+    occupied &= magic.mask;
+    std::size_t index = (magic.magic * occupied.Data()) >> magic.shift;
+    return kSliderAttacks.attacks[magic.attack_table_index + index];
+  }
 
-constexpr Bitboard GenerateRookAttacks(Square square, Bitboard occupied) {
-  const MagicEntry &magic = kSlidingAttackTables.rook_magic_squares[square];
-  occupied &= magic.mask;
-  std::size_t index = (magic.magic * occupied.Data()) >> magic.shift;
-  return kSlidingAttackTables.attacks[magic.attack_table_index + index];
-}
+  static constexpr Bitboard GenerateRookAttacks(Square square,
+                                                Bitboard occupied) {
+    const MagicEntry &magic = kSliderAttacks.rook_magic_squares[square];
+    occupied &= magic.mask;
+    std::size_t index = (magic.magic * occupied.Data()) >> magic.shift;
+    return kSliderAttacks.attacks[magic.attack_table_index + index];
+  }
+};
 
-template <Piece Piece>
+template <Piece Piece, typename SliderAttacks = MagicSliderAttacks>
 constexpr Bitboard GenerateAttacks(Square square, Bitboard occupied) {
   static_assert(Piece != kPawn);
 
@@ -127,16 +132,16 @@ constexpr Bitboard GenerateAttacks(Square square, Bitboard occupied) {
   }
 
   if constexpr (Piece == kBishop) {
-    return GenerateBishopAttacks(square, occupied);
+    return SliderAttacks::GenerateBishopAttacks(square, occupied);
   }
 
   if constexpr (Piece == kRook) {
-    return GenerateRookAttacks(square, occupied);
+    return SliderAttacks::GenerateRookAttacks(square, occupied);
   }
 
   if constexpr (Piece == kQueen) {
-    return GenerateBishopAttacks(square, occupied) |
-           GenerateRookAttacks(square, occupied);
+    return SliderAttacks::GenerateBishopAttacks(square, occupied) |
+           SliderAttacks::GenerateRookAttacks(square, occupied);
   }
 
   return kEmptyBoard;
