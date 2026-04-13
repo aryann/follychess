@@ -96,6 +96,12 @@ consteval std::array<Bitboard, kNumSquares> GenerateKingAttacks() {
   return attacks;
 }
 
+template <typename T>
+concept SliderAttacksPolicy = requires(Square square, Bitboard occupied) {
+  { T::GetBishopAttacks(square, occupied) } -> std::same_as<Bitboard>;
+  { T::GetRookAttacks(square, occupied) } -> std::same_as<Bitboard>;
+};
+
 class MagicSliderAttacks {
  public:
   static constexpr Bitboard GetBishopAttacks(Square square, Bitboard occupied) {
@@ -179,7 +185,7 @@ class MapSliderAttacks {
   }
 };
 
-template <Piece Piece, typename SliderAttacks = MagicSliderAttacks>
+template <Piece Piece, SliderAttacksPolicy SliderAttacks = MagicSliderAttacks>
 constexpr Bitboard GenerateAttacks(Square square, Bitboard occupied) {
   static_assert(Piece != kPawn);
 
