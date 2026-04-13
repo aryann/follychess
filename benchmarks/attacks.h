@@ -24,22 +24,6 @@
 
 namespace follychess {
 
-template <Piece Piece>
-Bitboard GenerateAttacksOnTheFly(Square square, Bitboard occupied) {
-  static_assert(Piece == kBishop || Piece == kRook || Piece == kQueen);
-
-  if constexpr (Piece == kBishop) {
-    return GenerateSlidingAttacks<kNorthEast, kSouthEast, kSouthWest,
-                                  kNorthWest>(square, occupied);
-  }
-  if constexpr (Piece == kRook) {
-    return GenerateSlidingAttacks<kNorth, kEast, kSouth, kWest>(square,
-                                                                occupied);
-  }
-  return GenerateAttacksOnTheFly<kBishop>(square, occupied) |
-         GenerateAttacksOnTheFly<kRook>(square, occupied);
-}
-
 template <template <typename...> class Map, Piece Piece>
 [[nodiscard]] auto GenerateAttacksMap() {
   std::array<Map<Bitboard, Bitboard>, kNumSquares> result;

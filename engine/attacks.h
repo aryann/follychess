@@ -98,7 +98,7 @@ consteval std::array<Bitboard, kNumSquares> GenerateKingAttacks() {
 
 class MagicSliderAttacks {
  public:
-  static constexpr Bitboard GenerateBishopAttacks(Square square,
+  static constexpr Bitboard GetBishopAttacks(Square square,
                                                   Bitboard occupied) {
     const MagicEntry &magic = kSliderAttacks.bishop_magic_squares[square];
     occupied &= magic.mask;
@@ -106,12 +106,26 @@ class MagicSliderAttacks {
     return kSliderAttacks.attacks[magic.attack_table_index + index];
   }
 
-  static constexpr Bitboard GenerateRookAttacks(Square square,
+  static constexpr Bitboard GetRookAttacks(Square square,
                                                 Bitboard occupied) {
     const MagicEntry &magic = kSliderAttacks.rook_magic_squares[square];
     occupied &= magic.mask;
     std::size_t index = (magic.magic * occupied.Data()) >> magic.shift;
     return kSliderAttacks.attacks[magic.attack_table_index + index];
+  }
+};
+
+class LazySliderAttacks {
+  public:
+    static constexpr Bitboard GetBishopAttacks(Square square,
+                                                  Bitboard occupied) {
+    return GenerateSlidingAttacks<kNorthEast, kSouthEast, kSouthWest,
+                                  kNorthWest>(square, occupied);
+  }
+
+  static constexpr Bitboard GetRookAttacks(Square square, Bitboard occupied) {
+    return GenerateSlidingAttacks<kNorth, kEast, kSouth, kWest>(square,
+                                                                occupied);
   }
 };
 
@@ -132,16 +146,16 @@ constexpr Bitboard GenerateAttacks(Square square, Bitboard occupied) {
   }
 
   if constexpr (Piece == kBishop) {
-    return SliderAttacks::GenerateBishopAttacks(square, occupied);
+    return SliderAttacks::GetBishopAttacks(square, occupied);
   }
 
   if constexpr (Piece == kRook) {
-    return SliderAttacks::GenerateRookAttacks(square, occupied);
+    return SliderAttacks::GetRookAttacks(square, occupied);
   }
 
   if constexpr (Piece == kQueen) {
-    return SliderAttacks::GenerateBishopAttacks(square, occupied) |
-           SliderAttacks::GenerateRookAttacks(square, occupied);
+    return SliderAttacks::GetBishopAttacks(square, occupied) |
+           SliderAttacks::GetRookAttacks(square, occupied);
   }
 
   return kEmptyBoard;

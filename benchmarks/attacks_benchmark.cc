@@ -40,14 +40,14 @@ std::vector<Bitboard> GetRandomOccupancies() {
 }
 
 template <Piece Piece>
-void BM_GenerateAttacksOnTheFly(benchmark::State& state) {
+void BM_GenerateAttacksLazily(benchmark::State& state) {
   int square = 0;
   std::vector<Bitboard> occupancies = GetRandomOccupancies();
   int occupancy_index = 0;
 
   for (auto _ : state) {
     Bitboard occupied = occupancies[occupancy_index % occupancies.size()];
-    benchmark::DoNotOptimize(GenerateAttacksOnTheFly<Piece>(
+    benchmark::DoNotOptimize(GenerateAttacks<Piece, LazySliderAttacks>(
         static_cast<Square>(square % kNumSquares), occupied));
 
     ++square;
@@ -79,7 +79,7 @@ void BM_LookupAttacksFromMagicTables(benchmark::State& state) {
 
   for (auto _ : state) {
     Bitboard occupied = occupancies[occupancy_index % occupancies.size()];
-    benchmark::DoNotOptimize(GenerateAttacks<Piece>(
+    benchmark::DoNotOptimize(GenerateAttacks<Piece, MagicSliderAttacks>(
         static_cast<Square>(square % kNumSquares), occupied));
 
     ++square;
@@ -88,9 +88,9 @@ void BM_LookupAttacksFromMagicTables(benchmark::State& state) {
 }
 
 // Naively generate attacks on the fly:
-BENCHMARK(BM_GenerateAttacksOnTheFly<kBishop>);
-BENCHMARK(BM_GenerateAttacksOnTheFly<kRook>);
-BENCHMARK(BM_GenerateAttacksOnTheFly<kQueen>);
+BENCHMARK(BM_GenerateAttacksLazily<kBishop>);
+BENCHMARK(BM_GenerateAttacksLazily<kRook>);
+BENCHMARK(BM_GenerateAttacksLazily<kQueen>);
 
 // Use absl::flat_hash_map to lookup precomputed attacks:
 BENCHMARK(BM_LookupAttacksFrom<absl::flat_hash_map, kBishop>);
