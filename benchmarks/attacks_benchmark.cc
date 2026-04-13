@@ -17,7 +17,6 @@
 
 #include "absl/container/flat_hash_map.h"
 #include "benchmark/benchmark.h"
-#include "benchmarks/attacks.h"
 #include "engine/attacks.h"
 #include "engine/types.h"
 
@@ -63,7 +62,7 @@ void BM_LookupAttacksFrom(benchmark::State& state) {
 
   for (auto _ : state) {
     Bitboard occupied = occupancies[occupancy_index % occupancies.size()];
-    benchmark::DoNotOptimize(GetAttacksFromMap<Map, Piece>(
+    benchmark::DoNotOptimize(GenerateAttacks<Piece, MapSliderAttacks<Map>>(
         static_cast<Square>(square % kNumSquares), occupied));
 
     ++square;

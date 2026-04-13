@@ -987,7 +987,6 @@ TEST(MakePowerSet, RookMask) {
                          }));
 }
 
-
 TEST(LazySliderAttacks, Bishop) {
   {
     Bitboard blockers = kEmptyBoard;
@@ -1153,6 +1152,177 @@ TEST(LazySliderAttacks, Queen) {
   }
 }
 
+TEST(MapSliderAttacks, Bishop) {
+  {
+    Bitboard blockers = kEmptyBoard;
+
+    EXPECT_THAT(
+        (GenerateAttacks<kBishop, MapSliderAttacks<std::map>>(D5, blockers)),
+        EqualsBitboard("8: X . . . . . X ."
+                       "7: . X . . . X . ."
+                       "6: . . X . X . . ."
+                       "5: . . . . . . . ."
+                       "4: . . X . X . . ."
+                       "3: . X . . . X . ."
+                       "2: X . . . . . X ."
+                       "1: . . . . . . . X"
+                       "   a b c d e f g h"));
+  }
+
+  {
+    Bitboard blockers(
+        "8: . . . . . . . X"
+        "7: . . . . . . . ."
+        "6: . . . . . . . ."
+        "5: . . . . . . . ."
+        "4: . . . . . X . ."
+        "3: X . . . X . . ."
+        "2: . . . . . . . ."
+        "1: . . . . . . . X"
+        "   a b c d e f g h");
+
+    EXPECT_THAT(
+        (GenerateAttacks<kBishop, MapSliderAttacks<std::map>>(C1, blockers)),
+        EqualsBitboard("8: . . . . . . . ."
+                       "7: . . . . . . . ."
+                       "6: . . . . . . . ."
+                       "5: . . . . . . . ."
+                       "4: . . . . . . . ."
+                       "3: X . . . X . . ."
+                       "2: . X . X . . . ."
+                       "1: . . . . . . . ."
+                       "   a b c d e f g h"));
+  }
+}
+
+TEST(MapSliderAttacks, Rook) {
+  {
+    Bitboard blockers(
+        "8: . . . . . . . ."
+        "7: . . . . . . . ."
+        "6: . . . . . . . ."
+        "5: . . . . . . . ."
+        "4: X . . . . . . ."
+        "3: . . . . . . . ."
+        "2: . . . . . . . ."
+        "1: . . . X . . . ."
+        "   a b c d e f g h");
+
+    EXPECT_THAT(
+        (GenerateAttacks<kRook, MapSliderAttacks<std::map>>(A1, blockers)),
+        EqualsBitboard("8: . . . . . . . ."
+                       "7: . . . . . . . ."
+                       "6: . . . . . . . ."
+                       "5: . . . . . . . ."
+                       "4: X . . . . . . ."
+                       "3: X . . . . . . ."
+                       "2: X . . . . . . ."
+                       "1: . X X X . . . ."
+                       "   a b c d e f g h"));
+  }
+
+  {
+    Bitboard blockers(
+        "8: . . . . . . . ."
+        "7: . . . . . . . ."
+        "6: . . . . . . . ."
+        "5: . . . . . . . ."
+        "4: . . X . X . . ."
+        "3: . . . . . . . ."
+        "2: . . . . . . . ."
+        "1: . . . . . . . ."
+        "   a b c d e f g h");
+
+    EXPECT_THAT(
+        (GenerateAttacks<kRook, MapSliderAttacks<std::map>>(A4, blockers)),
+        EqualsBitboard("8: X . . . . . . ."
+                       "7: X . . . . . . ."
+                       "6: X . . . . . . ."
+                       "5: X . . . . . . ."
+                       "4: . X X . . . . ."
+                       "3: X . . . . . . ."
+                       "2: X . . . . . . ."
+                       "1: X . . . . . . ."
+                       "   a b c d e f g h"));
+  }
+
+  {
+    Bitboard blockers(
+        "8: . . . X . . . ."
+        "7: . . . . . . . ."
+        "6: . . . . . . . ."
+        "5: . . X . X . . ."
+        "4: . . . . . . . ."
+        "3: . . . . . . . ."
+        "2: . . . . . . . ."
+        "1: . . . . . . . ."
+        "   a b c d e f g h");
+
+    EXPECT_THAT(
+        (GenerateAttacks<kRook, MapSliderAttacks<std::map>>(D1, blockers)),
+        EqualsBitboard("8: . . . X . . . ."
+                       "7: . . . X . . . ."
+                       "6: . . . X . . . ."
+                       "5: . . . X . . . ."
+                       "4: . . . X . . . ."
+                       "3: . . . X . . . ."
+                       "2: . . . X . . . ."
+                       "1: X X X . X X X X"
+                       "   a b c d e f g h"));
+  }
+}
+
+TEST(MapSliderAttacks, Queen) {
+  {
+    Bitboard blockers(
+        "8: . . . . . . . ."
+        "7: . . . . . . . ."
+        "6: . . X . . . . ."
+        "5: . . . . . . . ."
+        "4: . . . X . . . ."
+        "3: . . . . . X . ."
+        "2: . . . . . . . ."
+        "1: . . . . . . . ."
+        "   a b c d e f g h");
+
+    EXPECT_THAT(
+        (GenerateAttacks<kQueen, MapSliderAttacks<std::map>>(D5, blockers)),
+        EqualsBitboard("8: . . . X . . X ."
+                       "7: . . . X . X . ."
+                       "6: . . X X X . . ."
+                       "5: X X X . X X X X"
+                       "4: . . X X X . . ."
+                       "3: . X . . . X . ."
+                       "2: X . . . . . . ."
+                       "1: . . . . . . . ."
+                       "   a b c d e f g h"));
+  }
+
+  {
+    Bitboard blockers(
+        "8: X X X X X X X X"
+        "7: X X X X X X X X"
+        "6: X X X X X X X X"
+        "5: X X X X X X X X"
+        "4: X X X X X X X X"
+        "3: X X X X X X X X"
+        "2: X X X X X X X X"
+        "1: X X X X X X X X"
+        "   a b c d e f g h");
+
+    EXPECT_THAT(
+        (GenerateAttacks<kQueen, MapSliderAttacks<std::map>>(E4, blockers)),
+        EqualsBitboard("8: . . . . . . . ."
+                       "7: . . . . . . . ."
+                       "6: . . . . . . . ."
+                       "5: . . . X X X . ."
+                       "4: . . . X . X . ."
+                       "3: . . . X X X . ."
+                       "2: . . . . . . . ."
+                       "1: . . . . . . . ."
+                       "   a b c d e f g h"));
+  }
+}
 
 }  // namespace
 }  // namespace follychess

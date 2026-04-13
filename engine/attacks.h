@@ -98,16 +98,14 @@ consteval std::array<Bitboard, kNumSquares> GenerateKingAttacks() {
 
 class MagicSliderAttacks {
  public:
-  static constexpr Bitboard GetBishopAttacks(Square square,
-                                                  Bitboard occupied) {
+  static constexpr Bitboard GetBishopAttacks(Square square, Bitboard occupied) {
     const MagicEntry &magic = kSliderAttacks.bishop_magic_squares[square];
     occupied &= magic.mask;
     std::size_t index = (magic.magic * occupied.Data()) >> magic.shift;
     return kSliderAttacks.attacks[magic.attack_table_index + index];
   }
 
-  static constexpr Bitboard GetRookAttacks(Square square,
-                                                Bitboard occupied) {
+  static constexpr Bitboard GetRookAttacks(Square square, Bitboard occupied) {
     const MagicEntry &magic = kSliderAttacks.rook_magic_squares[square];
     occupied &= magic.mask;
     std::size_t index = (magic.magic * occupied.Data()) >> magic.shift;
@@ -116,9 +114,8 @@ class MagicSliderAttacks {
 };
 
 class LazySliderAttacks {
-  public:
-    static constexpr Bitboard GetBishopAttacks(Square square,
-                                                  Bitboard occupied) {
+ public:
+  static constexpr Bitboard GetBishopAttacks(Square square, Bitboard occupied) {
     return GenerateSlidingAttacks<kNorthEast, kSouthEast, kSouthWest,
                                   kNorthWest>(square, occupied);
   }
@@ -126,6 +123,59 @@ class LazySliderAttacks {
   static constexpr Bitboard GetRookAttacks(Square square, Bitboard occupied) {
     return GenerateSlidingAttacks<kNorth, kEast, kSouth, kWest>(square,
                                                                 occupied);
+  }
+};
+
+template <template <typename...> typename Map>
+class MapSliderAttacks {
+ public:
+  static constexpr Bitboard GetBishopAttacks(Square square, Bitboard occupied) {
+    static const std::array<Map<Bitboard, Bitboard>, kNumSquares>
+        kBishopAttacks = GenerateBishopAttackMap();
+
+    Bitboard mask = kSliderAttacks.bishop_magic_squares[square].mask;
+    return kBishopAttacks[square].at(occupied & mask);
+  }
+
+  static constexpr Bitboard GetRookAttacks(Square square, Bitboard occupied) {
+    static const std::array<Map<Bitboard, Bitboard>, kNumSquares> kRookAttacks =
+        GenerateRookAttackMap();
+
+    Bitboard mask = kSliderAttacks.rook_magic_squares[square].mask;
+    return kRookAttacks[square].at(occupied & mask);
+  }
+
+ private:
+  [[nodiscard]] static auto GenerateBishopAttackMap() {
+    std::array<Map<Bitboard, Bitboard>, kNumSquares> result;
+    for (int square = kFirstSquare; square < kNumSquares; ++square) {
+      const Square from = static_cast<Square>(square);
+      Bitboard mask = kSliderAttacks.bishop_magic_squares[square].mask;
+
+      std::vector<Bitboard> occupancies = MakePowerSet(mask);
+      for (Bitboard occupied : occupancies) {
+        result[from][occupied] =
+            MagicSliderAttacks::GetBishopAttacks(from, occupied);
+      }
+    }
+
+    return result;
+  }
+
+  [[nodiscard]] static auto GenerateRookAttackMap() {
+    std::array<Map<Bitboard, Bitboard>, kNumSquares> result;
+    for (int square = kFirstSquare; square < kNumSquares; ++square) {
+      const Square from = static_cast<Square>(square);
+      Bitboard mask = kSliderAttacks.rook_magic_squares[square].mask;
+
+      std::vector<Bitboard> occupancies = MakePowerSet(mask);
+      for (Bitboard occupied : occupancies) {
+        result[from][occupied] =
+            MagicSliderAttacks::GetRookAttacks(from, occupied);
+      }
+    }
+
+    return result;
   }
 };
 
