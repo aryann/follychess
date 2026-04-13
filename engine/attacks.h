@@ -96,16 +96,14 @@ consteval std::array<Bitboard, kNumSquares> GenerateKingAttacks() {
   return attacks;
 }
 
-[[nodiscard]] constexpr Bitboard GenerateBishopAttacks(Square square,
-                                                       Bitboard occupied) {
+constexpr Bitboard GenerateBishopAttacks(Square square, Bitboard occupied) {
   const MagicEntry &magic = kSlidingAttackTables.bishop_magic_squares[square];
   occupied &= magic.mask;
   std::size_t index = (magic.magic * occupied.Data()) >> magic.shift;
   return kSlidingAttackTables.attacks[magic.attack_table_index + index];
 }
 
-[[nodiscard]] constexpr Bitboard GenerateRookAttacks(Square square,
-                                                     Bitboard occupied) {
+constexpr Bitboard GenerateRookAttacks(Square square, Bitboard occupied) {
   const MagicEntry &magic = kSlidingAttackTables.rook_magic_squares[square];
   occupied &= magic.mask;
   std::size_t index = (magic.magic * occupied.Data()) >> magic.shift;
@@ -113,8 +111,7 @@ consteval std::array<Bitboard, kNumSquares> GenerateKingAttacks() {
 }
 
 template <Piece Piece>
-[[nodiscard]] constexpr Bitboard GenerateAttacks(Square square,
-                                                 Bitboard occupied) {
+constexpr Bitboard GenerateAttacks(Square square, Bitboard occupied) {
   static_assert(Piece != kPawn);
 
   if constexpr (Piece == kKnight) {

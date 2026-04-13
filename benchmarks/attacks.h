@@ -25,8 +25,7 @@
 namespace follychess {
 
 template <Piece Piece>
-[[nodiscard]] Bitboard GenerateAttacksOnTheFly(Square square,
-                                               Bitboard occupied) {
+Bitboard GenerateAttacksOnTheFly(Square square, Bitboard occupied) {
   static_assert(Piece == kBishop || Piece == kRook || Piece == kQueen);
 
   if constexpr (Piece == kBishop) {
@@ -65,7 +64,7 @@ template <template <typename...> class Map, Piece Piece>
 }
 
 template <template <typename...> class Map, Piece Piece>
-[[nodiscard]] Bitboard GetAttacksFromMap(Square square, Bitboard occupied) {
+Bitboard GetAttacksFromMap(Square square, Bitboard occupied) {
   static_assert(Piece == kBishop || Piece == kRook || Piece == kQueen);
 
   static const std::array<Map<Bitboard, Bitboard>, kNumSquares> kBishopAttacks =
