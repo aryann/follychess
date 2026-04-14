@@ -341,7 +341,11 @@ std::vector<Move> GenerateLegalMoves(const Position &position) {
   return SelectLegalMoves(position, GenerateMoves<MoveType>(position));
 }
 
+template std::vector<Move> GenerateLegalMoves<kQuiet>(
+    const Position &position);
 template std::vector<Move> GenerateLegalMoves<kCapture>(
+    const Position &position);
+template std::vector<Move> GenerateLegalMoves<kEvasion>(
     const Position &position);
 
 std::vector<Move> GenerateLegalMoves(const Position &position) {

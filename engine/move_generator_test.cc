@@ -34,10 +34,10 @@ using ::testing::Not;
 using ::testing::UnorderedElementsAre;
 using ::testing::UnorderedElementsAreArray;
 
-TEST(GenerateMoves, QuietMoves_StartingPosition) {
+TEST(GenerateLegalMoves, QuietMoves_StartingPosition) {
   auto position = Position::Starting();
 
-  EXPECT_THAT(GenerateMoves<kQuiet>(position),
+  EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
               UnorderedElementsAreArray(MakeMoves({
                   "a2a3",      //
                   "a2a4#dpp",  //
@@ -62,7 +62,7 @@ TEST(GenerateMoves, QuietMoves_StartingPosition) {
               })));
 }
 
-TEST(GenerateMoves, QuietMoves_StartingPosition2) {
+TEST(GenerateLegalMoves, QuietMoves_StartingPosition2) {
   Position position = MakePosition(
       "8: r n b q k b n r"
       "7: p p . p p p p p"
@@ -76,7 +76,7 @@ TEST(GenerateMoves, QuietMoves_StartingPosition2) {
       //
       "   w KQkq c6 0 2");
 
-  EXPECT_THAT(GenerateMoves<kQuiet>(position),
+  EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
               UnorderedElementsAreArray(MakeMoves({
                   "a2a3",      //
                   "a2a4#dpp",  //
@@ -121,22 +121,25 @@ TEST(Pawns, QuietPromotions) {
         "4: . . . . . . . ."
         "3: . . . . . . . ."
         "2: . . . . . . . ."
-        "1: . . . . . . . ."
+        "1: K . . . . . . k"
         "   a b c d e f g h"
         //
         "   w - - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "e7e8n",
                     "e7e8b",
                     "e7e8r",
                     "e7e8q",
+                    "a1a2",
+                    "a1b1",
+                    "a1b2",
                 })));
   }
   {
     Position position = MakePosition(
-        "8: . . . . . . . ."
+        "8: K . . . . . . k"
         "7: . . . . . . . ."
         "6: . . . . . . . ."
         "5: . . . . . . . ."
@@ -148,12 +151,15 @@ TEST(Pawns, QuietPromotions) {
         //
         "   b - - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "a2a1n",
                     "a2a1b",
                     "a2a1r",
                     "a2a1q",
+                    "h8g8",
+                    "h8h7",
+                    "h8g7",
                 })));
   }
 }
@@ -161,19 +167,19 @@ TEST(Pawns, QuietPromotions) {
 TEST(Pawns, Captures) {
   {
     Position position = MakePosition(
-        "8: . . . . . . . ."
+        "8: . . . . . . . k"
         "7: . . . . . . . ."
         "6: . . . . . . . ."
         "5: . . . . . . . ."
         "4: . . . p . r . ."
         "3: . . . . P . . ."
         "2: . . . . . . . ."
-        "1: . . . . . . . ."
+        "1: K . . . . . . ."
         "   a b c d e f g h"
         //
         "   w - - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kCapture>(position),
+    EXPECT_THAT(GenerateLegalMoves<kCapture>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "e3d4#c",
                     "e3f4#c",
@@ -181,19 +187,19 @@ TEST(Pawns, Captures) {
   }
   {
     Position position = MakePosition(
-        "8: . . . . . . . ."
+        "8: . . . . . . . k"
         "7: . . . . . . . ."
         "6: . . . . . . . ."
         "5: . . . p . . . ."
         "4: . . P . R . . ."
         "3: . . . . . . . ."
         "2: . . . . . . . ."
-        "1: . . . . . . . ."
+        "1: K . . . . . . ."
         "   a b c d e f g h"
         //
         "   b - - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kCapture>(position),
+    EXPECT_THAT(GenerateLegalMoves<kCapture>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "d5c4#c",
                     "d5e4#c",
@@ -208,12 +214,12 @@ TEST(Pawns, Captures) {
         "4: . . . . . . . ."
         "3: . . . . . . . ."
         "2: . . . . . . . ."
-        "1: . . . . . . . ."
+        "1: K . . . . . . k"
         "   a b c d e f g h"
         //
         "   w - - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kCapture>(position),
+    EXPECT_THAT(GenerateLegalMoves<kCapture>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "e7d8n#c",
                     "e7d8b#c",
@@ -230,46 +236,52 @@ TEST(Pawns, Captures) {
 TEST(Pawns, EnPassant) {
   {
     Position position = MakePosition(
-        "8: . . . . . . . ."
+        "8: . . . . . . . k"
         "7: . . . . . . . ."
         "6: . . . . . . . ."
         "5: . . . . p P . ."
         "4: . . . . . . . ."
         "3: . . . . . . . ."
         "2: . . . . . . . ."
-        "1: . . . . . . . ."
+        "1: K . . . . . . ."
         "   a b c d e f g h"
         //
         "   w - e6 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "f5f6",
+                    "a1a2",
+                    "a1b1",
+                    "a1b2",
                 })));
-    EXPECT_THAT(GenerateMoves<kCapture>(position),
+    EXPECT_THAT(GenerateLegalMoves<kCapture>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "f5e6#ep",
                 })));
   }
   {
     Position position = MakePosition(
-        "8: . . . . . . . ."
+        "8: . . . . . . . k"
         "7: . . . . . . . ."
         "6: . . . . . . . ."
         "5: . . . P p . . ."
         "4: . . . . . . . ."
         "3: . . . . . . . ."
         "2: . . . . . . . ."
-        "1: . . . . . . . ."
+        "1: K . . . . . . ."
         "   a b c d e f g h"
         //
         "   w - e6 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "d5d6",
+                    "a1a2",
+                    "a1b1",
+                    "a1b2",
                 })));
-    EXPECT_THAT(GenerateMoves<kCapture>(position),
+    EXPECT_THAT(GenerateLegalMoves<kCapture>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "d5e6#ep",
                 })));
@@ -277,7 +289,7 @@ TEST(Pawns, EnPassant) {
 
   {
     Position position = MakePosition(
-        "8: . . . . . . . ."
+        "8: K . . . . . . k"
         "7: . . . . . . . ."
         "6: . . . . . . . ."
         "5: . . . . . . . ."
@@ -289,11 +301,14 @@ TEST(Pawns, EnPassant) {
         //
         "   b - a3 1 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "b4b3",
+                    "h8g8",
+                    "h8h7",
+                    "h8g7",
                 })));
-    EXPECT_THAT(GenerateMoves<kCapture>(position),
+    EXPECT_THAT(GenerateLegalMoves<kCapture>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "b4a3#ep",
                 })));
@@ -301,7 +316,7 @@ TEST(Pawns, EnPassant) {
 
   {
     Position position = MakePosition(
-        "8: . . . . . . . ."
+        "8: K . . . . . . k"
         "7: . . . . . . . ."
         "6: . . . . . . . ."
         "5: . . . . . . . ."
@@ -313,11 +328,14 @@ TEST(Pawns, EnPassant) {
         //
         "   b - h3 1 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "g4g3",
+                    "h8g8",
+                    "h8h7",
+                    "h8g7",
                 })));
-    EXPECT_THAT(GenerateMoves<kCapture>(position),
+    EXPECT_THAT(GenerateLegalMoves<kCapture>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "g4h3#ep",
                 })));
@@ -327,7 +345,7 @@ TEST(Pawns, EnPassant) {
 TEST(Knights, QuietMoves) {
   {
     Position position = MakePosition(
-        "8: . . . . . . . ."
+        "8: K . . . . . . k"
         "7: . . . . . . . ."
         "6: . . . . . . . ."
         "5: . . . . . . . ."
@@ -339,7 +357,7 @@ TEST(Knights, QuietMoves) {
         //
         "   w - - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "e3d5",
                     "e3f5",
@@ -349,11 +367,14 @@ TEST(Knights, QuietMoves) {
                     "e3g2",
                     "e3d1",
                     "e3f1",
+                    "a8a7",
+                    "a8b8",
+                    "a8b7",
                 })));
   }
   {
     Position position = MakePosition(
-        "8: . . . . . . . ."
+        "8: K . . . . . . k"
         "7: . . . . . . . ."
         "6: . . . . . . . ."
         "5: . . . r . r . ."
@@ -365,12 +386,15 @@ TEST(Knights, QuietMoves) {
         //
         "   w - - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "e3c2",
                     "e3c4",
                     "e3g2",
                     "e3g4",
+                    "a8a7",
+                    "a8b8",
+                    "a8b7",
                 })));
   }
 }
@@ -378,7 +402,7 @@ TEST(Knights, QuietMoves) {
 TEST(Knights, Captures) {
   {
     Position position = MakePosition(
-        "8: . . . . . . . ."
+        "8: K . . . . . . k"
         "7: . . . . . . . ."
         "6: . . . . . . . ."
         "5: . . . . . . . ."
@@ -390,23 +414,23 @@ TEST(Knights, Captures) {
         //
         "   w - - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kCapture>(position), IsEmpty());
+    EXPECT_THAT(GenerateLegalMoves<kCapture>(position), IsEmpty());
   }
   {
     Position position = MakePosition(
-        "8: . . . . . . . ."
+        "8: . . . . . . . k"
         "7: . . . . . . . ."
         "6: . . . . . . . ."
         "5: . . . b . b . ."
         "4: . . . . . . . ."
         "3: . . . . N . . ."
-        "2: . . . . . . . ."
+        "2: . . . . . . . K"
         "1: . . . r . r . ."
         "   a b c d e f g h"
         //
         "   w - - 12 20");
 
-    EXPECT_THAT(GenerateMoves<kCapture>(position),
+    EXPECT_THAT(GenerateLegalMoves<kCapture>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "e3d1#c",
                     "e3d5#c",
@@ -418,7 +442,7 @@ TEST(Knights, Captures) {
 
 TEST(Bishops, QuietMoves) {
   Position position = MakePosition(
-      "8: . . . . . . . ."
+      "8: K . . . . . . k"
       "7: . . . . . . . ."
       "6: . p . . . p . ."
       "5: . . . . . . . ."
@@ -430,18 +454,21 @@ TEST(Bishops, QuietMoves) {
       //
       "   w - - 0 1");
 
-  EXPECT_THAT(GenerateMoves<kQuiet>(position),
+  EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
               UnorderedElementsAreArray(MakeMoves({
                   "d4c5",
                   "d4c3",
                   "d4e5",
                   "d4e3",
+                  "a8a7",
+                  "a8b8",
+                  "a8b7",
               })));
 }
 
 TEST(Bishops, Captures) {
   Position position = MakePosition(
-      "8: . . . . . . . ."
+      "8: K . . . . . . k"
       "7: . . . . . . . ."
       "6: . p . . . p . ."
       "5: . . . . . . . ."
@@ -453,7 +480,7 @@ TEST(Bishops, Captures) {
       //
       "   w - - 12 20");
 
-  EXPECT_THAT(GenerateMoves<kCapture>(position),
+  EXPECT_THAT(GenerateLegalMoves<kCapture>(position),
               UnorderedElementsAreArray(MakeMoves({
                   "d4b6#c",
                   "d4b2#c",
@@ -467,7 +494,7 @@ TEST(Bishops, Captures) {
 TEST(King, QuietMoves) {
   {
     Position position = MakePosition(
-        "8: . . . . . . . ."
+        "8: . . . . . . . k"
         "7: . . . . . . . ."
         "6: . . . . . p . ."
         "5: . . . . . . . ."
@@ -479,14 +506,12 @@ TEST(King, QuietMoves) {
         //
         "   w - - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "d4d5",
                     "d4e4",
-                    "d4e5",
                     "d4e3",
                     "d4d3",
-                    "d4c3",
                     "d4c4",
                     "d4c5",
                 })));
@@ -500,19 +525,17 @@ TEST(King, QuietMoves) {
         "4: . . . k . . . ."
         "3: . . . . . . . ."
         "2: . . . . . P . ."
-        "1: . N . . . . . ."
+        "1: . N . . . . . K"
         "   a b c d e f g h"
         //
         "   b - - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 UnorderedElementsAreArray(MakeMoves({
                     "d4d5",
                     "d4e5",
                     "d4e4",
-                    "d4e3",
                     "d4d3",
-                    "d4c3",
                     "d4c4",
                     "d4c5",
                 })));
@@ -524,7 +547,7 @@ TEST(King, QuietMoves) {
 TEST(King, Evasions) {
   {
     Position position = MakePosition(
-        "8: . . . . . . . ."
+        "8: . . . . . . . k"
         "7: . . . r . . . ."
         "6: . . . . . . . ."
         "5: . . . . . . . ."
@@ -536,13 +559,11 @@ TEST(King, Evasions) {
         //
         "   w - - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kEvasion>(position),
+    EXPECT_THAT(GenerateLegalMoves<kEvasion>(position),
                 UnorderedElementsAreArray(MakeMoves({
-                    "d4d5",
                     "d4c5",
                     "d4c4",
                     "d4c3",
-                    "d4d3",
                     "d4e5",
                     "d4e4",
                     "d4e3",
@@ -565,7 +586,7 @@ TEST(Castling, WhiteCastling) {
       "   w KQ - 0 1");
 
   EXPECT_THAT(
-      GenerateMoves<kQuiet>(position),
+      GenerateLegalMoves<kQuiet>(position),
       AllOf(Contains(MakeMove("e1g1#oo")), Contains(MakeMove("e1c1#ooo"))));
 }
 
@@ -584,7 +605,7 @@ TEST(Castling, WhiteKingSideOnly) {
         //
         "   w KQ - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 AllOf(Contains(MakeMove("e1g1#oo")),
                       Not(Contains(MakeMove("e1c1#ooo")))));
   }
@@ -602,7 +623,7 @@ TEST(Castling, WhiteKingSideOnly) {
         //
         "   w KQ - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 AllOf(Contains(MakeMove("e1g1#oo")),
                       Not(Contains(MakeMove("e1c1#ooo")))));
   }
@@ -623,7 +644,7 @@ TEST(Castling, WhiteQueenSideOnly) {
         //
         "   w KQ - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 AllOf(Contains(MakeMove("e1c1#ooo")),
                       Not(Contains(MakeMove("e1g1#oo")))));
   }
@@ -641,7 +662,7 @@ TEST(Castling, WhiteQueenSideOnly) {
         //
         "   w KQ - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 AllOf(Contains(MakeMove("e1c1#ooo")),
                       Not(Contains(MakeMove("e1g1#oo")))));
   }
@@ -659,7 +680,7 @@ TEST(Castling, WhiteQueenSideOnly) {
         //
         "   w KQ - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 AllOf(Contains(MakeMove("e1c1#ooo")),
                       Not(Contains(MakeMove("e1g1#oo")))));
   }
@@ -677,7 +698,7 @@ TEST(Castling, WhiteQueenSideOnly) {
         //
         "   w KQ - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 AllOf(Contains(MakeMove("e1c1#ooo")),
                       Not(Contains(MakeMove("e1g1#oo")))));
   }
@@ -698,7 +719,7 @@ TEST(Castling, Black) {
       "   b kq - 0 1");
 
   EXPECT_THAT(
-      GenerateMoves<kQuiet>(position),
+      GenerateLegalMoves<kQuiet>(position),
       AllOf(Contains(MakeMove("e8g8#oo")), Contains(MakeMove("e8c8#ooo"))));
 }
 
@@ -716,7 +737,7 @@ TEST(Castling, BlackKingSideOnly) {
       //
       "   b kq - 0 1");
 
-  EXPECT_THAT(GenerateMoves<kQuiet>(position),
+  EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
               AllOf(Contains(MakeMove("e8g8#oo")),
                     Not(Contains(MakeMove("e8c8#ooo")))));
 }
@@ -735,7 +756,7 @@ TEST(Castling, BlackQueenSideOnly) {
       //
       "   b kq - 0 1");
 
-  EXPECT_THAT(GenerateMoves<kQuiet>(position),
+  EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
               AllOf(Contains(MakeMove("e8c8#ooo")),
                     Not(Contains(MakeMove("e8g8#oo")))));
 }
@@ -755,7 +776,7 @@ TEST(Castling, NoCastlingRights) {
         //
         "   w - - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 AllOf(Not(Contains(MakeMove("e1g1#oo"))),
                       Not(Contains(MakeMove("e1c1#ooo")))));
   }
@@ -774,7 +795,7 @@ TEST(Castling, NoCastlingRights) {
         //
         "   b - - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 AllOf(Not(Contains(MakeMove("e8g8#oo"))),
                       Not(Contains(MakeMove("e8c8#ooo")))));
   }
@@ -795,7 +816,7 @@ TEST(Castling, WhiteKingSidePassesThroughCheck) {
         //
         "   w KQ - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 AllOf(Not(Contains(MakeMove("e1g1#oo"))),
                       Contains(MakeMove("e1c1#ooo"))));
   }
@@ -814,7 +835,7 @@ TEST(Castling, WhiteKingSidePassesThroughCheck) {
         //
         "   w KQ - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 AllOf(Not(Contains(MakeMove("e1g1#oo"))),
                       Contains(MakeMove("e1c1#ooo"))));
   }
@@ -835,7 +856,7 @@ TEST(Castling, WhiteQueenSidePassesThroughCheck) {
         //
         "   w KQ - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 AllOf(Contains(MakeMove("e1g1#oo")),
                       Not(Contains(MakeMove("e1c1#ooo")))));
   }
@@ -854,7 +875,7 @@ TEST(Castling, WhiteQueenSidePassesThroughCheck) {
         //
         "   w KQ - 0 1");
 
-    EXPECT_THAT(GenerateMoves<kQuiet>(position),
+    EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
                 AllOf(Contains(MakeMove("e1g1#oo")),
                       Not(Contains(MakeMove("e1c1#ooo")))));
   }
@@ -875,7 +896,7 @@ TEST(Castling, BlackKingSidePassesThroughCheck) {
       "   b kq - 0 1");
 
   // Queenside should still be allowed
-  EXPECT_THAT(GenerateMoves<kQuiet>(position),
+  EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
               AllOf(Not(Contains(MakeMove("e8g8#oo"))),
                     Contains(MakeMove("e8c8#ooo"))));
 }
@@ -894,7 +915,7 @@ TEST(Castling, BlackQueenSidePassesThroughCheck) {
       //
       "   b kq - 0 1");
 
-  EXPECT_THAT(GenerateMoves<kQuiet>(position),
+  EXPECT_THAT(GenerateLegalMoves<kQuiet>(position),
               AllOf(Contains(MakeMove("e8g8#oo")),
                     Not(Contains(MakeMove("e8c8#ooo")))));
 }
@@ -914,7 +935,7 @@ TEST(Castling, WhiteQueenSideB1AttackedIsLegal) {
       "   w KQ - 0 1");
 
   EXPECT_THAT(
-      GenerateMoves<kQuiet>(position),
+      GenerateLegalMoves<kQuiet>(position),
       AllOf(Contains(MakeMove("e1g1#oo")), Contains(MakeMove("e1c1#ooo"))));
 }
 
@@ -933,7 +954,7 @@ TEST(Castling, BlackQueenSideB8AttackedIsLegal) {
       "   b kq - 0 1");
 
   EXPECT_THAT(
-      GenerateMoves<kQuiet>(position),
+      GenerateLegalMoves<kQuiet>(position),
       AllOf(Contains(MakeMove("e8g8#oo")), Contains(MakeMove("e8c8#ooo"))));
 }
 
@@ -946,12 +967,12 @@ TEST(Evasion, CheckResolvedViaKnightCapture) {
       "4: . . . . . . . ."
       "3: . . . . . . . ."
       "2: . . . . . . . ."
-      "1: . . . . . . . ."
+      "1: . . . . . . . K"
       "   a b c d e f g h"
       //
       "   b - - 0 2");
 
-  EXPECT_THAT(GenerateMoves<kEvasion>(position), Contains(MakeMove("g6f7#c")));
+  EXPECT_THAT(GenerateLegalMoves<kEvasion>(position), Contains(MakeMove("g6f7#c")));
 }
 
 }  // namespace

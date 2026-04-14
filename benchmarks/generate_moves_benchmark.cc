@@ -35,12 +35,9 @@ void BM_GenerateLegalMovesWithCopy(benchmark::State& state, Args&&... args) {
 
   for (auto _ : state) {
     std::vector<Move> moves;
-    for (Move move : GenerateMoves(position)) {
+    for (Move move : GenerateLegalMoves(position)) {
       Position new_position = position;
       new_position.Do(move);
-      if (new_position.GetCheckers(~new_position.SideToMove())) {
-        continue;
-      }
       moves.push_back(move);
     }
     benchmark::DoNotOptimize(moves);
@@ -58,26 +55,11 @@ void BM_GenerateLegalMovesWithScopedMove(benchmark::State& state,
 
   for (auto _ : state) {
     std::vector<Move> moves;
-    for (Move move : GenerateMoves(position)) {
+    for (Move move : GenerateLegalMoves(position)) {
       ScopedMove scoped_move(move, position);
-      if (position.GetCheckers(~position.SideToMove())) {
-        continue;
-      }
       moves.push_back(move);
     }
     benchmark::DoNotOptimize(moves);
-  }
-}
-
-template <class... Args>
-void BM_GeneratePseudoLegalMoves(benchmark::State& state, Args&&... args) {
-  auto args_tuple = std::make_tuple(std::move(args)...);
-
-  auto position = Position::FromFen(std::get<0>(args_tuple));
-  CHECK_EQ(position.error_or(""), "");
-
-  for (auto _ : state) {
-    benchmark::DoNotOptimize(GenerateMoves(position.value()));
   }
 }
 
@@ -102,11 +84,6 @@ BENCHMARK_CAPTURE(BM_GenerateLegalMovesWithScopedMove, Starting, kStarting);
 BENCHMARK_CAPTURE(BM_GenerateLegalMovesWithScopedMove, Position2, kPosition2);
 BENCHMARK_CAPTURE(BM_GenerateLegalMovesWithScopedMove, Position3, kPosition3);
 BENCHMARK_CAPTURE(BM_GenerateLegalMovesWithScopedMove, kPosition5, kPosition5);
-
-BENCHMARK_CAPTURE(BM_GeneratePseudoLegalMoves, kStarting, kStarting);
-BENCHMARK_CAPTURE(BM_GeneratePseudoLegalMoves, kPosition2, kPosition2);
-BENCHMARK_CAPTURE(BM_GeneratePseudoLegalMoves, kPosition3, kPosition3);
-BENCHMARK_CAPTURE(BM_GeneratePseudoLegalMoves, kPosition5, kPosition5);
 
 }  // namespace
 }  // namespace follychess
