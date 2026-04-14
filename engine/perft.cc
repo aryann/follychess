@@ -39,15 +39,11 @@ std::size_t RunPerft(std::size_t depth, std::size_t current_depth,
     return 1;
   }
 
-  std::vector<Move> moves = GenerateMoves(position);
+  std::vector<Move> moves = GenerateLegalMoves(position);
   std::size_t final_move_count = 0;
 
   for (const Move &move : moves) {
     ScopedMove scoped_move(move, position);
-
-    if (position.GetCheckers(~position.SideToMove())) {
-      continue;
-    }
     final_move_count +=
         RunPerft(depth, current_depth + 1, position, depth_counts);
   }
@@ -64,7 +60,7 @@ void RunPerft(std::size_t depth, const Position &position,
     return;
   }
 
-  std::vector<Move> initial_moves = GenerateMoves(position);
+  std::vector<Move> initial_moves = GenerateLegalMoves(position);
 
   std::vector<std::vector<std::size_t>> all_depth_counts(
       initial_moves.size(), std::vector<std::size_t>(depth + 1, 0));
@@ -78,9 +74,6 @@ void RunPerft(std::size_t depth, const Position &position,
 
       Position new_position = position;
       new_position.Do(move);
-      if (new_position.GetCheckers(~new_position.SideToMove())) {
-        return;
-      }
 
       all_move_counts[i] =
           RunPerft(depth, 1, new_position, all_depth_counts[i]);
