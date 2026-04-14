@@ -37,14 +37,7 @@ using ::testing::Optional;
 constexpr int kMaxMovesAllowed = 16;
 
 [[nodiscard]] bool GameOver(Position position) {
-  for (Move move : GenerateMoves(position)) {
-    ScopedMove scoped_move(move, position);
-    if (!position.GetCheckers(~position.SideToMove())) {
-      return false;
-    }
-  }
-
-  return true;
+  return GenerateLegalMoves(position).empty();
 }
 
 std::vector<Move> Play(Game& game) {

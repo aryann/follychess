@@ -46,7 +46,7 @@ std::expected<void, std::string> ApplyMoves(
   }
 
   for (int i = 1; i < uci_moves.size(); ++i) {
-    std::vector<Move> moves = GenerateMoves(game.GetPosition());
+    std::vector<Move> moves = GenerateLegalMoves(game.GetPosition());
 
     std::optional<Move> move = FindMove(uci_moves[i], moves);
     if (!move) {
