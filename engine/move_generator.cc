@@ -336,9 +336,6 @@ std::vector<Move> GenerateLegalMoves(Position position) {
   return SelectLegalMoves(position, pseudo_legal_moves);
 }
 
-template std::vector<Move> GenerateLegalMoves<kWhite>(Position position);
-template std::vector<Move> GenerateLegalMoves<kBlack>(Position position);
-
 template <MoveType MoveType>
 std::vector<Move> GenerateLegalMoves(const Position &position) {
   return SelectLegalMoves(position, GenerateMoves<MoveType>(position));

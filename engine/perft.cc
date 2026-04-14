@@ -22,7 +22,6 @@
 #include <thread>
 #include <vector>
 
-#include "absl/log/log.h"
 #include "move.h"
 #include "move_generator.h"
 #include "position.h"
