@@ -185,7 +185,8 @@ class MapSliderAttacks {
   }
 };
 
-template <Piece Piece, SliderAttacksPolicy SliderAttacks = MagicSliderAttacks>
+template <Piece Piece, typename SliderAttacks = MagicSliderAttacks>
+  requires SliderAttacksPolicy<SliderAttacks>
 constexpr Bitboard GenerateAttacks(Square square, Bitboard occupied) {
   static_assert(Piece != kPawn);
 
