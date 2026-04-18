@@ -1,27 +1,27 @@
-2026-04-18T15:15:11-07:00
+2026-04-18T15:25:10-07:00
 Running /private/var/tmp/_bazel_aryan/7319055b4501a6d3ca80b76ba19a8b9a/execroot/_main/bazel-out/darwin_arm64-opt/bin/benchmarks/moves_benchmark
 Run on (10 X 24 MHz CPU s)
 CPU Caches:
   L1 Data 64 KiB
   L1 Instruction 128 KiB
   L2 Unified 4096 KiB (x10)
-Load Average: 5.89, 5.94, 4.04
+Load Average: 3.70, 4.00, 3.81
 -------------------------------------------------------------------
 Benchmark                         Time             CPU   Iterations
 -------------------------------------------------------------------
-BM_MakeMoves/Starting/1         764 ns          763 ns       914782
-BM_MakeMoves/Starting/2       16338 ns        16325 ns        42822
-BM_MakeMoves/Starting/3      359091 ns       358694 ns         1953
-BM_MakeMoves/Starting/4     8104830 ns      8096333 ns           87
-BM_MakeMoves/Starting/5   194773802 ns    194599500 ns            4
-BM_MakeMoves/Starting/6  4878003541 ns   4869259000 ns            1
-BM_MakeMoves/Position2/1       1619 ns         1616 ns       428601
-BM_MakeMoves/Position2/2      76774 ns        76710 ns         9052
-BM_MakeMoves/Position2/3    3556231 ns      3551162 ns          198
-BM_MakeMoves/Position2/4  158502760 ns    158387500 ns            4
-BM_MakeMoves/Position2/5 7073639959 ns   7065037000 ns            1
-BM_MakeMoves/Position5/1       1501 ns         1500 ns       465599
-BM_MakeMoves/Position5/2      59185 ns        59127 ns        11942
-BM_MakeMoves/Position5/3    2398802 ns      2393599 ns          289
-BM_MakeMoves/Position5/4   85648865 ns     85587500 ns            8
-BM_MakeMoves/Position5/5 3426248000 ns   3421885000 ns            1
+BM_MakeMoves/Starting/1         868 ns          868 ns       799762
+BM_MakeMoves/Starting/2       18172 ns        18166 ns        38741
+BM_MakeMoves/Starting/3      419551 ns       419413 ns         1672
+BM_MakeMoves/Starting/4     9350890 ns      9345135 ns           74
+BM_MakeMoves/Starting/5   232733903 ns    232689333 ns            3
+BM_MakeMoves/Starting/6  5896285375 ns   5827256000 ns            1
+BM_MakeMoves/Position2/1       2013 ns         2011 ns       346045
+BM_MakeMoves/Position2/2      92928 ns        92442 ns         7593
+BM_MakeMoves/Position2/3    5232865 ns      4964338 ns          148
+BM_MakeMoves/Position2/4  217486736 ns    209487667 ns            3
+BM_MakeMoves/Position2/5 9014347291 ns   8951876000 ns            1
+BM_MakeMoves/Position5/1       1893 ns         1884 ns       373906
+BM_MakeMoves/Position5/2      67848 ns        67818 ns        10330
+BM_MakeMoves/Position5/3    3125860 ns      3125274 ns          223
+BM_MakeMoves/Position5/4  103262299 ns    103237667 ns            6
+BM_MakeMoves/Position5/5 4535704500 ns   4534709000 ns            1

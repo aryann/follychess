@@ -104,17 +104,17 @@ Bitboard Position::GetAttackers(Square to, Side attacker_side) const {
 
   attackers |=
       GetPawnAttacks(to, victim_side) & GetPieces(attacker_side, kPawn);
-  attackers |= GenerateAttacks<kKnight>(to, occupied) &
+  attackers |= GenerateAttacks<kKnight, LazySliderAttacks>(to, occupied) &
                GetPieces(attacker_side, kKnight);
-  attackers |=
-      GenerateAttacks<kKing>(to, occupied) & GetPieces(attacker_side, kKing);
+  attackers |= GenerateAttacks<kKing, LazySliderAttacks>(to, occupied) &
+               GetPieces(attacker_side, kKing);
 
   // Generates attacks from rooks, bishops, and queens:
   attackers |=
-      GenerateAttacks<kRook>(to, occupied) &
+      GenerateAttacks<kRook, LazySliderAttacks>(to, occupied) &
       (GetPieces(attacker_side, kRook) | GetPieces(attacker_side, kQueen));
   attackers |=
-      GenerateAttacks<kBishop>(to, occupied) &
+      GenerateAttacks<kBishop, LazySliderAttacks>(to, occupied) &
       (GetPieces(attacker_side, kBishop) | GetPieces(attacker_side, kQueen));
 
   return attackers;
