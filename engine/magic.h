@@ -170,8 +170,8 @@ constexpr void FindMagicForSquare(Square from, std::size_t attack_table_index,
     }
 
     if (found) {
-      LOG(INFO) << "Found magic for " << ToString(from) << " after " << attempt
-                << " attempts: " << magic;
+      LOG(INFO) << std::format("  Found magic for {} after {:6} attempts: {}",
+                               ToString(from), attempt, magic);
       for (int i = 0; i < placements.size(); ++i) {
         attack_table[attack_table_index + i] = placements[i];
       }
@@ -192,6 +192,7 @@ constexpr SlidingAttackTables GenerateSlidingAttackTables() {
   std::size_t rook_attack_table_index =
       SlidingAttackTables::kBishopTableSizePerSquare * kNumSquares;
 
+  LOG(INFO) << "Finding magic numbers for bishops:";
   for (int square = kFirstSquare; square < kNumSquares; ++square) {
     const auto from = static_cast<Square>(square);
 
@@ -199,7 +200,11 @@ constexpr SlidingAttackTables GenerateSlidingAttackTables() {
     FindMagicForSquare<kNorthEast, kSouthEast, kSouthWest, kNorthWest>(
         from, (1 << 9) * from, sliding_attacks.attacks.begin(),
         sliding_attacks.bishop_magic_squares[square]);
+  }
 
+  LOG(INFO) << "Finding magic numbers for rooks:";
+  for (int square = kFirstSquare; square < kNumSquares; ++square) {
+    const auto from = static_cast<Square>(square);
     // Generate the MagicEntry for a rook on this square:
     FindMagicForSquare<kNorth, kEast, kSouth, kWest>(
         from, rook_attack_table_index + (1 << 12) * from,
