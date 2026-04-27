@@ -11,8 +11,11 @@ package(
 
 cc_library(
     name = "attacks",
-    srcs = ["magic.generated.h"],
-    hdrs = ["attacks.h"],
+    srcs = [],
+    hdrs = [
+        "attacks.h",
+        "magic.generated.h",
+    ],
     deps = [
         ":bitboard",
         ":magic",
