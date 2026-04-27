@@ -75,20 +75,6 @@ class AlphaBetaSearcher {
     context_.info_observer(MakeSearchInfo(score, depth));
 
     Move best_move = context_.pv_table.GetBestMove();
-    if (best_move == Move::NullMove()) {
-      // If the Principal Variation table is empty, then it is likely due to a
-      // root transposition table cutoff. In this case, we check the
-      // transposition table for the best move.
-      context_.transpositions.Probe(context_.game.GetPosition().GetKey(),
-                                    {
-                                        .alpha = kAlpha,
-                                        .beta = kBeta,
-                                        .ply = kStartPly,
-                                        .depth = depth,
-                                    },
-                                    &best_move);
-    }
-
     DCHECK_NE(best_move, Move::NullMove());
     return best_move;
   }
@@ -103,8 +89,6 @@ class AlphaBetaSearcher {
   [[nodiscard]] int Search(int alpha, const int beta, const int depth,
                            const int ply) {
     using enum TranspositionTable::BoundType;
-
-    context_.pv_table.RecordMove(ply, Move::NullMove());
     ++nodes_;
 
     Move best_move;
@@ -117,8 +101,11 @@ class AlphaBetaSearcher {
                                               .depth = depth,
                                           },
                                           &best_move)) {
+      context_.pv_table.RecordMove(ply, best_move);
       return *score;
     }
+
+    context_.pv_table.RecordMove(ply, Move::NullMove());
 
     if (depth <= 0 && !CurrentSideInCheck()) {
       const int score = QuiescentSearch(alpha, beta, ply);
