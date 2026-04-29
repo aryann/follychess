@@ -117,7 +117,8 @@ void GenerateMoves(const Position &position, Bitboard targets,
   while (pieces) {
     Square from = pieces.PopLeastSignificantBit();
     Bitboard attacks =
-        GenerateAttacks<Piece>(from, position.GetPieces()) & targets;
+        GenerateAttacks<Piece, LazySliderAttacks>(from, position.GetPieces()) &
+        targets;
 
     while (attacks) {
       Square to = attacks.PopLeastSignificantBit();
@@ -341,8 +342,7 @@ std::vector<Move> GenerateLegalMoves(const Position &position) {
   return SelectLegalMoves(position, GenerateMoves<MoveType>(position));
 }
 
-template std::vector<Move> GenerateLegalMoves<kQuiet>(
-    const Position &position);
+template std::vector<Move> GenerateLegalMoves<kQuiet>(const Position &position);
 template std::vector<Move> GenerateLegalMoves<kCapture>(
     const Position &position);
 template std::vector<Move> GenerateLegalMoves<kEvasion>(
