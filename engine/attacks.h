@@ -135,7 +135,7 @@ class LazySliderAttacks {
 template <template <typename...> typename Map>
 class MapSliderAttacks {
  public:
-  static constexpr Bitboard GetBishopAttacks(Square square, Bitboard occupied) {
+  static Bitboard GetBishopAttacks(Square square, Bitboard occupied) {
     static const std::array<Map<Bitboard, Bitboard>, kNumSquares>
         kBishopAttacks = GenerateBishopAttackMap();
 
@@ -143,7 +143,7 @@ class MapSliderAttacks {
     return kBishopAttacks[square].at(occupied & mask);
   }
 
-  static constexpr Bitboard GetRookAttacks(Square square, Bitboard occupied) {
+  static Bitboard GetRookAttacks(Square square, Bitboard occupied) {
     static const std::array<Map<Bitboard, Bitboard>, kNumSquares> kRookAttacks =
         GenerateRookAttackMap();
 

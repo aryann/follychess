@@ -119,7 +119,7 @@ cc_test(
 
 cc_library(
     name = "magic",
-    srcs = [],
+    srcs = ["magic.cc"],
     hdrs = ["magic.h"],
     deps = [
         ":bitboard",
