@@ -58,7 +58,7 @@ class [[nodiscard]] CastlingRights {
     kAllCastlingRights = /**/ 0b1111,
   };
 
-  explicit CastlingRights(std::uint8_t rights = kNoCastlingRights)
+  explicit constexpr CastlingRights(std::uint8_t rights = kNoCastlingRights)
       : rights_(rights) {}
 
   template <Side Side>

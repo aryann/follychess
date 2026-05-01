@@ -73,24 +73,23 @@ inline const ZobristKeys kZobristKeys;
 
 class [[nodiscard]] ZobristKey {
  public:
-  ZobristKey() : key_(0ULL) {}
+  constexpr ZobristKey() : key_(0ULL) {}
 
-  explicit ZobristKey(std::uint64_t key) : key_(key) {}
+  explicit constexpr ZobristKey(std::uint64_t key) : key_(key) {}
 
-  constexpr void Update(const Square square, const Piece piece,
-                        const Side side) {
+  void Update(const Square square, const Piece piece, const Side side) {
     key_ ^= kZobristKeys.elements[square][piece][side];
   }
 
-  constexpr void UpdateSideToMove() { key_ ^= kZobristKeys.black_to_move; }
+  void UpdateSideToMove() { key_ ^= kZobristKeys.black_to_move; }
 
-  constexpr void ToggleEnPassantTarget(const std::optional<Square> target) {
+  void ToggleEnPassantTarget(const std::optional<Square> target) {
     if (target) {
       key_ ^= kZobristKeys.en_passant_files[GetFile(*target)];
     }
   }
 
-  constexpr void ToggleCastlingRights(const CastlingRights& castling_rights) {
+  void ToggleCastlingRights(const CastlingRights& castling_rights) {
     DCHECK(castling_rights.Get() < kNumCastlingCombinations);
     key_ ^= kZobristKeys.castling[castling_rights.Get()];
   }
