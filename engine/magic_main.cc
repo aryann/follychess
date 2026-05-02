@@ -41,7 +41,7 @@ void AddMagicEntry(const MagicEntry& entry, std::ofstream& output) {
 }
 
 void AddTable(std::ofstream& output) {
-  SlidingAttackTables table = follychess::GenerateSlidingAttackTables();
+  SlidingAttackTables table = follychess::GenerateSlidingAttacks();
 
   std::println(output, "constexpr SlidingAttackTables kSliderAttacks = {{");
   std::println(output, "  .attacks = {{");

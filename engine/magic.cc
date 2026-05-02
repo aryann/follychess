@@ -17,6 +17,8 @@
 
 #include "magic.h"
 
+#include "absl/log/log.h"
+
 namespace follychess {
 
 template <Direction... Directions>
@@ -75,25 +77,23 @@ void FindMagicForSquare(Square from, std::size_t attack_table_index,
   }
 }
 
-SlidingAttackTables GenerateSlidingAttackTables() {
+SlidingAttackTables GenerateSlidingAttacks() {
   SlidingAttackTables sliding_attacks;
-  std::size_t rook_attack_table_index =
-      SlidingAttackTables::kBishopTableSizePerSquare * kNumSquares;
 
   LOG(INFO) << "Finding magic numbers for bishops:";
   for (int square = kFirstSquare; square < kNumSquares; ++square) {
     const auto from = static_cast<Square>(square);
-
-    // Generate the MagicEntry for a bishop on this square:
     FindMagicForSquare<kNorthEast, kSouthEast, kSouthWest, kNorthWest>(
         from, (1 << 9) * from, sliding_attacks.attacks.begin(),
         sliding_attacks.bishop_magic_squares[square]);
   }
 
+  std::size_t rook_attack_table_index =
+      SlidingAttackTables::kBishopTableSizePerSquare * kNumSquares;
+
   LOG(INFO) << "Finding magic numbers for rooks:";
   for (int square = kFirstSquare; square < kNumSquares; ++square) {
     const auto from = static_cast<Square>(square);
-    // Generate the MagicEntry for a rook on this square:
     FindMagicForSquare<kNorth, kEast, kSouth, kWest>(
         from, rook_attack_table_index + (1 << 12) * from,
         sliding_attacks.attacks.begin(),

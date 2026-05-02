@@ -129,7 +129,7 @@ struct SlidingAttackTables {
   std::array<MagicEntry, kNumSquares> rook_magic_squares;
 };
 
-SlidingAttackTables GenerateSlidingAttackTables();
+SlidingAttackTables GenerateSlidingAttacks();
 
 }  // namespace follychess
 
