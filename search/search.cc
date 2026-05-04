@@ -197,14 +197,15 @@ class AlphaBetaSearcher {
     alpha = std::max(alpha, score);
 
     Move best_move;
-    context_.transpositions.Probe(context_.game.GetPosition().GetKey(),
-                                  {
-                                      .alpha = alpha,
-                                      .beta = beta,
-                                      .ply = ply,
-                                      .depth = 0,
-                                  },
-                                  &best_move);
+    (void)context_.transpositions.Probe(
+        context_.game.GetPosition().GetKey(),
+        {
+            .alpha = alpha,
+            .beta = beta,
+            .ply = ply,
+            .depth = 0,
+        },
+        &best_move);
 
     std::vector<Move> moves =
         GenerateLegalMoves<kCapture>(context_.game.GetPosition());

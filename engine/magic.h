@@ -62,7 +62,7 @@ constexpr Bitboard GenerateSlidingAttacks(Square from, Bitboard occupied) {
   return (GenerateRayAttacks<Directions>(from, occupied) | ...);
 }
 
-constexpr std::vector<Bitboard> MakePowerSet(Bitboard mask) {
+[[nodiscard]] constexpr std::vector<Bitboard> MakePowerSet(Bitboard mask) {
   // https://www.chessprogramming.org/Traversing_Subsets_of_a_Set
   const std::size_t cardinality = 1ULL << mask.GetCount();
   std::vector<Bitboard> subsets(cardinality);
@@ -89,7 +89,7 @@ struct MagicEntry {
   std::size_t attack_table_index;
 };
 
-struct SlidingAttackTables {
+struct [[nodiscard]] SlidingAttackTables {
   // The following diagram shows the number of relevancy bits (i.e., squares
   // on the relevant attack rays, excluding edges) for a bishop *on* each
   // square:

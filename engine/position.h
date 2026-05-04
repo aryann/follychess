@@ -30,7 +30,7 @@
 
 namespace follychess {
 
-class Position {
+class [[nodiscard]] Position {
  public:
   static Position Starting();
 
@@ -49,13 +49,13 @@ class Position {
   // Returns the side at the given square.
   [[nodiscard]] Side GetSide(Square square) const;
 
-  [[nodiscard]] Bitboard GetPieces() const;
+  Bitboard GetPieces() const;
 
-  [[nodiscard]] Bitboard GetPieces(Side side) const;
+  Bitboard GetPieces(Side side) const;
 
-  [[nodiscard]] Bitboard GetPieces(Piece type) const;
+  Bitboard GetPieces(Piece type) const;
 
-  [[nodiscard]] Bitboard GetPieces(Side side, Piece type) const;
+  Bitboard GetPieces(Side side, Piece type) const;
 
   [[nodiscard]] Side SideToMove() const {
     DCHECK(side_to_move_ == kWhite || side_to_move_ == kBlack);
@@ -63,13 +63,13 @@ class Position {
   }
 
   // Returns all pieces that attack the given square.
-  [[nodiscard]] Bitboard GetAttackers(Square to, Side by) const;
+  Bitboard GetAttackers(Square to, Side by) const;
 
   // Returns the king for the side to move.
   [[nodiscard]] Square GetKing(Side side) const;
 
   // Returns the king checkers for the side to move.
-  [[nodiscard]] Bitboard GetCheckers(Side of) const;
+  Bitboard GetCheckers(Side of) const;
 
   [[nodiscard]] const CastlingRights &GetCastlingRights() const {
     return castling_rights_;
@@ -89,7 +89,7 @@ class Position {
 
   void Undo(const UndoInfo &undo_info);
 
-  [[nodiscard]] ZobristKey GetKey() const { return zobrist_key_; }
+  ZobristKey GetKey() const { return zobrist_key_; }
 
  private:
   Position()

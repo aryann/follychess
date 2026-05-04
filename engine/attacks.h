@@ -36,7 +36,7 @@ consteval void MakePawnAttacks(std::array<Bitboard, kNumSquares> &attacks) {
   }
 }
 
-consteval auto MakePawnAttacks() {
+[[nodiscard]] consteval auto MakePawnAttacks() {
   std::array<std::array<Bitboard, kNumSquares>, kNumSides> attacks;
   MakePawnAttacks<kNorthEast, kNorthWest>(attacks[kWhite]);
   MakePawnAttacks<kSouthEast, kSouthWest>(attacks[kBlack]);
@@ -49,7 +49,7 @@ constexpr Bitboard GetPawnAttacks(Square square, Side side) {
   return kPawnAttacks[side][square];
 }
 
-consteval auto GeneratePawnAttacks() {
+[[nodiscard]] consteval auto GeneratePawnAttacks() {
   std::array<Bitboard, kNumSquares> attacks;
   for (int square = kFirstSquare; square < kNumSquares; ++square) {
     Bitboard start(static_cast<Square>(square));
@@ -62,7 +62,8 @@ consteval auto GeneratePawnAttacks() {
   return attacks;
 }
 
-consteval std::array<Bitboard, kNumSquares> GenerateKnightAttacks() {
+[[nodiscard]] consteval std::array<Bitboard, kNumSquares>
+GenerateKnightAttacks() {
   std::array<Bitboard, kNumSquares> attacks;
   for (int square = kFirstSquare; square < kNumSquares; ++square) {
     Bitboard start(static_cast<Square>(square));
@@ -79,7 +80,8 @@ consteval std::array<Bitboard, kNumSquares> GenerateKnightAttacks() {
   return attacks;
 }
 
-consteval std::array<Bitboard, kNumSquares> GenerateKingAttacks() {
+[[nodiscard]] consteval std::array<Bitboard, kNumSquares>
+GenerateKingAttacks() {
   std::array<Bitboard, kNumSquares> attacks;
   for (int square = kFirstSquare; square < kNumSquares; ++square) {
     Bitboard start(static_cast<Square>(square));

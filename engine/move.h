@@ -52,7 +52,8 @@ class [[nodiscard]] Move {
   explicit constexpr Move(Square from, Square to, Flags flags = kNone)
       : data_(from + (to << 6) + (flags << 12)) {}
 
-  static std::expected<Move, std::string> FromUCI(std::string_view input);
+  [[nodiscard]] static std::expected<Move, std::string> FromUCI(
+      std::string_view input);
 
   constexpr Move() : data_(0) {}
 

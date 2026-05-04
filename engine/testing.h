@@ -31,7 +31,8 @@
 
 namespace follychess {
 
-std::expected<Position, std::string> TryMakePosition(std::string_view input);
+[[nodiscard]] std::expected<Position, std::string> TryMakePosition(
+    std::string_view input);
 
 Position MakePosition(
     std::string_view input,
@@ -40,7 +41,7 @@ Position MakePosition(
 Move MakeMove(std::string_view input,
               std::source_location location = std::source_location::current());
 
-std::vector<Move> MakeMoves(
+[[nodiscard]] std::vector<Move> MakeMoves(
     std::initializer_list<std::string_view> input,
     std::source_location location = std::source_location::current());
 

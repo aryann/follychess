@@ -46,7 +46,6 @@ namespace follychess {
 // This layout matches the typical visual representation of a board, improving
 // code readability and debuggability.
 class [[nodiscard]] Bitboard {
-  // ...
  public:
   constexpr explicit Bitboard(std::uint64_t data) : data_(data) {}
 

@@ -51,13 +51,18 @@ constexpr std::size_t kNumSquares = kRanks * kFiles;
 
 // Parses a string of the form "a1" as a Square. Returns `std::nullopt`
 // if and only if the input is invalid.
-std::optional<Square> ParseSquare(std::string_view input);
+[[nodiscard]] std::optional<Square> ParseSquare(std::string_view input);
 
-constexpr std::uint8_t GetRank(Square square) { return square / 8; }
+[[nodiscard]] constexpr std::uint8_t GetRank(Square square) {
+  return square / 8;
+}
 
-constexpr std::uint8_t GetFile(Square square) { return square % 8; }
+[[nodiscard]] constexpr std::uint8_t GetFile(Square square) {
+  return square % 8;
+}
 
-constexpr Square MakeSquare(std::uint8_t rank, std::uint8_t file) {
+[[nodiscard]] constexpr Square MakeSquare(std::uint8_t rank,
+                                          std::uint8_t file) {
   DCHECK_GE(rank, 0);
   DCHECK_LT(rank, 8);
   DCHECK_GE(file, 0);
@@ -66,12 +71,12 @@ constexpr Square MakeSquare(std::uint8_t rank, std::uint8_t file) {
   return static_cast<Square>(rank * 8 + file);
 }
 
-constexpr Square Reflect(const Square square) {
+[[nodiscard]] constexpr Square Reflect(const Square square) {
   const int new_rank = 7 - GetRank(square);
   return static_cast<Square>(new_rank * 8 + GetFile(square));
 }
 
-std::string ToString(Square square);
+[[nodiscard]] std::string ToString(Square square);
 
 // Required for GoogleTest to print Square in error messages.
 inline void PrintTo(const Square &square, std::ostream *os) {

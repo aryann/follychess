@@ -27,9 +27,9 @@
 namespace follychess {
 
 template <MoveType MoveType>
-std::vector<Move> GenerateLegalMoves(const Position &position);
+[[nodiscard]] std::vector<Move> GenerateLegalMoves(const Position &position);
 
-std::vector<Move> GenerateLegalMoves(const Position &position);
+[[nodiscard]] std::vector<Move> GenerateLegalMoves(const Position &position);
 
 }  // namespace follychess
 

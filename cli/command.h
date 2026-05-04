@@ -45,7 +45,8 @@ class Printer {
 
   void PrintStdIn(std::string_view in) const;
 
-  std::expected<void, std::string> SetLogFile(std::string filename);
+  [[nodiscard]] std::expected<void, std::string> SetLogFile(
+      std::string filename);
 
  private:
   std::unique_ptr<std::ofstream> log_file_;

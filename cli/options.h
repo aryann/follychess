@@ -33,11 +33,11 @@ class Option {
 
   [[nodiscard]] virtual std::string_view GetType() const = 0;
 
-  virtual std::expected<void, std::string> Set(std::string_view log_directory,
-                                               CommandState& state) = 0;
+  [[nodiscard]] virtual std::expected<void, std::string> Set(
+      std::string_view log_directory, CommandState& state) = 0;
 };
 
-std::vector<Option*> GetOptions();
+[[nodiscard]] std::vector<Option*> GetOptions();
 
 }  // namespace follychess
 

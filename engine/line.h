@@ -41,7 +41,7 @@ consteval void FillFromOrigin(Square from,
   }
 }
 
-consteval auto GenerateLineTable() {
+[[nodiscard]] consteval auto GenerateLineTable() {
   std::array<std::array<Bitboard, kNumSquares>, kNumSquares> lines;
 
   for (int square = A8; square < kNumSquares; ++square) {

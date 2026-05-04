@@ -22,7 +22,7 @@
 
 namespace follychess {
 
-CommandDispatcher MakeCommandDispatcher(CommandState& state);
+[[nodiscard]] CommandDispatcher MakeCommandDispatcher(CommandState& state);
 
 }  // namespace follychess
 

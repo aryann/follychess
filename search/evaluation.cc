@@ -135,7 +135,7 @@ consteval auto MakePlacementScores() {
 constexpr auto kPlacementScores = MakePlacementScores();
 
 template <Side Side, Piece Piece>
-[[nodiscard]] constexpr Score GetPlacementScore(const Position& position) {
+constexpr Score GetPlacementScore(const Position& position) {
   Bitboard pieces = position.GetPieces(Side, Piece);
 
   Score score;

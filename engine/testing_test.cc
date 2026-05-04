@@ -74,8 +74,8 @@ TEST(TryMakePosition, Ok) {
 }
 
 TEST(MakePosition, Failures) {
-  ASSERT_DEATH(MakePosition(""), "Invalid position input: ");
-  ASSERT_DEATH(MakePosition("KQkq"), "Invalid position input: KQkq");
+  ASSERT_DEATH((void)MakePosition(""), "Invalid position input: ");
+  ASSERT_DEATH((void)MakePosition("KQkq"), "Invalid position input: KQkq");
 }
 
 }  // namespace

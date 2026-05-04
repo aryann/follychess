@@ -63,8 +63,9 @@ class TranspositionTable {
         probes_(0),
         hits_(0) {}
 
-  std::optional<int> Probe(ZobristKey key, ProbeParams probe_params,
-                           Move* best_move);
+  [[nodiscard]] std::optional<int> Probe(ZobristKey key,
+                                         ProbeParams probe_params,
+                                         Move* best_move);
 
   void Record(ZobristKey key, int score, RecordParams record_params,
               BoundType type, Move best_move);

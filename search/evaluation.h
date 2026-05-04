@@ -26,7 +26,7 @@ constexpr int kBaseCheckMateScore = 20'000;
 constexpr int kCheckMateThreshold = 19'000;
 constexpr int kStalemateScore = 0;
 
-struct Score {
+struct [[nodiscard]] Score {
   int middle = 0;
   int end = 0;
 
@@ -70,7 +70,7 @@ consteval auto MakePassedPawnMasks() {
 constexpr auto kPassedPawnMasks = MakePassedPawnMasks();
 
 template <Side Side>
-[[nodiscard]] Score GetPlacementScore(const Position& position);
+Score GetPlacementScore(const Position& position);
 
 template <Side Side>
 [[nodiscard]] int GetMaterialScore(const Position& position);
@@ -82,13 +82,13 @@ template <Side Side>
 [[nodiscard]] int CountBlockedPawns(const Position& position);
 
 template <Side Side>
-[[nodiscard]] Score GetPassedPawnScore(const Position& position);
+Score GetPassedPawnScore(const Position& position);
 
 template <Side Side>
-[[nodiscard]] Score GetBishopMobilityScore(const Position& position);
+Score GetBishopMobilityScore(const Position& position);
 
 template <Side Side>
-[[nodiscard]] Score GetQueenMobilityScore(const Position& position);
+Score GetQueenMobilityScore(const Position& position);
 
 // Returns the number of rooks on semi-open file. A semi-open file is a file
 // that contains no friendly pawns.
@@ -99,7 +99,7 @@ template <Side Side>
 [[nodiscard]] int CountOpenFileRooks(const Position& position);
 
 template <Side Side>
-[[nodiscard]] Score GetKingSafetyScore(const Position& position);
+Score GetKingSafetyScore(const Position& position);
 
 [[nodiscard]] int Evaluate(const Position& position, int phase);
 
