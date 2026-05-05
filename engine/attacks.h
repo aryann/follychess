@@ -44,22 +44,9 @@ consteval void MakePawnAttacks(std::array<Bitboard, kNumSquares> &attacks) {
 }
 
 constexpr Bitboard GetPawnAttacks(Square square, Side side) {
-  static constexpr std::array<std::array<Bitboard, kNumSquares>, kNumSides>
+  static const std::array<std::array<Bitboard, kNumSquares>, kNumSides>
       kPawnAttacks = MakePawnAttacks();
   return kPawnAttacks[side][square];
-}
-
-[[nodiscard]] consteval auto GeneratePawnAttacks() {
-  std::array<Bitboard, kNumSquares> attacks;
-  for (int square = kFirstSquare; square < kNumSquares; ++square) {
-    Bitboard start(static_cast<Square>(square));
-    attacks[square] = kEmptyBoard                  //
-                      | start.Shift<kNorthEast>()  //
-                      | start.Shift<kSouthEast>()  //
-                      | start.Shift<kSouthWest>()  //
-                      | start.Shift<kNorthWest>();
-  }
-  return attacks;
 }
 
 [[nodiscard]] consteval std::array<Bitboard, kNumSquares>
