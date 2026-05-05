@@ -23,65 +23,69 @@
 namespace follychess {
 namespace {
 
-std::vector<Bitboard> GetRandomOccupancies() {
-  constexpr std::size_t kSampleSize = 10'000'000;
+constexpr std::size_t kNumOccupancies = 1 << 24;  // ~16.8 million
 
+std::unique_ptr<std::array<Bitboard, kNumOccupancies>> GetRandomOccupancies() {
   std::mt19937 engine(std::random_device{}());
   std::uniform_int_distribution<std::uint64_t> dist(
       0, std::numeric_limits<std::uint64_t>::max());
 
-  std::vector<Bitboard> result;
-  result.reserve(kSampleSize);
-  for (int i = 0; i < kSampleSize; ++i) {
-    result.emplace_back(dist(engine));
+  auto occupancies = std::make_unique<std::array<Bitboard, kNumOccupancies>>();
+  for (Bitboard& occupied : *occupancies) {
+    occupied = Bitboard(dist(engine));
   }
-  return result;
+  return occupancies;
 }
 
 template <Piece Piece>
 void BM_GenerateAttacksLazily(benchmark::State& state) {
-  int square = 0;
-  std::vector<Bitboard> occupancies = GetRandomOccupancies();
+  int square_index = 0;
+  const auto occupancies = GetRandomOccupancies();
   int occupancy_index = 0;
 
   for (auto _ : state) {
-    Bitboard occupied = occupancies[occupancy_index % occupancies.size()];
-    benchmark::DoNotOptimize(GenerateAttacks<Piece, LazySliderAttacks>(
-        static_cast<Square>(square % kNumSquares), occupied));
+    auto square = static_cast<Square>(square_index % kNumSquares);
+    Bitboard occupied = (*occupancies)[occupancy_index % occupancies->size()];
 
-    ++square;
+    benchmark::DoNotOptimize(
+        GenerateAttacks<Piece, LazySliderAttacks>(square, occupied));
+
+    ++square_index;
     ++occupancy_index;
   }
 }
 
 template <template <typename...> class Map, Piece Piece>
 void BM_LookupAttacksFrom(benchmark::State& state) {
-  int square = 0;
-  std::vector<Bitboard> occupancies = GetRandomOccupancies();
+  int square_index = 0;
+  const auto occupancies = GetRandomOccupancies();
   int occupancy_index = 0;
 
   for (auto _ : state) {
-    Bitboard occupied = occupancies[occupancy_index % occupancies.size()];
-    benchmark::DoNotOptimize(GenerateAttacks<Piece, MapSliderAttacks<Map>>(
-        static_cast<Square>(square % kNumSquares), occupied));
+    auto square = static_cast<Square>(square_index % kNumSquares);
+    Bitboard occupied = (*occupancies)[occupancy_index % occupancies->size()];
+    benchmark::DoNotOptimize(
+        GenerateAttacks<Piece, MapSliderAttacks<Map>>(square, occupied));
 
-    ++square;
+    ++square_index;
     ++occupancy_index;
   }
 }
 
 template <Piece Piece>
 void BM_LookupAttacksFromMagicTables(benchmark::State& state) {
-  int square = 0;
-  std::vector<Bitboard> occupancies = GetRandomOccupancies();
+  int square_index = 0;
+  const auto occupancies = GetRandomOccupancies();
   int occupancy_index = 0;
 
   for (auto _ : state) {
-    Bitboard occupied = occupancies[occupancy_index % occupancies.size()];
-    benchmark::DoNotOptimize(GenerateAttacks<Piece, MagicSliderAttacks>(
-        static_cast<Square>(square % kNumSquares), occupied));
+    auto square = static_cast<Square>(square_index % kNumSquares);
+    Bitboard occupied = (*occupancies)[occupancy_index % occupancies->size()];
 
-    ++square;
+    benchmark::DoNotOptimize(
+        GenerateAttacks<Piece, MagicSliderAttacks>(square, occupied));
+
+    ++square_index;
     ++occupancy_index;
   }
 }
