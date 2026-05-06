@@ -277,18 +277,21 @@ std::expected<Position, std::string> Position::FromFen(
   Position position;
   auto result =
       ParseBoard(parts[0], position.pieces_, position.sides_)
-          .and_then(
-              [&] { return SetSideToMove(parts[1], position.side_to_move_); })
-          .and_then([&] {
+          .and_then([&] {  //
+            return SetSideToMove(parts[1], position.side_to_move_);
+          })
+          .and_then([&] {  //
             return SetCastlingRights(parts[2], position.castling_rights_);
           })
-          .and_then([&] {
+          .and_then([&] {  //
             return SetEnPassantTarget(parts[3], position.en_passant_target_);
           })
-          .and_then(
-              [&] { return SetMoveCounter(parts[4], position.half_moves_); })
-          .and_then(
-              [&] { return SetMoveCounter(parts[5], position.full_moves_); });
+          .and_then([&] {  //
+            return SetMoveCounter(parts[4], position.half_moves_);
+          })
+          .and_then([&] {  //
+            return SetMoveCounter(parts[5], position.full_moves_);
+          });
 
   if (!result) {
     return std::unexpected(result.error());
