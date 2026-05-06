@@ -41,7 +41,7 @@ class [[nodiscard]] Position {
   static std::expected<Position, std::string> FromFen(std::string_view fen);
 
   static std::expected<Position, std::string> FromFen(
-      const std::vector<std::string_view> &fen_parts);
+      const std::vector<std::string_view> &parts);
 
   // Returns the piece at the given square.
   [[nodiscard]] Piece GetPiece(Square square) const;

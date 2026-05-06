@@ -123,7 +123,7 @@ TEST(FEN, HalfMoves) {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - INVALID 1");
 
     ASSERT_THAT(position.has_value(), IsFalse());
-    EXPECT_THAT(position.error(), Eq("Invalid half moves: INVALID"));
+    EXPECT_THAT(position.error(), Eq("Invalid move counter: INVALID"));
   }
 }
 
@@ -140,7 +140,7 @@ TEST(FEN, FullMoves) {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 INVALID");
 
     ASSERT_THAT(position.has_value(), IsFalse());
-    EXPECT_THAT(position.error(), Eq("Invalid full moves: INVALID"));
+    EXPECT_THAT(position.error(), Eq("Invalid move counter: INVALID"));
   }
 }
 

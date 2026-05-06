@@ -218,8 +218,41 @@ std::expected<void, std::string> SetCastlingRights(std::string_view input,
   return {};
 }
 
-bool IsNumeric(std::string_view input) {
-  return std::ranges::all_of(input, isdigit);
+std::expected<void, std::string> SetSideToMove(std::string_view input,
+                                               Side &side) {
+  if (input == "w") {
+    side = kWhite;
+  } else if (input == "b") {
+    side = kBlack;
+  } else {
+    return std::unexpected(
+        std::format("Invalid side to move value: {}", input));
+  }
+
+  return {};
+}
+
+std::expected<void, std::string> SetEnPassantTarget(
+    std::string_view input, std::optional<Square> &en_passant_target) {
+  if (input == "-") {
+    return {};
+  }
+
+  en_passant_target = ParseSquare(input);
+  if (!en_passant_target) {
+    return std::unexpected(std::format("Invalid en-passant target: {}", input));
+  }
+  return {};
+}
+
+std::expected<void, std::string> SetMoveCounter(std::string_view input,
+                                                auto &counter) {
+  const bool is_numeric = std::ranges::all_of(input, isdigit);
+  if (!is_numeric) {
+    return std::unexpected(std::format("Invalid move counter: {}", input));
+  }
+  counter = std::stoi(std::string(input));
+  return {};
 }
 
 }  // namespace
@@ -235,57 +268,31 @@ Position Position::Starting() {
 }
 
 std::expected<Position, std::string> Position::FromFen(
-    const std::vector<std::string_view> &fen_parts) {
-  if (fen_parts.size() != 6) {
+    const std::vector<std::string_view> &parts) {
+  if (parts.size() != 6) {
     return std::unexpected(std::format(
-        "FEN string must have 6 parts; received: {}", fen_parts.size()));
+        "FEN string must have 6 parts; received: {}", parts.size()));
   }
-
-  std::string_view board = fen_parts[0];
-  std::string_view side_to_move = fen_parts[1];
-  std::string_view castling_rights = fen_parts[2];
-  std::string_view en_passant_target = fen_parts[3];
-  std::string_view half_moves = fen_parts[4];
-  std::string_view full_moves = fen_parts[5];
 
   Position position;
-  if (auto result = ParseBoard(board, position.pieces_, position.sides_);
-      !result.has_value()) {
+  auto result =
+      ParseBoard(parts[0], position.pieces_, position.sides_)
+          .and_then(
+              [&] { return SetSideToMove(parts[1], position.side_to_move_); })
+          .and_then([&] {
+            return SetCastlingRights(parts[2], position.castling_rights_);
+          })
+          .and_then([&] {
+            return SetEnPassantTarget(parts[3], position.en_passant_target_);
+          })
+          .and_then(
+              [&] { return SetMoveCounter(parts[4], position.half_moves_); })
+          .and_then(
+              [&] { return SetMoveCounter(parts[5], position.full_moves_); });
+
+  if (!result) {
     return std::unexpected(result.error());
   }
-
-  if (side_to_move == "w") {
-    position.side_to_move_ = kWhite;
-  } else if (side_to_move == "b") {
-    position.side_to_move_ = kBlack;
-  } else {
-    return std::unexpected(
-        std::format("Invalid side to move value: {}", side_to_move));
-  }
-
-  if (auto result =
-          SetCastlingRights(castling_rights, position.castling_rights_);
-      !result.has_value()) {
-    return std::unexpected(result.error());
-  }
-
-  if (en_passant_target != "-") {
-    position.en_passant_target_ = ParseSquare(en_passant_target);
-    if (!position.en_passant_target_) {
-      return std::unexpected(
-          std::format("Invalid en-passant target: {}", en_passant_target));
-    }
-  }
-
-  if (!IsNumeric(half_moves)) {
-    return std::unexpected(std::format("Invalid half moves: {}", half_moves));
-  }
-  position.half_moves_ = std::stoi(std::string(half_moves));
-
-  if (!IsNumeric(full_moves)) {
-    return std::unexpected(std::format("Invalid full moves: {}", full_moves));
-  }
-  position.full_moves_ = std::stoi(std::string(full_moves));
 
   position.InitKey();
   return position;
