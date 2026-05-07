@@ -19,8 +19,6 @@ cc_library(
     deps = [
         ":bitboard",
         ":magic",
-        "@abseil-cpp//absl/log",
-        "@abseil-cpp//absl/log:check",
     ],
 )
 

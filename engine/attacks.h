@@ -19,10 +19,8 @@
 #define FOLLYCHESS_ATTACKS_H_
 
 #include <array>
-#include <random>
 
-#include "absl/log/check.h"
-#include "bitboard.h"
+#include "engine/bitboard.h"
 #include "engine/magic.generated.h"
 #include "engine/magic.h"
 
