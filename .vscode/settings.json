@@ -1,3 +1,4 @@
 {
-  "cSpell.words": ["BITBOARD", "follychess", "Naraghi"]
+  "cSpell.words": ["BITBOARD", "follychess", "Naraghi"],
+  "C_Cpp.default.cppStandard": "c++23"
 }
