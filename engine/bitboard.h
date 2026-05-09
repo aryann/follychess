@@ -20,6 +20,7 @@
 
 #include <bit>
 #include <format>
+#include <ranges>
 #include <string>
 
 #include "absl/log/check.h"
@@ -53,15 +54,18 @@ class [[nodiscard]] Bitboard {
   constexpr explicit Bitboard(Square square) : data_(1ULL << square) {}
 
   constexpr explicit Bitboard(std::string_view input) : data_(0ULL) {
-    int square = 0;
-    for (const char curr : input) {
-      if (curr != '.' && curr != 'X') {
-        continue;
+    auto SelectSquares = [](char c) { return c == '.' || c == 'X'; };
+
+    auto squares = input | std::views::filter(SelectSquares);
+
+    // TODO(aryann): Replace this with std::views::enumerate once it's available
+    // on the default macOS Clang.
+    auto enumerated_squares = std::views::zip(std::views::iota(0), squares);
+
+    for (auto [index, value] : enumerated_squares) {
+      if (value == 'X') {
+        Set(static_cast<Square>(index));
       }
-      if (curr == 'X') {
-        Set(static_cast<Square>(square));
-      }
-      ++square;
     }
   }
 
