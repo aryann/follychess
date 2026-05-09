@@ -52,7 +52,7 @@ class [[nodiscard]] Bitboard {
 
   constexpr explicit Bitboard(Square square) : data_(1ULL << square) {}
 
-  explicit constexpr Bitboard(std::string_view input) : data_(0ULL) {
+  constexpr explicit Bitboard(std::string_view input) : data_(0ULL) {
     int square = 0;
     for (const char curr : input) {
       if (curr != '.' && curr != 'X') {
