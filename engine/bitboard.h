@@ -49,11 +49,11 @@ class [[nodiscard]] Bitboard {
  public:
   constexpr explicit Bitboard(std::uint64_t data) : data_(data) {}
 
-  constexpr Bitboard() : data_(0ULL) {}
+  constexpr Bitboard() {}
 
   constexpr explicit Bitboard(Square square) : data_(1ULL << square) {}
 
-  constexpr explicit Bitboard(std::string_view input) : data_(0ULL) {
+  constexpr explicit Bitboard(std::string_view input) {
     auto SelectSquares = [](char c) { return c == '.' || c == 'X'; };
 
     auto squares = input | std::views::filter(SelectSquares);
@@ -167,7 +167,7 @@ class [[nodiscard]] Bitboard {
   [[nodiscard]] constexpr auto Data() const { return data_; }
 
  private:
-  std::uint64_t data_;
+  std::uint64_t data_{0ULL};
 };
 
 namespace rank {
