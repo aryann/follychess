@@ -30,6 +30,7 @@ std::unique_ptr<std::array<Bitboard, kNumOccupancies>> GetRandomOccupancies() {
   std::uniform_int_distribution<std::uint64_t> dist(
       0, std::numeric_limits<std::uint64_t>::max());
 
+  // N.B.: The array cannot be stack allocated because it is too large.
   auto occupancies = std::make_unique<std::array<Bitboard, kNumOccupancies>>();
   for (Bitboard& occupied : *occupancies) {
     occupied = Bitboard(dist(engine));
