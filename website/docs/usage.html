@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How to run FollyChess and connect it to a chess GUI.">
+<title>Usage - FollyChess</title>
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body class="docs">
+  <aside>
+    <a class="name" href="/">FollyChess</a>
+    <h4>Getting started</h4>
+    <a class="item" href="/docs/">Overview</a>
+    <a class="item" href="/docs/installation.html">Installation</a>
+    <a class="item active" href="/docs/usage.html">Usage</a>
+    <h4>Project</h4>
+    <a class="item" href="/docs/internals.html">Internals</a>
+    <a class="item" href="https://github.com/aryann/follychess">GitHub</a>
+  </aside>
+
+  <main>
+    <div class="content">
+      <h1>Usage</h1>
+      <p class="lead">How to run FollyChess and connect it to a chess GUI.</p>
+
+      <p>Once you have <a href="/docs/installation.html">compiled the
+      engine</a>, you can use it through a chess GUI or directly on the
+      command line.</p>
+
+      <h2>Using with a chess GUI</h2>
+      <p>FollyChess implements the
+      <a href="https://en.wikipedia.org/wiki/Universal_Chess_Interface">Universal
+      Chess Interface</a> (UCI). It does not draw a board itself; a chess GUI
+      does that and talks to the engine for you. Some GUIs that work well:</p>
+      <ul>
+        <li><a href="http://www.playwitharena.de/">Arena</a></li>
+        <li><a href="https://banksiagui.com/">BanksiaGUI</a></li>
+        <li><a href="https://github.com/cutechess/cutechess">Cutechess</a></li>
+        <li><a href="https://www.hiarcs.com/chess-explorer.html">HIARCS Chess Explorer</a></li>
+      </ul>
+      <p>In your GUI, add a new engine and select the
+      <code>bazel-bin/cli/follychess</code> binary when prompted.</p>
+
+      <h2>Running on the command line</h2>
+      <p>You can also talk to the engine directly via your shell. This is
+      useful for debugging and scripting:</p>
+      <pre><code>bazel-bin/cli/follychess</code></pre>
+      <p>The engine then waits for commands. FollyChess supports a subset of
+      the UCI protocol, described below. In the examples, commands you type
+      are shown in bold; the rest is engine output.</p>
+
+      <h3><code>uci</code></h3>
+      <p>Starts the UCI protocol. The engine identifies itself and lists its
+      options.</p>
+
+      <h3><code>isready</code></h3>
+      <p>Synchronizes with the engine. FollyChess answers <code>readyok</code>
+      once it has finished its internal setup.</p>
+
+      <h3><code>d</code></h3>
+      <p>A custom command (not part of UCI). Prints the current position:</p>
+      <pre><code><b>d</b>
+8: r n b q k b n r
+7: p p p p p p p p
+6: . . . . . . . .
+5: . . . . . . . .
+4: . . . . . . . .
+3: . . . . . . . .
+2: P P P P P P P P
+1: R N B Q K B N R
+   a b c d e f g h
+
+   w KQkq - 0 1</code></pre>
+
+      <h3><code>position</code></h3>
+      <p>Sets up the board. It supports these forms:</p>
+
+      <p><b>Starting position.</b> <code>position startpos</code> resets the
+      board to the starting position.</p>
+
+      <p><b>FEN string.</b> <code>position fen &lt;fenstring&gt;</code> sets
+      the board to a position given in
+      <a href="https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation">Forsyth–Edwards
+      Notation</a>:</p>
+      <pre><code><b>position fen 8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1</b>
+<b>d</b>
+8: . . . . . . . .
+7: . . p . . . . .
+6: . . . p . . . .
+5: K P . . . . . r
+4: . R . . . p . k
+3: . . . . . . . .
+2: . . . . P . P .
+1: . . . . . . . .
+   a b c d e f g h
+
+   w - - 0 1</code></pre>
+
+      <p><b>Adding moves.</b>
+      <code>position [startpos | fen &lt;fenstring&gt;] moves &lt;move1&gt; &lt;move2&gt; ...</code>
+      applies a sequence of moves to the given position:</p>
+      <pre><code><b>position startpos moves e2e4 e7e5 g1f3</b>
+<b>d</b>
+8: r n b q k b n r
+7: p p p p . p p p
+6: . . . . . . . .
+5: . . . . p . . .
+4: . . . . P . . .
+3: . . . . . N . .
+2: P P P P . P P P
+1: R N B Q K B . R
+   a b c d e f g h
+
+   b KQkq - 3 2</code></pre>
+
+      <p>Moves use
+      <a href="https://www.chessprogramming.org/Algebraic_Chess_Notation">long
+      algebraic notation</a>:</p>
+      <table>
+        <tr><th>Type</th><th>Format</th><th>Example</th></tr>
+        <tr><td>Standard</td><td><code>&lt;from&gt;&lt;to&gt;</code></td>
+            <td><code>e2e4</code>, <code>g1f3</code></td></tr>
+        <tr><td>Castling</td><td><code>&lt;from&gt;&lt;to&gt;</code></td>
+            <td><code>e1g1</code> (white kingside), <code>e8c8</code> (black queenside)</td></tr>
+        <tr><td>Promotion</td><td><code>&lt;from&gt;&lt;to&gt;&lt;piece&gt;</code></td>
+            <td><code>a7a8q</code> (queen), <code>h2h1n</code> (knight)</td></tr>
+      </table>
+
+      <h3><code>go</code></h3>
+      <p>Calculates the best move at a given depth:</p>
+      <pre><code><b>go depth 3</b>
+info depth 3 seldepth 3 nodes 1024 nps 175402 tbhits 36
+info depth 3 seldepth 4 nodes 2048 nps 241766 tbhits 133
+info depth 3 seldepth 3 nodes 3072 nps 286567 tbhits 166
+info depth 3 seldepth 3 nodes 4096 nps 286033 tbhits 187
+info depth 3 seldepth 3 nodes 5120 nps 310058 tbhits 264
+bestmove b1c3</code></pre>
+
+      <h3><code>quit</code></h3>
+      <p>Ends the engine process.</p>
+    </div>
+    <footer>© 2025–2026 <a href="https://aryan.app/">Aryan Naraghi</a></footer>
+  </main>
+</body>
+</html>

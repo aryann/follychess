@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How to build FollyChess from source.">
+<title>Installation - FollyChess</title>
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body class="docs">
+  <aside>
+    <a class="name" href="/">FollyChess</a>
+    <h4>Getting started</h4>
+    <a class="item" href="/docs/">Overview</a>
+    <a class="item active" href="/docs/installation.html">Installation</a>
+    <a class="item" href="/docs/usage.html">Usage</a>
+    <h4>Project</h4>
+    <a class="item" href="/docs/internals.html">Internals</a>
+    <a class="item" href="https://github.com/aryann/follychess">GitHub</a>
+  </aside>
+
+  <main>
+    <div class="content">
+      <h1>Installation</h1>
+      <p class="lead">How to build FollyChess from source.</p>
+
+      <p>FollyChess is distributed as
+      <a href="https://github.com/aryann/follychess">source code</a>. To run
+      the engine, you build it for your own environment.</p>
+
+      <h2>Prerequisites</h2>
+      <ol>
+        <li>A C++23 compiler, such as
+        <a href="https://llvm.org/">Clang 17 or newer</a>.</li>
+        <li><a href="https://bazel.build/start">Bazel</a>, available in your
+        <code>PATH</code>.</li>
+      </ol>
+
+      <h2>Compiling</h2>
+      <p>To build the command-line binary, run:</p>
+      <pre><code>git clone https://github.com/aryann/follychess.git
+cd follychess
+bazel build --compilation_mode=opt //cli:follychess</code></pre>
+
+      <div class="note">
+        <code>--compilation_mode=opt</code> tells the compiler to apply
+        optimizations. The engine is much slower without it.
+      </div>
+
+      <p>The binary is written to <code>bazel-bin/cli/follychess</code>.</p>
+
+      <p>Next: <a href="/docs/usage.html">Usage</a> explains how to connect
+      the engine to a chess GUI and which commands it supports.</p>
+    </div>
+    <footer>© 2025–2026 <a href="https://aryan.app/">Aryan Naraghi</a></footer>
+  </main>
+</body>
+</html>

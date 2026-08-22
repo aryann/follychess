@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="FollyChess documentation.">
+<title>Docs - FollyChess</title>
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body class="docs">
+  <aside>
+    <a class="name" href="/">FollyChess</a>
+    <h4>Getting started</h4>
+    <a class="item active" href="/docs/">Overview</a>
+    <a class="item" href="/docs/installation.html">Installation</a>
+    <a class="item" href="/docs/usage.html">Usage</a>
+    <h4>Project</h4>
+    <a class="item" href="/docs/internals.html">Internals</a>
+    <a class="item" href="https://github.com/aryann/follychess">GitHub</a>
+  </aside>
+
+  <main>
+    <div class="content">
+      <pre class="pawn-float">
+     ,,
+    ,/  \
+   / 'O  |
+  (   &lt; _|
+   \___/
+   /   \
+  /_____\
+ /_______\
+ (________)</pre>
+
+      <h1>Overview</h1>
+      <p class="lead">A UCI-compatible chess engine written in C++23.</p>
+
+      <p>FollyChess implements the
+      <a href="https://www.chessprogramming.org/UCI">Universal Chess Interface</a>
+      (UCI), so you can use it with a chess GUI such as
+      <a href="http://www.playwitharena.de/">Arena</a>,
+      <a href="https://github.com/cutechess/cutechess">Cutechess</a>,
+      <a href="https://banksiagui.com/">BanksiaGUI</a>, or
+      <a href="https://www.hiarcs.com/chess-explorer.html">HIARCS</a>. You
+      can also run it directly in a terminal.</p>
+
+      <p>These pages cover:</p>
+      <ul>
+        <li><a href="/docs/installation.html">Installation</a>: how to build FollyChess from source.</li>
+        <li><a href="/docs/usage.html">Usage</a>: how to run the engine and which commands it supports.</li>
+        <li><a href="/docs/internals.html">Internals</a>: where to find the source code and talks about how the engine works.</li>
+      </ul>
+
+      <h2>Example session</h2>
+      <p>Commands you type are shown in bold; the rest is engine output.</p>
+      <pre><code>$ <b>bazel-bin/cli/follychess</b>
+
+        ,,
+      ,/  \
+     / 'O  |
+    (   &lt; _|
+     \___/
+     /   \
+    /_____\
+   /_______\
+   (________)
+
+   FollyChess
+
+<b>position startpos moves e2e4 e7e5</b>
+<b>d</b>
+8: r n b q k b n r
+7: p p p p . p p p
+6: . . . . . . . .
+5: . . . . p . . .
+4: . . . . P . . .
+3: . . . . . . . .
+2: P P P P . P P P
+1: R N B Q K B N R
+   a b c d e f g h
+
+   w KQkq e6 0 2
+
+<b>go depth 3</b>
+info depth 1 score cp 67 nodes 63 nps 3847 tthits 0 tthitrate 0.00 pv d2d4
+info depth 2 score cp 24 nodes 292 nps 17040 tthits 0 tthitrate 0.00 pv d2d4 d7d5 d4e5 d5e4 d1d8 e8d8
+info depth 3 score cp 38 nodes 2653 nps 140782 tthits 14 tthitrate 0.01 pv d1h5 d7d6 h5d1
+bestmove d1h5</code></pre>
+    </div>
+    <footer>© 2025–2026 <a href="https://aryan.app/">Aryan Naraghi</a></footer>
+  </main>
+</body>
+</html>
