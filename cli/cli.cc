@@ -47,6 +47,7 @@ CommandDispatcher MakeCommandDispatcher(CommandState& state) {
   dispatcher.Add("ucinewgame", std::make_unique<UciNewGame>(state));
   dispatcher.Add("setoption", std::make_unique<SetOption>(state));
   dispatcher.Add("go", std::make_unique<Go>(state));
+  dispatcher.Add("stop", std::make_unique<Stop>());
 
   return dispatcher;
 }

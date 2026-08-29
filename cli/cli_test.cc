@@ -231,6 +231,12 @@ TEST_F(CliTest, GoClampsExcessiveDepth) {
   EXPECT_THAT(GetOutput(), HasSubstr("bestmove"));
 }
 
+TEST_F(CliTest, StopIsANoOp) {
+  ASSERT_THAT(Run({"stop"}).error_or(""), IsEmpty());
+
+  EXPECT_THAT(GetOutput(), IsEmpty());
+}
+
 TEST_F(CliTest, Bench) {
   ASSERT_THAT(Run({"bench", "2"}).error_or(""), IsEmpty());
 

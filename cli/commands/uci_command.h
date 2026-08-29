@@ -99,6 +99,17 @@ class SetOption : public Command {
   CommandState& state_;
 };
 
+// The search runs synchronously: by the time this command is read, no search
+// is in progress and there is nothing to stop. Accepting the command keeps
+// tournament runners like fastchess happy, since they send it routinely.
+class Stop : public Command {
+ public:
+  std::expected<void, std::string> Run(
+      std::vector<std::string_view> args) override {
+    return {};
+  }
+};
+
 class Go : public Command {
  public:
   explicit Go(CommandState& state) : state_(state) {}
