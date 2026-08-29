@@ -18,7 +18,10 @@
 #ifndef FOLLYCHESS_CLI_COMMANDS_UCI_COMMAND_H_
 #define FOLLYCHESS_CLI_COMMANDS_UCI_COMMAND_H_
 
+#include <algorithm>
+#include <charconv>
 #include <chrono>
+#include <cstdint>
 #include <iostream>
 #include <optional>
 
@@ -106,14 +109,34 @@ class Go : public Command {
 
     SearchOptions options;
     std::optional<int> depth;
-    for (std::size_t i = 0; i + 1 < args.size(); i += 2) {
-      const std::string value(args[i + 1]);
-      if (args[i] == "depth") {
-        depth = std::stoi(value);
-      } else if (args[i] == "movetime") {
-        options.SetMoveTime(std::chrono::milliseconds(std::stoll(value)));
-      } else if (args[i] == "nodes") {
-        options.SetNodeLimit(std::stoll(value));
+    for (std::size_t i = 0; i < args.size(); ++i) {
+      const std::string_view key = args[i];
+      if (key != "depth" && key != "movetime" && key != "nodes") {
+        // The UCI protocol instructs engines to skip tokens they do not
+        // understand. GUIs routinely send options FollyChess does not support
+        // yet, such as wtime and btime.
+        continue;
+      }
+
+      if (i + 1 == args.size()) {
+        return std::unexpected(std::format("Missing value for go {}", key));
+      }
+
+      const std::expected<std::int64_t, std::string> value =
+          ParseValue(key, args[++i]);
+      if (!value) {
+        return std::unexpected(value.error());
+      }
+
+      if (key == "depth") {
+        // Depths beyond kMaxSearchDepth would overrun the search's per-ply
+        // tables.
+        depth =
+            static_cast<int>(std::min<std::int64_t>(*value, kMaxSearchDepth));
+      } else if (key == "movetime") {
+        options.SetMoveTime(std::chrono::milliseconds(*value));
+      } else {
+        options.SetNodeLimit(*value);
       }
     }
 
@@ -138,6 +161,19 @@ class Go : public Command {
   }
 
  private:
+  [[nodiscard]] static std::expected<std::int64_t, std::string> ParseValue(
+      std::string_view key, std::string_view value) {
+    std::int64_t result = 0;
+    const auto [ptr, ec] =
+        std::from_chars(value.data(), value.data() + value.size(), result);
+    if (ec != std::errc() || ptr != value.data() + value.size() ||
+        result <= 0) {
+      return std::unexpected(
+          std::format("Invalid value for go {}: {}", key, value));
+    }
+    return result;
+  }
+
   CommandState& state_;
 };
 

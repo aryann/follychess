@@ -191,5 +191,42 @@ TEST_F(CliTest, GoNoArguments) {
                                HasSubstr("bestmove")));
 }
 
+TEST_F(CliTest, GoRejectsMalformedValues) {
+  EXPECT_THAT(Run({"go", "depth", "abc"}).error_or(""),
+              Eq("Invalid value for go depth: abc"));
+  EXPECT_THAT(Run({"go", "depth", "5x"}).error_or(""),
+              Eq("Invalid value for go depth: 5x"));
+  EXPECT_THAT(Run({"go", "movetime", "-100"}).error_or(""),
+              Eq("Invalid value for go movetime: -100"));
+  EXPECT_THAT(Run({"go", "nodes", "0"}).error_or(""),
+              Eq("Invalid value for go nodes: 0"));
+  EXPECT_THAT(Run({"go", "nodes", "99999999999999999999"}).error_or(""),
+              Eq("Invalid value for go nodes: 99999999999999999999"));
+  EXPECT_THAT(Run({"go", "depth"}).error_or(""),
+              Eq("Missing value for go depth"));
+
+  // No search ran, so nothing was written to standard output.
+  EXPECT_THAT(GetOutput(), IsEmpty());
+}
+
+TEST_F(CliTest, GoClampsExcessiveDepth) {
+  // The depth is clamped to kMaxSearchDepth; the node limit keeps the test
+  // fast.
+  ASSERT_THAT(Run({"go", "depth", "1000", "nodes", "2000"}).error_or(""),
+              IsEmpty());
+
+  EXPECT_THAT(GetOutput(), HasSubstr("bestmove"));
+}
+
+TEST_F(CliTest, GoIgnoresUnknownTokens) {
+  ASSERT_THAT(Run({"go", "ponder", "movestogo", "40", "depth", "2"}).error_or(""),
+              IsEmpty());
+
+  EXPECT_THAT(GetOutput(), AllOf(                               //
+                               HasSubstr("info depth 2"),       //
+                               Not(HasSubstr("info depth 3")),  //
+                               HasSubstr("bestmove")));
+}
+
 }  // namespace
 }  // namespace follychess
