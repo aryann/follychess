@@ -105,7 +105,7 @@ Script | Description | Example
 --- |------------------------------------------------------------------------------------------| ---
 [benchmark](benchmark) | Runs a single benchmark and updates the results in the [benchmarks](benchmarks) directory. | `./benchmark attacks`
 [perft](perft) | Runs all [Perft](https://www.chessprogramming.org/Perft) tests to verify move generation. | `./perft`
-[scripts/sprt](scripts/sprt) | Runs an [SPRT](https://en.wikipedia.org/wiki/Sequential_probability_ratio_test) self-play match between the working tree and a baseline git revision to test whether a change gains strength. | `./scripts/sprt --mode gain`
+[scripts/sprt.py](scripts/sprt.py) | Runs an [SPRT](https://en.wikipedia.org/wiki/Sequential_probability_ratio_test) self-play match between the working tree and a baseline git revision to test whether a change gains strength. | `./scripts/sprt.py --mode gain`
 [watch](watch) | Watches the directory for file changes. Automatically recompiles (fastbuild) and runs unit tests on save. | `./watch`
 
 ### Running Tests Manually

@@ -7,3 +7,8 @@ py_binary(
         "@pypi//chess",
     ],
 )
+
+py_binary(
+    name = "sprt",
+    srcs = ["sprt.py"],
+)
