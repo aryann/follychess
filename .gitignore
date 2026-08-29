@@ -2,3 +2,8 @@ bazel*
 .clwb
 .idea
 compile_commands.json
+
+# Cached baseline binaries and match results produced by scripts/sprt. The
+# opening books in testing/books are checked in.
+testing/bins/
+testing/results/

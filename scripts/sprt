@@ -1,0 +1,121 @@
+#!/bin/bash
+#
+# Runs an SPRT (sequential probability ratio test) self-play match between the
+# engine in the current working tree ("candidate") and the engine at a
+# baseline git revision ("baseline") to determine whether a change gains or
+# loses strength.
+#
+# Games are played with a fixed node budget per move, which is deterministic
+# and machine-independent. Openings come from an opening book so that game
+# pairs differ; without one, the deterministic engine would repeat the same
+# game forever.
+#
+# Usage: ./scripts/sprt [options]
+#
+#   --baseline REF     Git revision to test against (default: main).
+#   --mode MODE        gain:     the change should gain strength;
+#                                SPRT bounds [0, 5] Elo (default).
+#                      simplify: the change should not lose strength;
+#                                SPRT bounds [-5, 0] Elo.
+#   --nodes N          Node budget per move (default: 30000).
+#   --max-rounds N     Maximum opening pairs to play before giving up on a
+#                      conclusive result; two games per round (default: 500).
+#   --book FILE        Opening book, .epd or .pgn (default:
+#                      testing/books/UHO_4060_v4.epd).
+#   --concurrency N    Concurrent games (default: number of CPUs minus two).
+#
+# The SPRT stops the match as soon as the result is statistically conclusive:
+# H1 accepted means the candidate is stronger (or, for simplify, not weaker);
+# H0 accepted means it is not. Results, games, and logs are archived under
+# testing/results/.
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "${ROOT}"
+
+BASELINE_REF=main
+MODE=gain
+NODES=30000
+MAX_ROUNDS=500
+BOOK=testing/books/UHO_4060_v4.epd
+NUM_CPUS="$(sysctl -n hw.ncpu 2>/dev/null || nproc)"
+CONCURRENCY=$((NUM_CPUS > 2 ? NUM_CPUS - 2 : 1))
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --baseline) BASELINE_REF="$2"; shift 2 ;;
+    --mode) MODE="$2"; shift 2 ;;
+    --nodes) NODES="$2"; shift 2 ;;
+    --max-rounds) MAX_ROUNDS="$2"; shift 2 ;;
+    --book) BOOK="$2"; shift 2 ;;
+    --concurrency) CONCURRENCY="$2"; shift 2 ;;
+    *) echo "Unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+case "${MODE}" in
+  gain) ELO0=0; ELO1=5 ;;
+  simplify) ELO0=-5; ELO1=0 ;;
+  *) echo "Invalid --mode: ${MODE} (expected gain or simplify)" >&2; exit 1 ;;
+esac
+
+case "${BOOK}" in
+  *.epd) BOOK_FORMAT=epd ;;
+  *.pgn) BOOK_FORMAT=pgn ;;
+  *) echo "Cannot infer book format from: ${BOOK}" >&2; exit 1 ;;
+esac
+
+if [[ ! -f "${BOOK}" ]]; then
+  echo "Opening book not found: ${BOOK}" >&2
+  exit 1
+fi
+
+echo "Building candidate (working tree) and fastchess..."
+bazel build -c opt //cli:follychess @fastchess//:fastchess
+CANDIDATE_BIN="${ROOT}/bazel-bin/cli/follychess"
+FASTCHESS_BIN="$(bazel cquery -c opt --output=files @fastchess//:fastchess 2>/dev/null)"
+
+BASELINE_COMMIT="$(git rev-parse --verify "${BASELINE_REF}^{commit}")"
+BASELINE_SHORT="$(git rev-parse --short "${BASELINE_COMMIT}")"
+BASELINE_BIN="${ROOT}/testing/bins/follychess-${BASELINE_COMMIT}"
+
+# Baseline binaries are cached per commit, so each baseline is only ever
+# built once.
+if [[ ! -x "${BASELINE_BIN}" ]]; then
+  echo "Building baseline ${BASELINE_REF} (${BASELINE_SHORT})..."
+  WORKTREE="$(mktemp -d)"
+  git worktree add --quiet --detach "${WORKTREE}" "${BASELINE_COMMIT}"
+  (cd "${WORKTREE}" && bazel build -c opt //cli:follychess)
+  mkdir -p "$(dirname "${BASELINE_BIN}")"
+  cp "${WORKTREE}/bazel-bin/cli/follychess" "${BASELINE_BIN}"
+  git worktree remove --force "${WORKTREE}"
+else
+  echo "Using cached baseline binary for ${BASELINE_REF} (${BASELINE_SHORT})."
+fi
+
+RUN_DIR="testing/results/$(date +%Y%m%d-%H%M%S)-${MODE}-vs-${BASELINE_SHORT}"
+mkdir -p "${RUN_DIR}"
+
+echo
+echo "SPRT: candidate (working tree) vs baseline ${BASELINE_REF} (${BASELINE_SHORT})"
+echo "Bounds: [${ELO0}, ${ELO1}] Elo, nodes/move: ${NODES}, book: ${BOOK}"
+echo "Results: ${RUN_DIR}"
+echo
+
+"${FASTCHESS_BIN}" \
+  -engine "cmd=${CANDIDATE_BIN}" name=candidate \
+  -engine "cmd=${BASELINE_BIN}" "name=baseline-${BASELINE_SHORT}" \
+  -each tc=inf "nodes=${NODES}" \
+  -openings "file=${BOOK}" "format=${BOOK_FORMAT}" order=random \
+  -repeat -games 2 -rounds "${MAX_ROUNDS}" \
+  -sprt "elo0=${ELO0}" "elo1=${ELO1}" alpha=0.05 beta=0.05 \
+  -draw movenumber=40 movecount=8 score=10 \
+  -resign movecount=3 score=600 twosided=true \
+  -concurrency "${CONCURRENCY}" \
+  -config "outname=${RUN_DIR}/config.json" \
+  -pgnout "file=${RUN_DIR}/games.pgn" \
+  -log "file=${RUN_DIR}/fastchess.log" \
+  | tee "${RUN_DIR}/summary.txt"
