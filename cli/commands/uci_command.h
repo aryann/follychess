@@ -18,7 +18,9 @@
 #ifndef FOLLYCHESS_CLI_COMMANDS_UCI_COMMAND_H_
 #define FOLLYCHESS_CLI_COMMANDS_UCI_COMMAND_H_
 
+#include <chrono>
 #include <iostream>
+#include <optional>
 
 #include "cli/command.h"
 #include "cli/options.h"
@@ -101,17 +103,32 @@ class Go : public Command {
   std::expected<void, std::string> Run(
       std::vector<std::string_view> args) override {
     constexpr int kDefaultSearchDepth = 6;
-    int depth = kDefaultSearchDepth;
 
-    for (int i = 0; i < args.size() - 1; i += 2) {
+    SearchOptions options;
+    std::optional<int> depth;
+    for (std::size_t i = 0; i + 1 < args.size(); i += 2) {
+      const std::string value(args[i + 1]);
       if (args[i] == "depth") {
-        depth = std::stoi(std::string(args[i + 1]));
+        depth = std::stoi(value);
+      } else if (args[i] == "movetime") {
+        options.SetMoveTime(std::chrono::milliseconds(std::stoll(value)));
+      } else if (args[i] == "nodes") {
+        options.SetNodeLimit(std::stoll(value));
       }
     }
 
+    if (depth) {
+      options.SetDepth(*depth);
+    } else if (options.move_time || options.node_limit) {
+      // The search is bounded by time or nodes, so let iterative deepening
+      // run as far as the limit allows.
+      options.SetDepth(kMaxSearchDepth);
+    } else {
+      options.SetDepth(kDefaultSearchDepth);
+    }
+
     Move move = Search(state_.game,
-                       SearchOptions()       //
-                           .SetDepth(depth)  //
+                       options  //
                            .SetInfoObserver([&](const SearchInfo& info) {
                              state_.printer.Println(std::cout, "{}", info);
                            }));

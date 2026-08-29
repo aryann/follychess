@@ -18,6 +18,9 @@
 #ifndef FOLLYCHESS_SEARCH_SEARCH_H_
 #define FOLLYCHESS_SEARCH_SEARCH_H_
 
+#include <chrono>
+#include <optional>
+
 #include "engine/game.h"
 #include "engine/move.h"
 #include "engine/position.h"
@@ -74,6 +77,11 @@ struct std::formatter<follychess::SearchInfo> : std::formatter<std::string> {
 
 namespace follychess {
 
+// The maximum depth iterative deepening ever reaches. Callers that limit the
+// search by time or node count rather than depth should pass this as the
+// depth.
+inline constexpr int kMaxSearchDepth = 64;
+
 struct SearchOptions {
   SearchOptions& SetDepth(int value) {
     depth = value;
@@ -81,6 +89,24 @@ struct SearchOptions {
   }
 
   int depth = 5;
+
+  SearchOptions& SetNodeLimit(std::int64_t value) {
+    node_limit = value;
+    return *this;
+  }
+
+  // If set, the search stops once this many nodes have been visited. The
+  // depth-1 iteration is exempt so that the search always produces a move.
+  std::optional<std::int64_t> node_limit;
+
+  SearchOptions& SetMoveTime(std::chrono::milliseconds value) {
+    move_time = value;
+    return *this;
+  }
+
+  // If set, the search stops once this much time has elapsed. The depth-1
+  // iteration is exempt so that the search always produces a move.
+  std::optional<std::chrono::milliseconds> move_time;
 
   SearchOptions& SetInfoObserver(std::function<void(const SearchInfo&)> value) {
     info_observer = std::move(value);

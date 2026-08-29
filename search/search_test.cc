@@ -20,6 +20,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <cstdint>
+
 #include "engine/move.h"
 #include "engine/move_generator.h"
 #include "engine/position.h"
@@ -194,6 +197,61 @@ TEST(Search, BlackMateInOne) {
           .SetDepth(1));
   EXPECT_THAT(move, Eq(MakeMove("d8h4")));
   EXPECT_THAT(info.mate_in, Optional(1));
+}
+
+// These tests would run practically forever if the limit were ignored, since
+// they request the maximum search depth. Termination is enforced by the test
+// timeout.
+
+TEST(Search, NodeLimit) {
+  constexpr std::int64_t kNodeLimit = 10'000;
+
+  Game game;
+  SearchInfo info;
+  const Move move = Search(
+      game,
+      SearchOptions()
+          .SetDepth(kMaxSearchDepth)
+          .SetNodeLimit(kNodeLimit)
+          .SetInfoObserver([&info](const SearchInfo& curr) { info = curr; }));
+
+  EXPECT_THAT(move, testing::Ne(Move::NullMove()));
+  // The last completed iteration must have finished within the limit, plus
+  // the slack from limits only being consulted every 1024 nodes.
+  EXPECT_THAT(info.nodes,
+              testing::AllOf(testing::Gt(0), testing::Le(kNodeLimit + 1024)));
+  EXPECT_THAT(info.depth, testing::Lt(kMaxSearchDepth));
+}
+
+TEST(Search, TinyNodeLimitStillProducesMove) {
+  Game game;
+  SearchInfo info;
+  const Move move = Search(
+      game,
+      SearchOptions()
+          .SetDepth(kMaxSearchDepth)
+          .SetNodeLimit(1)
+          .SetInfoObserver([&info](const SearchInfo& curr) { info = curr; }));
+
+  EXPECT_THAT(move, testing::Ne(Move::NullMove()));
+  // The search stops at the first limit check past the limit, so no completed
+  // iteration can span more nodes than the check interval.
+  EXPECT_THAT(info.nodes, testing::Lt(1024));
+}
+
+TEST(Search, MoveTime) {
+  Game game;
+  const auto start = std::chrono::steady_clock::now();
+  const Move move = Search(game, SearchOptions()
+                                     .SetDepth(kMaxSearchDepth)
+                                     .SetMoveTime(std::chrono::milliseconds(100)));
+  const auto elapsed = std::chrono::steady_clock::now() - start;
+
+  EXPECT_THAT(move, testing::Ne(Move::NullMove()));
+  // The deadline is checked every 1024 nodes and mid-iteration, so the search
+  // should end shortly after the deadline. The bound is generous to keep the
+  // test robust on slow machines.
+  EXPECT_LT(elapsed, std::chrono::seconds(10));
 }
 
 }  // namespace

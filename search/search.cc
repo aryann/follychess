@@ -55,6 +55,8 @@ struct SearchContext {
 
   std::function<void(const SearchInfo&)> info_observer;
   std::chrono::steady_clock::time_point start_time;
+  std::optional<std::int64_t> node_limit;
+  std::optional<std::chrono::steady_clock::time_point> deadline;
 
   KillerMoves killer_moves;
   PrincipalVariationTable pv_table;
@@ -67,11 +69,19 @@ class AlphaBetaSearcher {
   explicit AlphaBetaSearcher(SearchContext& context)
       : context_(context), nodes_(0) {}
 
-  [[nodiscard]] Move Search(const int depth) {
+  // Runs one iteration of the search at the given depth. Returns std::nullopt
+  // if the iteration was cut short by the node or time limit, in which case
+  // the caller should discard the iteration and use the best move from the
+  // previous one.
+  [[nodiscard]] std::optional<Move> Search(const int depth) {
     constexpr int kAlpha = -100'000;
     constexpr int kBeta = 100'000;
     constexpr int kStartPly = 0;
+    current_depth_ = depth;
     const int score = Search(kAlpha, kBeta, depth, kStartPly);
+    if (stopped_) {
+      return std::nullopt;
+    }
     context_.info_observer(MakeSearchInfo(score, depth));
 
     Move best_move = context_.pv_table.GetBestMove();
@@ -90,6 +100,9 @@ class AlphaBetaSearcher {
                            const int ply) {
     using enum TranspositionTable::BoundType;
     ++nodes_;
+    if (ShouldStop()) {
+      return 0;
+    }
 
     Move best_move;
     if (std::optional<int> score =
@@ -124,6 +137,9 @@ class AlphaBetaSearcher {
       constexpr int kDepthReduction = 2;
       const int next_depth = std::max(0, depth - 1 - kDepthReduction);
       const int score = -Search(-beta, -beta + 1, next_depth, ply + 1);
+      if (stopped_) {
+        return 0;
+      }
       if (score >= beta) {
         return beta;
       }
@@ -137,6 +153,9 @@ class AlphaBetaSearcher {
     for (Move move : moves) {
       ScopedMove2 scoped_move(move, context_.game);
       const int score = -Search(-beta, -alpha, depth - 1, ply + 1);
+      if (stopped_) {
+        return 0;
+      }
 
       if (score >= beta) {
         // Beta cutoff.
@@ -188,6 +207,9 @@ class AlphaBetaSearcher {
   // NOLINTNEXTLINE(misc-no-recursion)
   [[nodiscard]] int QuiescentSearch(int alpha, const int beta, const int ply) {
     ++nodes_;
+    if (ShouldStop()) {
+      return 0;
+    }
     context_.pv_table.RecordMove(ply, Move::NullMove());
 
     int score = GetScore();
@@ -215,6 +237,9 @@ class AlphaBetaSearcher {
     for (Move move : moves) {
       ScopedMove2 scoped_move(move, context_.game);
       score = -QuiescentSearch(-beta, -alpha, ply + 1);
+      if (stopped_) {
+        return 0;
+      }
 
       if (score >= beta) {
         return beta;
@@ -227,6 +252,42 @@ class AlphaBetaSearcher {
     }
 
     return alpha;
+  }
+
+  // Returns true once the node or time limit is exhausted. After the first
+  // true result, `stopped_` latches and the search unwinds, discarding the
+  // current iteration. The depth-1 iteration is exempt so the search always
+  // produces a move.
+  //
+  // To keep the per-node cost down to a couple of predictable branches, the
+  // limits are only consulted every `kNodesPerLimitCheck` nodes, so the search
+  // may overshoot a limit by up to that many nodes.
+  [[nodiscard]] bool ShouldStop() {
+    if (stopped_) {
+      return true;
+    }
+
+    constexpr std::int64_t kNodesPerLimitCheck = 1024;
+    if (nodes_ % kNodesPerLimitCheck != 0) {
+      return false;
+    }
+
+    if (current_depth_ <= 1) {
+      return false;
+    }
+
+    if (context_.node_limit && nodes_ >= *context_.node_limit) {
+      stopped_ = true;
+      return true;
+    }
+
+    if (context_.deadline &&
+        std::chrono::steady_clock::now() >= *context_.deadline) {
+      stopped_ = true;
+      return true;
+    }
+
+    return false;
   }
 
   [[nodiscard]] int GetScore() const {
@@ -278,6 +339,8 @@ class AlphaBetaSearcher {
 
   SearchContext& context_;
   std::int64_t nodes_;
+  int current_depth_ = 0;
+  bool stopped_ = false;
 };
 
 }  // namespace
@@ -287,14 +350,22 @@ Move Search(const Game& game, SearchOptions options) {
       .game = game,
       .info_observer = std::move(options.info_observer),
       .start_time = std::chrono::steady_clock::now(),
+      .node_limit = options.node_limit,
       .pv_table = PrincipalVariationTable(),
       .transpositions = TranspositionTable(),
   };
+  if (options.move_time) {
+    context.deadline = context.start_time + *options.move_time;
+  }
 
   AlphaBetaSearcher searcher(context);
   Move best_move = Move::NullMove();
   for (int depth = 1; depth <= options.depth; ++depth) {
-    best_move = searcher.Search(depth);
+    std::optional<Move> move = searcher.Search(depth);
+    if (!move) {
+      break;
+    }
+    best_move = *move;
   }
 
   return best_move;

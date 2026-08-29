@@ -167,5 +167,29 @@ TEST_F(CliTest, Go) {
                                HasSubstr("bestmove e2e4")));
 }
 
+TEST_F(CliTest, GoNodes) {
+  ASSERT_THAT(Run({"go", "nodes", "10000"}).error_or(""), IsEmpty());
+
+  EXPECT_THAT(GetOutput(), AllOf(                          //
+                               HasSubstr("info depth 1"),  //
+                               HasSubstr("bestmove")));
+}
+
+TEST_F(CliTest, GoMovetime) {
+  ASSERT_THAT(Run({"go", "movetime", "100"}).error_or(""), IsEmpty());
+
+  EXPECT_THAT(GetOutput(), AllOf(                          //
+                               HasSubstr("info depth 1"),  //
+                               HasSubstr("bestmove")));
+}
+
+TEST_F(CliTest, GoNoArguments) {
+  ASSERT_THAT(Run({"go"}).error_or(""), IsEmpty());
+
+  EXPECT_THAT(GetOutput(), AllOf(                          //
+                               HasSubstr("info depth 6"),  //
+                               HasSubstr("bestmove")));
+}
+
 }  // namespace
 }  // namespace follychess
