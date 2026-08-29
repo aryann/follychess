@@ -67,11 +67,26 @@ th { background: var(--sidebar-bg); }
 
 .lead { font-size: 17px; color: var(--muted); margin: 0 0 24px; }
 
+.toc {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--sidebar-bg);
+  padding: 12px 18px;
+  margin: 18px 0 28px;
+  font-size: 14px;
+}
+.toc ul { margin: 4px 0 0 22px; }
+.toc ul ul { margin-top: 0; }
+.toc li { margin: 2px 0; }
+
+h2 .anchor, h3 .anchor { visibility: hidden; font-weight: 400; }
+h2:hover .anchor, h3:hover .anchor { visibility: visible; }
+
 footer { color: var(--muted); font-size: 14px; }
 
 /* Home page */
 
-body.home { max-width: 68ch; margin: 0 auto; padding: 40px 20px 60px; }
+body.home { max-width: 82ch; margin: 0 auto; padding: 40px 20px 60px; }
 body.home nav { font-size: 15px; }
 body.home nav a { margin-right: 18px; }
 body.home hr { border: 0; border-top: 1px solid var(--border); margin: 36px 0; }
@@ -135,7 +150,7 @@ aside a.item.active {
 }
 
 body.docs main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.content { max-width: 720px; padding: 48px 48px 64px; flex: 1; width: 100%; }
+.content { max-width: 900px; padding: 48px 48px 64px; flex: 1; width: 100%; }
 
 .pawn-float {
   float: right;

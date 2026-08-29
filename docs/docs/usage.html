@@ -28,7 +28,24 @@
       engine</a>, you can use it through a chess GUI or directly on the
       command line.</p>
 
-      <h2>Using with a chess GUI</h2>
+      <nav class="toc">
+        <b>On this page</b>
+        <ul>
+          <li><a href="#gui">Using with a chess GUI</a></li>
+          <li><a href="#cli">Running on the command line</a>
+            <ul>
+              <li><a href="#uci"><code>uci</code></a></li>
+              <li><a href="#isready"><code>isready</code></a></li>
+              <li><a href="#d"><code>d</code></a></li>
+              <li><a href="#position"><code>position</code></a></li>
+              <li><a href="#go"><code>go</code></a></li>
+              <li><a href="#quit"><code>quit</code></a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <h2 id="gui">Using with a chess GUI <a class="anchor" href="#gui">#</a></h2>
       <p>FollyChess implements the
       <a href="https://en.wikipedia.org/wiki/Universal_Chess_Interface">Universal
       Chess Interface</a> (UCI). It does not draw a board itself; a chess GUI
@@ -42,7 +59,7 @@
       <p>In your GUI, add a new engine and select the
       <code>bazel-bin/cli/follychess</code> binary when prompted.</p>
 
-      <h2>Running on the command line</h2>
+      <h2 id="cli">Running on the command line <a class="anchor" href="#cli">#</a></h2>
       <p>You can also talk to the engine directly via your shell. This is
       useful for debugging and scripting:</p>
       <pre><code>bazel-bin/cli/follychess</code></pre>
@@ -50,15 +67,15 @@
       the UCI protocol, described below. In the examples, commands you type
       are shown in bold; the rest is engine output.</p>
 
-      <h3><code>uci</code></h3>
+      <h3 id="uci"><code>uci</code> <a class="anchor" href="#uci">#</a></h3>
       <p>Starts the UCI protocol. The engine identifies itself and lists its
       options.</p>
 
-      <h3><code>isready</code></h3>
+      <h3 id="isready"><code>isready</code> <a class="anchor" href="#isready">#</a></h3>
       <p>Synchronizes with the engine. FollyChess answers <code>readyok</code>
       once it has finished its internal setup.</p>
 
-      <h3><code>d</code></h3>
+      <h3 id="d"><code>d</code> <a class="anchor" href="#d">#</a></h3>
       <p>A custom command (not part of UCI). Prints the current position:</p>
       <pre><code><b>d</b>
 8: r n b q k b n r
@@ -73,7 +90,7 @@
 
    w KQkq - 0 1</code></pre>
 
-      <h3><code>position</code></h3>
+      <h3 id="position"><code>position</code> <a class="anchor" href="#position">#</a></h3>
       <p>Sets up the board. It supports these forms:</p>
 
       <p><b>Starting position.</b> <code>position startpos</code> resets the
@@ -127,7 +144,7 @@
             <td><code>a7a8q</code> (queen), <code>h2h1n</code> (knight)</td></tr>
       </table>
 
-      <h3><code>go</code></h3>
+      <h3 id="go"><code>go</code> <a class="anchor" href="#go">#</a></h3>
       <p>Calculates the best move for the current position. The search can be
       limited in three ways:</p>
 
@@ -166,7 +183,7 @@ bestmove d2d4</code></pre>
       always completes at least a depth-1 search so that it can produce a
       move.</p>
 
-      <h3><code>quit</code></h3>
+      <h3 id="quit"><code>quit</code> <a class="anchor" href="#quit">#</a></h3>
       <p>Ends the engine process.</p>
     </div>
     <footer>© 2025–2026 <a href="https://aryan.app/">Aryan Naraghi</a></footer>
