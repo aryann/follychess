@@ -128,14 +128,43 @@
       </table>
 
       <h3><code>go</code></h3>
-      <p>Calculates the best move at a given depth:</p>
+      <p>Calculates the best move for the current position. The search can be
+      limited in three ways:</p>
+
+      <p><b>Depth.</b> <code>go depth &lt;plies&gt;</code> searches to a fixed
+      depth. The engine reports each completed iteration and finishes with the
+      best move it found:</p>
       <pre><code><b>go depth 3</b>
-info depth 3 seldepth 3 nodes 1024 nps 175402 tbhits 36
-info depth 3 seldepth 4 nodes 2048 nps 241766 tbhits 133
-info depth 3 seldepth 3 nodes 3072 nps 286567 tbhits 166
-info depth 3 seldepth 3 nodes 4096 nps 286033 tbhits 187
-info depth 3 seldepth 3 nodes 5120 nps 310058 tbhits 264
-bestmove b1c3</code></pre>
+info depth 1 score cp 69 nodes 41 nps 408 tthits 0 tthitrate 0.00 pv e2e4
+info depth 2 score cp 0 nodes 182 nps 1799 tthits 0 tthitrate 0.00 pv e2e4 e7e5
+info depth 3 score cp 41 nodes 908 nps 8715 tthits 1 tthitrate 0.00 pv d2d4 d7d5 c1f4
+bestmove d2d4</code></pre>
+
+      <p><b>Time.</b> <code>go movetime &lt;milliseconds&gt;</code> searches
+      for a fixed amount of time, going as deep as the budget allows. When the
+      time runs out, the engine plays the best move from the last iteration it
+      completed:</p>
+      <pre><code><b>go movetime 1000</b>
+info depth 1 score cp 69 nodes 41 nps 451 tthits 0 tthitrate 0.00 pv e2e4
+...
+info depth 6 score cp 5 nodes 75501 nps 116195 tthits 2133 tthitrate 0.04 pv d2d4 d7d5 e2e4 d5e4 f1b5 c8d7
+bestmove d2d4</code></pre>
+
+      <p><b>Nodes.</b> <code>go nodes &lt;count&gt;</code> stops the search
+      once roughly that many positions have been visited. Unlike a time limit,
+      a node limit produces the same result on every run and on any machine,
+      which makes it useful for testing:</p>
+      <pre><code><b>go nodes 20000</b>
+info depth 1 score cp 69 nodes 41 nps 451 tthits 0 tthitrate 0.00 pv e2e4
+...
+info depth 5 score cp 34 nodes 11217 nps 75929 tthits 417 tthitrate 0.05 pv d2d4 d7d5 c1f4 c8f5 b1d2
+bestmove d2d4</code></pre>
+
+      <p>The limits can be combined, in which case the search stops at
+      whichever limit is reached first. With no arguments, <code>go</code>
+      searches to a default depth of 6. Regardless of the limits, the engine
+      always completes at least a depth-1 search so that it can produce a
+      move.</p>
 
       <h3><code>quit</code></h3>
       <p>Ends the engine process.</p>
