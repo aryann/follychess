@@ -44,7 +44,13 @@ inline ZobristKeys::ZobristKeys() : elements(), en_passant_files(), castling() {
   static_assert(std::tuple_size_v<decltype(elements)::value_type> ==
                 kNumPieces);
 
-  std::mt19937 engine(std::random_device{}());
+  // The seed is fixed so that the keys, and therefore search node counts, are
+  // identical on every run. This makes searches reproducible for debugging
+  // and lets the bench command's node count act as a search signature. A
+  // fixed seed produces keys that are just as good for hashing as randomly
+  // seeded ones.
+  constexpr std::uint32_t kSeed = 0x46'6F'6C'6C;  // "Foll"
+  std::mt19937 engine(kSeed);
   std::uniform_int_distribution<std::uint64_t> dist(0);
 
   for (int i = 0; i < kNumSquares; ++i) {

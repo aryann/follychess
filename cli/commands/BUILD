@@ -1,6 +1,22 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_library(
+    name = "bench_command",
+    srcs = [],
+    hdrs = ["bench_command.h"],
+    visibility = [
+        "//cli:__subpackages__",
+    ],
+    deps = [
+        "//cli:command",
+        "//engine:game",
+        "//engine:move",
+        "//engine:position",
+        "//search",
+    ],
+)
+
+cc_library(
     name = "display",
     srcs = [],
     hdrs = ["display.h"],

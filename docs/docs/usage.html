@@ -39,6 +39,7 @@
               <li><a href="#d"><code>d</code></a></li>
               <li><a href="#position"><code>position</code></a></li>
               <li><a href="#go"><code>go</code></a></li>
+              <li><a href="#bench"><code>bench</code></a></li>
               <li><a href="#quit"><code>quit</code></a></li>
             </ul>
           </li>
@@ -182,6 +183,36 @@ bestmove d2d4</code></pre>
       searches to a default depth of 6. Regardless of the limits, the engine
       always completes at least a depth-1 search so that it can produce a
       move.</p>
+
+      <h3 id="bench"><code>bench</code> <a class="anchor" href="#bench">#</a></h3>
+      <p>A custom command (not part of UCI). Searches a fixed suite of 46
+      positions at a fixed depth (6 by default, or <code>bench
+      &lt;depth&gt;</code>). The suite spans the opening, sharp and quiet
+      middlegames, endgames, and terminal positions. Each position's regular
+      search output goes to standard output, while the position headers and
+      the summary go to standard error, so that standard output carries
+      nothing but engine protocol output:</p>
+      <pre><code><b>bench</b>
+
+Position: 1/46 (rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1)
+info depth 1 score cp 69 nodes 41 nps 2182 tthits 0 tthitrate 0.00 pv e2e4
+...
+info depth 6 score cp 5 nodes 75410 nps 1487441 tthits 2135 tthitrate 0.04 pv d2d4 d7d5 e2e4 d5e4 f1b5 c8d7
+bestmove d2d4
+
+Position: 2/46 (r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 10)
+...
+
+===========================
+Total time (ms) : 5259
+Nodes searched  : 14539344
+Nodes/second    : 2764353</code></pre>
+      <p>The <code>Nodes searched</code> count is deterministic: the same
+      source code produces the same count on every run and on any machine.
+      This makes it a signature of the search. A refactor that is not meant
+      to change search behavior must leave the count unchanged, while a
+      change to pruning or move ordering shows up as a different count.
+      <code>Nodes/second</code> tracks raw search speed.</p>
 
       <h3 id="quit"><code>quit</code> <a class="anchor" href="#quit">#</a></h3>
       <p>Ends the engine process.</p>

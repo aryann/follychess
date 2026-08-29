@@ -84,9 +84,10 @@ class AlphaBetaSearcher {
     }
     context_.info_observer(MakeSearchInfo(score, depth));
 
-    Move best_move = context_.pv_table.GetBestMove();
-    DCHECK_NE(best_move, Move::NullMove());
-    return best_move;
+    // The best move is the null move when the game is already over in this
+    // position (checkmate or stalemate), in which case there is no move to
+    // play.
+    return context_.pv_table.GetBestMove();
   }
 
  private:
@@ -366,6 +367,10 @@ Move Search(const Game& game, SearchOptions options) {
       break;
     }
     best_move = *move;
+    if (best_move.IsNullMove()) {
+      // The game is over; deeper iterations cannot find a move either.
+      break;
+    }
   }
 
   return best_move;

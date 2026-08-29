@@ -19,6 +19,7 @@
 
 #include "absl/strings/str_join.h"
 #include "command.h"
+#include "commands/bench_command.h"
 #include "commands/display.h"
 #include "commands/isready_command.h"
 #include "commands/perft_command.h"
@@ -38,6 +39,7 @@ CommandDispatcher MakeCommandDispatcher(CommandState& state) {
   dispatcher.Add("position", std::move(position_commands));
 
   dispatcher.Add("perft", std::make_unique<PerftCommand>(state));
+  dispatcher.Add("bench", std::make_unique<Bench>(state));
 
   dispatcher.Add("d", std::make_unique<Display>(state));
   dispatcher.Add("isready", std::make_unique<IsReady>(state));

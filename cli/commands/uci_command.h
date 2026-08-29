@@ -156,7 +156,12 @@ class Go : public Command {
                              state_.printer.Println(std::cout, "{}", info);
                            }));
 
-    state_.printer.Println(std::cout, "bestmove {}", move);
+    if (move.IsNullMove()) {
+      // The game is already over, so there is no move to play.
+      state_.printer.Println(std::cout, "bestmove (none)");
+    } else {
+      state_.printer.Println(std::cout, "bestmove {}", move);
+    }
     return {};
   }
 

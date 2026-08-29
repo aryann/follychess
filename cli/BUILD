@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["cli.h"],
     deps = [
         ":command",
+        "//cli/commands:bench_command",
         "//cli/commands:display",
         "//cli/commands:isready_command",
         "//cli/commands:perft_command",

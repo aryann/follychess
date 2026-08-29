@@ -199,6 +199,42 @@ TEST(Search, BlackMateInOne) {
   EXPECT_THAT(info.mate_in, Optional(1));
 }
 
+TEST(Search, StalematedPositionReturnsNullMove) {
+  Game game(
+      MakePosition("8: . . . . . . . ."
+                   "7: . . . . . . . ."
+                   "6: . . . . . . . ."
+                   "5: . . . . . . . ."
+                   "4: . . . . . . . ."
+                   "3: . . . . . . k ."
+                   "2: . . . . . . p ."
+                   "1: . . . . . . K ."
+                   "   a b c d e f g h"
+                   //
+                   "   w - - 0 1"));
+
+  EXPECT_THAT(Search(game, SearchOptions().SetDepth(6)),
+              Eq(Move::NullMove()));
+}
+
+TEST(Search, CheckmatedPositionReturnsNullMove) {
+  Game game(
+      MakePosition("8: . . . . . . . k"
+                   "7: . . . . . . . P"
+                   "6: . . . . . . K ."
+                   "5: . . . . . . . ."
+                   "4: . . . B . . . ."
+                   "3: . . . . . . . ."
+                   "2: . . . . . . . ."
+                   "1: . . . . . . . ."
+                   "   a b c d e f g h"
+                   //
+                   "   b - - 0 1"));
+
+  EXPECT_THAT(Search(game, SearchOptions().SetDepth(6)),
+              Eq(Move::NullMove()));
+}
+
 // These tests would run practically forever if the limit were ignored, since
 // they request the maximum search depth. Termination is enforced by the test
 // timeout.

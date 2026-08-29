@@ -75,15 +75,26 @@ class CliTest : public ::testing::Test {
  protected:
   CliTest()
       : command_dispatcher_(MakeCommandDispatcher(state_)),
-        old_stdout_buffer_((std::cout.rdbuf())) {
+        old_stdout_buffer_((std::cout.rdbuf())),
+        old_stderr_buffer_((std::cerr.rdbuf())) {
     std::cout.rdbuf(stream_.rdbuf());
+    std::cerr.rdbuf(error_stream_.rdbuf());
   }
 
-  ~CliTest() override { std::cout.rdbuf(old_stdout_buffer_); }
+  ~CliTest() override {
+    std::cout.rdbuf(old_stdout_buffer_);
+    std::cerr.rdbuf(old_stderr_buffer_);
+  }
 
   std::string GetOutput() {
     std::string val = stream_.str();
     stream_.str("");
+    return val;
+  }
+
+  std::string GetErrorOutput() {
+    std::string val = error_stream_.str();
+    error_stream_.str("");
     return val;
   }
 
@@ -96,7 +107,9 @@ class CliTest : public ::testing::Test {
   CommandDispatcher command_dispatcher_;
 
   std::stringstream stream_;
+  std::stringstream error_stream_;
   std::streambuf* old_stdout_buffer_;
+  std::streambuf* old_stderr_buffer_;
 };
 
 TEST_F(CliTest, Uci) {
@@ -216,6 +229,35 @@ TEST_F(CliTest, GoClampsExcessiveDepth) {
               IsEmpty());
 
   EXPECT_THAT(GetOutput(), HasSubstr("bestmove"));
+}
+
+TEST_F(CliTest, Bench) {
+  ASSERT_THAT(Run({"bench", "2"}).error_or(""), IsEmpty());
+
+  // The regular search output goes to stdout.
+  EXPECT_THAT(GetOutput(), AllOf(                          //
+                               HasSubstr("info depth 1"),  //
+                               HasSubstr("info depth 2"),  //
+                               HasSubstr("bestmove")));
+
+  // The position headers and the summary block go to stderr.
+  EXPECT_THAT(GetErrorOutput(),
+              AllOf(                                          //
+                  HasSubstr("Position: 1/46 ("),              //
+                  HasSubstr("Position: 46/46 ("),             //
+                  HasSubstr("==========================="),   //
+                  HasSubstr("Total time (ms) : "),            //
+                  HasSubstr("Nodes searched  : "),            //
+                  HasSubstr("Nodes/second    : ")));
+}
+
+TEST_F(CliTest, BenchRejectsMalformedDepth) {
+  EXPECT_THAT(Run({"bench", "abc"}).error_or(""),
+              Eq("Invalid value for bench depth: abc"));
+  EXPECT_THAT(Run({"bench", "0"}).error_or(""),
+              Eq("Invalid value for bench depth: 0"));
+
+  EXPECT_THAT(GetOutput(), IsEmpty());
 }
 
 TEST_F(CliTest, GoIgnoresUnknownTokens) {
