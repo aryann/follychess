@@ -93,8 +93,11 @@ class UpdateRunRequest(pydantic.BaseModel):
         return value
 
 
-@app.get("/healthz")
-def healthz():
+# N.B.: /healthz would be a more conventional name, but Google's frontend
+# reserves that path on run.app domains and answers it with a 404 before the
+# request reaches the container.
+@app.get("/health")
+def health():
     return {"ok": True}
 
 
