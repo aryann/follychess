@@ -47,7 +47,7 @@ export default function RunDetail() {
         {run.mode} vs <code>{shortCommit(run.baseline_commit)}</code>{" "}
         <span className={`status ${run.status}`}>{run.status}</span>
       </h1>
-      <p className="lead">{run.note || "No description."}</p>
+      {run.note && <p className="lead">{run.note}</p>}
 
       <div className="statgrid">
         <Stat label="Elo" value={formatElo(stats)} />
