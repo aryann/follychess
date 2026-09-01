@@ -16,9 +16,6 @@ export default function App() {
       <main>
         <Outlet />
       </main>
-      <footer>
-        © 2025–2026 <a href="https://aryan.app/">Aryan Naraghi</a>
-      </footer>
     </>
   );
 }
