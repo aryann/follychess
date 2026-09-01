@@ -1,0 +1,18 @@
+rules_version = '2';
+
+// FollyTest results are public read-only. All writes go through the
+// ingestion API (Cloud Run), which uses the Admin SDK and bypasses these
+// rules.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /runs/{run} {
+      allow read: if true;
+      allow write: if false;
+
+      match /games/{game} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+  }
+}

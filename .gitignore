@@ -7,3 +7,11 @@ compile_commands.json
 # opening books in testing/books are checked in.
 testing/bins/
 testing/results/
+
+# FollyTest (web/) build and local-development artifacts.
+.venv/
+node_modules/
+web/frontend/dist/
+.env.local
+.firebase/
+__pycache__/

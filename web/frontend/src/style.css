@@ -1,0 +1,136 @@
+/* Borrowed from the follychess.com stylesheet so FollyTest matches the
+ * site's look and feel. */
+
+:root {
+  --ink: #1f2328;
+  --muted: #59636e;
+  --blue: #0757ba;
+  --border: #e3e6ea;
+  --sidebar-bg: #f6f7f9;
+  --code-bg: #f6f8fa;
+  --green: #1a7f37;
+  --red: #cf222e;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  color: var(--ink);
+  background: #fff;
+  font: 16px/1.6 -apple-system, "Segoe UI", Roboto, Helvetica, sans-serif;
+}
+
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+h1 { font-size: 30px; letter-spacing: -0.02em; margin: 0 0 4px; }
+h2 { font-size: 21px; margin: 36px 0 10px; }
+p { margin: 10px 0; }
+
+code {
+  font: 13.5px/1.5 ui-monospace, Menlo, Consolas, monospace;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+table { border-collapse: collapse; margin: 14px 0; width: 100%; }
+th, td {
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  text-align: left;
+  font-size: 15px;
+}
+th { background: var(--sidebar-bg); }
+tr.rowlink { cursor: pointer; }
+tr.rowlink:hover td { background: var(--sidebar-bg); }
+
+.lead { font-size: 17px; color: var(--muted); margin: 0 0 24px; }
+
+header.top {
+  border-bottom: 1px solid var(--border);
+  background: var(--sidebar-bg);
+}
+header.top .inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+}
+header.top .name { font-weight: 700; font-size: 17px; color: var(--ink); }
+header.top .name:hover { text-decoration: none; }
+header.top nav a { font-size: 14px; margin-right: 14px; }
+
+main { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+.status {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 1px 10px;
+  border: 1px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.status.passed { color: var(--green); border-color: var(--green); }
+.status.failed { color: var(--red); border-color: var(--red); }
+.status.running { color: var(--blue); border-color: var(--blue); }
+.status.inconclusive, .status.interrupted { color: var(--muted); }
+
+.statgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 18px 0;
+}
+.statgrid .cell {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--sidebar-bg);
+  padding: 8px 14px;
+}
+.statgrid .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.statgrid .value { font-size: 18px; font-weight: 600; }
+
+.meta { color: var(--muted); font-size: 14px; }
+
+.gameview { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; }
+.board { width: 400px; max-width: 100%; }
+.board .controls { display: flex; gap: 8px; margin-top: 10px; }
+.board .controls button {
+  font: inherit;
+  font-size: 14px;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--sidebar-bg);
+  cursor: pointer;
+}
+.board .controls button:hover { background: #eceef1; }
+
+.moves {
+  flex: 1;
+  min-width: 260px;
+  font: 14px/1.9 ui-monospace, Menlo, Consolas, monospace;
+}
+.moves span.mv { cursor: pointer; padding: 1px 3px; border-radius: 3px; }
+.moves span.mv:hover { background: var(--sidebar-bg); }
+.moves span.mv.current { background: #eaf1fb; color: var(--blue); font-weight: 600; }
+
+footer {
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px 24px;
+  border-top: 1px solid var(--border);
+}
