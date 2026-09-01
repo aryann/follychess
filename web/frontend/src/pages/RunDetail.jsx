@@ -2,6 +2,7 @@ import { collection, doc, onSnapshot, orderBy, query } from "firebase/firestore"
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import Breadcrumbs from "../Breadcrumbs";
 import { db } from "../firebase";
 import { formatElo, formatScore, formatTimestamp, shortCommit } from "../format";
 
@@ -38,6 +39,10 @@ export default function RunDetail() {
 
   return (
     <>
+      <Breadcrumbs items={[
+        { label: "Runs", to: "/" },
+        { label: runId },
+      ]} />
       <h1>
         {run.mode} vs <code>{shortCommit(run.baseline_commit)}</code>{" "}
         <span className={`status ${run.status}`}>{run.status}</span>

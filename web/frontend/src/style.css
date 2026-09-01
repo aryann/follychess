@@ -103,9 +103,40 @@ main { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
 
 .meta { color: var(--muted); font-size: 14px; }
 
+.crumbs { font-size: 14px; margin: 0 0 14px; }
+.crumbs .sep { color: var(--muted); margin: 0 8px; }
+.crumbs .current { color: var(--muted); }
+
 .gameview { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; }
 .board { width: 400px; max-width: 100%; }
 .board .controls { display: flex; gap: 8px; margin-top: 10px; }
+.player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 2px;
+  font-size: 15px;
+}
+.player .pname { font-weight: 600; }
+.player .swatch {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--muted);
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.player .swatch.white { background: #fff; }
+.player .swatch.black { background: var(--ink); }
+.player .won {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green);
+  border: 1px solid var(--green);
+  border-radius: 10px;
+  padding: 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
 .board .controls button {
   font: inherit;
   font-size: 14px;

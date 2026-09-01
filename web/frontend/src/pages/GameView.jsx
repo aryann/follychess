@@ -2,8 +2,9 @@ import { Chess } from "chess.js";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { Chessboard } from "react-chessboard";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
+import Breadcrumbs from "../Breadcrumbs";
 import { db } from "../firebase";
 
 // Parses the PGN into the starting FEN (games start from book openings) and
@@ -24,6 +25,22 @@ function parseGame(pgn) {
     fens.push(replay.fen());
   }
   return { moves, fens, headers };
+}
+
+// Shows which engine plays which color, chess-GUI style: black above the
+// board, white below it.
+function PlayerBar({ color, name, result }) {
+  const won = (color === "white" && result === "1-0") ||
+    (color === "black" && result === "0-1");
+  return (
+    <div className="player">
+      <span className={`swatch ${color}`} />
+      <span className="pname">{name}</span>
+      <span className="meta">{color}</span>
+      {won && <span className="won">winner</span>}
+      {result === "1/2-1/2" && <span className="meta">draw</span>}
+    </div>
+  );
 }
 
 export default function GameView() {
@@ -74,20 +91,22 @@ export default function GameView() {
 
   return (
     <>
-      <h1>
-        Game {game.n}{" "}
-        <span className="meta" style={{ fontSize: 16, fontWeight: 400 }}>
-          <Link to={`/runs/${runId}`}>back to run</Link>
-        </span>
-      </h1>
+      <Breadcrumbs items={[
+        { label: "Runs", to: "/" },
+        { label: runId, to: `/runs/${runId}` },
+        { label: `Game ${game.n}` },
+      ]} />
+      <h1>Game {game.n}</h1>
       <p className="lead">
-        {game.white} vs {game.black} · {game.result}
+        {game.result}
         {game.termination ? ` · ${game.termination}` : ""}
       </p>
 
       <div className="gameview">
         <div className="board">
+          <PlayerBar color="black" name={game.black} result={game.result} />
           <Chessboard position={fens[ply]} arePiecesDraggable={false} />
+          <PlayerBar color="white" name={game.white} result={game.result} />
           <div className="controls">
             <button onClick={() => setPly(0)}>⏮</button>
             <button onClick={() => setPly((p) => Math.max(0, p - 1))}>◀</button>
