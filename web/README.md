@@ -52,13 +52,22 @@ One-time setup: create the `follychess` Firebase project, enable Firestore
 (Native mode), and register a web app in the Firebase console to obtain the
 web API key for `frontend/.env.local`.
 
-API to Cloud Run (generate a strong key, e.g. `openssl rand -hex 24`):
+The API key lives in Secret Manager so that it never appears in source,
+command lines, or the Cloud Run console. To rotate it:
+
+```shell
+openssl rand -hex 24 | tr -d '\n' | \
+    gcloud secrets versions add follytest-api-key --data-file=- \
+        --project follychess
+```
+
+API to Cloud Run:
 
 ```shell
 cd web/api
 gcloud run deploy follytest-api --source . --project follychess \
     --region us-west1 --allow-unauthenticated \
-    --set-env-vars API_KEY=<the-api-key>
+    --set-secrets API_KEY=follytest-api-key:latest
 ```
 
 Firestore rules and the frontend:

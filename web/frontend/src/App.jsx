@@ -12,8 +12,9 @@ export default function App() {
         <Outlet />
       </main>
       <footer>
-        FollyTest holds the test results for{" "}
-        <a href="https://follychess.com">FollyChess</a>.
+        FollyTest is the UI for{" "}
+        <a href="https://follychess.com">FollyChess</a> Sequential
+        Probability Ratio Test (SPRT) results.
       </footer>
     </>
   );

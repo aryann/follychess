@@ -22,9 +22,6 @@ export default function RunList() {
   return (
     <>
       <h1>Runs</h1>
-      <p className="lead">
-        SPRT self-play tests for the FollyChess engine, newest first.
-      </p>
       {runs.length === 0 && <p>No runs recorded yet.</p>}
       {runs.length > 0 && (
         <table>
