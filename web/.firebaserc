@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "follychess"
-  }
+  },
+  "targets": {
+    "follychess": {
+      "hosting": {
+        "app": [
+          "follychess"
+        ],
+        "api": [
+          "follychess-api"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
